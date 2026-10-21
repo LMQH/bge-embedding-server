@@ -1,0 +1,29 @@
+# macOS
+.DS_Store
+
+# Local secrets and environment settings
+.env
+.env.*
+!.env.example
+/config.toml
+
+# Local caches and model artifacts
+.cache/
+*.safetensors
+*.gguf
+*.onnx
+*.pt
+*.pth
+models/**/*.bin
+/models/bge-m3-mlx-8bit/
+/models/bge-m3-reference/
+__pycache__/
+.pytest_cache/
+*.egg-info/
+build/
+dist/
+*.log
+*.log.*
+
+# Independent upstream checkout; provenance is recorded in src/README.md
+/src/vendor/mlx/

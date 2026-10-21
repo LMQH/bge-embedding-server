@@ -1,0 +1,30 @@
+# Copy to a private file (mode 600). Paths are relative to this file.
+[server]
+host = "127.0.0.1"
+port = 8000
+
+[auth]
+api_key = ""
+
+[model]
+path = "models/bge-m3-mlx-8bit"
+
+[queue]
+max_waiting = 19
+wait_timeout_seconds = 30.0
+
+[limits]
+max_body_bytes = 1048576
+max_batch_size = 16
+max_tokens_per_text = 8192
+max_tokens_per_request = 32768
+
+[mlx]
+memory_limit_bytes = 2147483648
+cache_limit_bytes = 268435456
+
+[logging]
+file = "~/Library/Logs/bge-embedding/service.log"
+max_bytes = 5242880
+backup_count = 2
+level = "INFO"
