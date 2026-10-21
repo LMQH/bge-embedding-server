@@ -27,12 +27,14 @@
 | 目标解释器 | ${REMOTE_CONDA_ROOT}/envs/bge-embedding/bin/python |
 | 常驻配置 | ${REMOTE_HOME}/Library/LaunchAgents/local.bge-embedding.plist，权限 600，通过 --config 引用私有 TOML |
 | 运行配置 | ${REMOTE_PROJECT_DIR}/config.toml，权限 600，保存 Key 及其余 15 项运行参数；修改后重启生效 |
-| 日志 | ${REMOTE_HOME}/Library/Logs/bge-embedding/service.log，5 MiB / 2 备份 |
+| 日志 | ${REMOTE_PROJECT_DIR}/logs/service.log，5 MiB / 2 备份；2026-10-21 从 ~/Library/Logs 迁入项目，旧文件留存原处未删除 |
 | 依赖 | 两机使用同一带 wheel 哈希的 requirements.lock，pip check 均通过，无全局安装 |
 
 启动、停止、获取私有配置及基本调用见 [部署说明](deploy/README.md)。Key 未打印、未写入仓库；用户提供的登录密码未使用或保存。
 
 新版本由 `python -m bge_embedding --config <文件>` 启动。此次已在 M4 迁移旧 plist 的 Key、`0.0.0.0:8000` 和模型路径到 TOML，保留原访问凭据及地址；新 plist 只引用配置文件，不再保存旧环境变量。旧源码与私有 plist 已备份在目标项目的 `.cache/deploy-config-20261021-j_kuhy_5/`，目录权限 700，归档与 plist 权限 600。
+
+2026-10-21 按用户要求把过程文件归口到项目工作路径：服务日志默认从 `~/Library/Logs/bge-embedding/service.log` 改为项目内 `logs/service.log`（相对配置文件解析），M4 已更新 `config.toml` 并重启，冒烟通过；约定常驻轮转日志归 `logs/`、一次性诊断测量与备份产物归 `.cache/`，均不入版本控制，见 [部署说明](deploy/README.md)。
 
 ## 当前验证范围
 

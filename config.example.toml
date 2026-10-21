@@ -24,7 +24,7 @@ memory_limit_bytes = 2147483648
 cache_limit_bytes = 268435456
 
 [logging]
-file = "~/Library/Logs/bge-embedding/service.log"
+file = "logs/service.log"
 max_bytes = 5242880
 backup_count = 2
 level = "INFO"

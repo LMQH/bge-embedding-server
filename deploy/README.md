@@ -68,7 +68,7 @@ launchctl bootstrap gui/$(id -u) "$HOME/Library/LaunchAgents/local.bge-embedding
 
 `RunAtLoad` 在用户登录时启动；`KeepAlive.SuccessfulExit=false` 在异常退出后恢复。重启后必须登录该用户。手动停止用 `bootout`，不要用 kill 模拟正常停机。本轮不安排故障注入测试。
 
-日志文件、大小、备份数和级别从 `[logging]` 加载；示例为 `~/Library/Logs/bge-embedding/service.log`、5 MiB、2 份备份、INFO。launchd 的 stdout/stderr 指向 `/dev/null`；应用文件日志保留安全错误类别，无请求正文、Key、向量或底层异常文本。收到正常退出信号先拒绝新请求、释放等待任务，再等待当前 GPU 计算完成。
+日志文件、大小、备份数和级别从 `[logging]` 加载；示例为项目内 `logs/service.log`、5 MiB、2 份备份、INFO。相对路径以配置文件所在目录为基准，两机 `config.toml` 均在项目根，日志即落在项目工作路径下。过程文件归口：`logs/` 只放常驻轮转日志；一次性诊断、测量与备份产物放 `.cache/`，两者均不入版本控制。launchd 的 stdout/stderr 指向 `/dev/null`；应用文件日志保留安全错误类别，无请求正文、Key、向量或底层异常文本。收到正常退出信号先拒绝新请求、释放等待任务，再等待当前 GPU 计算完成。
 
 ## 基本冒烟
 

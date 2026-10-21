@@ -9,6 +9,7 @@
 
 # Local caches and model artifacts
 .cache/
+/logs/
 *.safetensors
 *.gguf
 *.onnx

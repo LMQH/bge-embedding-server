@@ -15,7 +15,6 @@ def config_file(tmp_path):
     (model / "tokenizer_config.json").write_text(json.dumps({"model_max_length": 8192}))
     template = (Path(__file__).resolve().parents[1] / "config.example.toml").read_text()
     template = template.replace('api_key = ""', 'api_key = "test-key-sentinel-950d"')
-    template = template.replace('file = "~/Library/Logs/bge-embedding/service.log"', 'file = "logs/service.log"')
     target = tmp_path / "config.toml"
     target.write_text(template)
     target.chmod(0o600)
