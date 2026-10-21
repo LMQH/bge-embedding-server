@@ -67,16 +67,16 @@ def create_app(config, embedder_factory=None):
                 if len(body) + len(chunk) > config.limits.max_body_bytes:
                     raise APIError("request_too_large")
                 body.extend(chunk)
-            texts = parse_body(body, config.limits)
+            texts, return_sparse = parse_body(body, config.limits)
             size = len(texts)
             tokens = await asyncio.to_thread(app.state.embedder.tokenize, texts)
             total = check_tokens(tokens, config.limits)
-            job = scheduler.submit(tokens)
+            job = scheduler.submit(tokens, return_sparse)
             watcher = asyncio.create_task(disconnected(request))
             done, _ = await asyncio.wait([job.result, watcher], return_when=asyncio.FIRST_COMPLETED)
             if watcher in done:
                 raise ClientDisconnect()
-            response = embedding_response(job.result.result(), total)
+            response = embedding_response(job.result.result(), total, return_sparse)
             status, code = 200, "ok"
             return response
         except APIError as error:

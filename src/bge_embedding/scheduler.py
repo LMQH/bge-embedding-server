@@ -9,6 +9,7 @@ from .api import APIError
 @dataclass(eq=False)
 class Job:
     tokens: list[list[int]]
+    return_sparse: bool
     result: asyncio.Future
     timer: asyncio.TimerHandle | None = None
 
@@ -23,13 +24,13 @@ class Scheduler:
         self.task = None
         self.closing = False
 
-    def submit(self, tokens):
+    def submit(self, tokens, return_sparse=False):
         if self.closing:
             raise APIError("model_unavailable")
         if self.active is not None and len(self.waiting) >= self.max_waiting:
             raise APIError("queue_full")
         loop = asyncio.get_running_loop()
-        job = Job(tokens, loop.create_future())
+        job = Job(tokens, return_sparse, loop.create_future())
         if self.active is None:
             self.active = job
             self.task = asyncio.create_task(self._run())
@@ -58,7 +59,7 @@ class Scheduler:
             job = self.active
             try:
                 value = await asyncio.get_running_loop().run_in_executor(
-                    self.executor, self.infer, job.tokens)
+                    self.executor, self.infer, job.tokens, job.return_sparse)
             except Exception:
                 if not job.result.done():
                     job.result.set_exception(APIError("inference_failed"))

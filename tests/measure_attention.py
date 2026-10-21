@@ -41,7 +41,7 @@ def main():
         mx.reset_peak_memory()
         before = swap_snapshot()
         started = time.monotonic()
-        vector = model.embed([ids])[0]
+        vector = model.embed([ids])[0].dense
         elapsed = time.monotonic() - started
         after = swap_snapshot()
         vectors.append(vector)

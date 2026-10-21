@@ -1,6 +1,7 @@
 import json
 from pathlib import Path
 
+import mlx.core as mx
 import pytest
 
 from bge_embedding.config import load_config
@@ -11,6 +12,8 @@ def config_file(tmp_path):
     model = tmp_path / "models/bge-m3-mlx-8bit"
     model.mkdir(parents=True)
     (model / "model.safetensors").touch()
+    mx.save_safetensors(str(model / "sparse_linear.safetensors"),
+                        {"weight": mx.zeros((1, 1024)), "bias": mx.zeros((1,))})
     (model / "config.json").write_text(json.dumps({"max_position_embeddings": 8194, "pad_token_id": 1}))
     (model / "tokenizer_config.json").write_text(json.dumps({"model_max_length": 8192}))
     template = (Path(__file__).resolve().parents[1] / "config.example.toml").read_text()

@@ -15,10 +15,19 @@ def test_real_embedder_single_batch_and_lengths():
     model = Embedder(config.model.path, config.mlx)
     texts = ["知识库入库", "How do plants use sunlight?"]
     ids = model.tokenize(texts)
-    batch = np.asarray(model.embed(ids))
-    single = np.asarray([model.embed([item])[0] for item in ids])
+    batch = np.asarray([item.dense for item in model.embed(ids)])
+    single = np.asarray([model.embed([item])[0].dense for item in ids])
     assert batch.shape == (2, 1024) and np.isfinite(batch).all()
     assert np.max(np.abs(np.linalg.norm(batch, axis=1) - 1)) <= 1e-5
     assert np.all(np.sum(batch * single, axis=1) >= 0.9999)
+
+    sparse = model.embed(ids, return_sparse=True)
+    assert all(item.sparse for item in sparse)
+    assert all(key.isdigit() and value > 0
+               for item in sparse for key, value in item.sparse.items())
+    assert all(int(key) not in model.special_ids
+               for item in sparse for key in item.sparse)
+    assert np.array_equal(np.asarray([item.dense for item in sparse]), batch)
+
     for length in (8192, 8193):
         assert len(model.tokenize(["test " * (length - 2)])[0]) == length

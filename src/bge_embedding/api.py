@@ -1,4 +1,4 @@
-"""Strict request validation and safe public errors (SPEC-0001)."""
+"""Strict request validation and safe public errors (SPEC-0001 / SPEC-0002)."""
 import json
 
 from starlette.responses import JSONResponse
@@ -27,17 +27,21 @@ class APIError(Exception):
                                       "param": self.param, "code": self.code}}, status)
 
 
-def parse_body(body: bytes, limits) -> list[str]:
+def parse_body(body: bytes, limits) -> tuple[list[str], bool]:
     try:
         data = json.loads(body)
     except (ValueError, UnicodeError, RecursionError):
         raise APIError("invalid_request") from None
-    if not isinstance(data, dict) or set(data) - {"model", "input", "encoding_format"}:
+    if not isinstance(data, dict) or set(data) - {"model", "input", "encoding_format",
+                                                  "return_sparse"}:
         raise APIError("invalid_request")
     if data.get("model") != "bge-m3":
         raise APIError("invalid_request", "model")
     if data.get("encoding_format", "float") != "float":
         raise APIError("invalid_request", "encoding_format")
+    return_sparse = data.get("return_sparse", False)
+    if type(return_sparse) is not bool:
+        raise APIError("invalid_request", "return_sparse")
     texts = data.get("input")
     if isinstance(texts, str):
         texts = [texts]
@@ -52,7 +56,7 @@ def parse_body(body: bytes, limits) -> list[str]:
             text.encode("utf-8")
         except UnicodeError:
             raise APIError("invalid_request", f"input[{i}]") from None
-    return texts
+    return texts, return_sparse
 
 
 def check_tokens(token_ids: list[list[int]], limits) -> int:
@@ -65,8 +69,14 @@ def check_tokens(token_ids: list[list[int]], limits) -> int:
     return total
 
 
-def embedding_response(vectors, total):
-    return JSONResponse({"object": "list", "model": "bge-m3", "data": [
-        {"object": "embedding", "index": i, "embedding": vector}
-        for i, vector in enumerate(vectors)
-    ], "usage": {"prompt_tokens": total, "total_tokens": total}})
+def embedding_response(embeddings, total, return_sparse=False):
+    data = []
+    for i, embedding in enumerate(embeddings):
+        item = {"object": "embedding", "index": i, "embedding": embedding.dense}
+        if return_sparse:
+            if embedding.sparse is None:
+                raise RuntimeError("Missing sparse output.")
+            item["sparse"] = embedding.sparse
+        data.append(item)
+    return JSONResponse({"object": "list", "model": "bge-m3", "data": data,
+                         "usage": {"prompt_tokens": total, "total_tokens": total}})

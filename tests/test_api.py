@@ -11,6 +11,7 @@ import pytest
 
 from bge_embedding.app import create_app
 from bge_embedding.config import load_config
+from bge_embedding.inference import Embedding
 
 KEY = "test-key-sentinel-950d"
 TEXT = "user-text-sentinel-781b"
@@ -28,13 +29,17 @@ class FakeEmbedder:
     def tokenize(self, texts):
         return [[ord(t[0])] * (len(t) + 2) for t in texts]
 
-    def embed(self, tokens):
+    def embed(self, tokens, return_sparse=False):
         self.calls.append(tokens)
         self.started.set()
         assert self.gate.wait(10), "Test did not release inference"
         if self.fail:
             raise RuntimeError(TEXT + KEY)
-        return [[1.0] + [0.0] * 1023 for _ in tokens]
+        result = []
+        for ids in tokens:
+            sparse = {str(ids[0]): 0.5, str(ids[1]): 0.25} if return_sparse else None
+            result.append(Embedding([1.0] + [0.0] * 1023, sparse))
+        return result
 
 
 @asynccontextmanager
@@ -46,8 +51,8 @@ async def client_for(settings, model=None):
             yield client, model, app
 
 
-def payload(text="你好"):
-    return {"model": "bge-m3", "input": text}
+def payload(text="你好", **extra):
+    return {"model": "bge-m3", "input": text, **extra}
 
 
 @pytest.mark.smoke
@@ -66,6 +71,27 @@ async def test_success_preserves_text_usage_and_order(settings):
         assert (await client.get("/healthz")).json() == {"status": "ready"}
 
 
+@pytest.mark.smoke
+async def test_sparse_is_opt_in_and_preserves_order(settings):
+    async with client_for(settings) as (client, model, _):
+        texts = ["中文", "English"]
+        r = await client.post("/v1/embeddings", headers=AUTH,
+                              json=payload(texts, return_sparse=True))
+        assert r.status_code == 200
+        data = r.json()["data"]
+        assert [item["index"] for item in data] == [0, 1]
+        assert all(item["sparse"] for item in data)
+        assert all(key.isdigit() and value > 0
+                   for item in data for key, value in item["sparse"].items())
+        assert data[0]["sparse"] != data[1]["sparse"]
+        assert all(len(item["embedding"]) == 1024 for item in data)
+
+        for extra in ({}, {"return_sparse": False}):
+            r = await client.post("/v1/embeddings", headers=AUTH, json=payload(texts, **extra))
+            assert r.status_code == 200
+            assert all("sparse" not in item for item in r.json()["data"])
+
+
 @pytest.mark.parametrize("value", [None, "", " \n\t", [], 12, True, [1], [["x"]], ["ok", None], ["ok", " "]])
 async def test_invalid_input_never_infers(value, settings):
     async with client_for(settings) as (client, model, _):
@@ -76,6 +102,9 @@ async def test_invalid_input_never_infers(value, settings):
 
 @pytest.mark.parametrize("change", [{"model": None}, {"model": "other"}, {"model": ["bge-m3"]},
                                     {"encoding_format": "base64"}, {"encoding_format": None},
+                                    {"return_sparse": "true"}, {"return_sparse": 1},
+                                    {"return_sparse": None}, {"return_sparse": []},
+                                    {"return_sparse": {}},
                                     {"user": "x"}, {"dimensions": 1024}])
 async def test_strict_fields(change, settings):
     async with client_for(settings) as (client, model, _):
