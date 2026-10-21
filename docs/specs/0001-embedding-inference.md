@@ -4,6 +4,7 @@
 - 确认依据：Q1～Q14 及最终原生环境确认；用户在 Q13 接受最小规则并授权落实字段默认值、错误码与基本容量限制。下列具体默认值和数值门槛由实施侧制定，不冒充用户逐项指定或实测结果。
 - 需求：[PRD-0001](../prd/0001-embedding-service.md)，REQ-001～REQ-012。
 - 决策：[ADR-0002](../adr/0002-bge-m3-mlx.md)、[ADR-0003](../adr/0003-native-python-runtime.md)。实施：[PLAN-0002](../plans/0002-minimal-service.md)。
+- 2026-10-21 范围变更：dense + sparse 双路输出由 [PRD-0002](../prd/0002-dense-sparse-embeddings.md) 纳入范围，扩展契约见 [SPEC-0002](0002-dense-sparse-output.md)；本契约继续描述 dense 基础行为，双路字段与 sparse 语义以 SPEC-0002 为准。
 
 ## 目标与运行前提
 

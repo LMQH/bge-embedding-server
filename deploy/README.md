@@ -16,7 +16,15 @@ python -m pip check
 python -m pytest -q
 ```
 
-完整锁包含运行与基本冒烟依赖，默认测试只有 2 项 smoke；不需要官方参考权重或 Torch。模型获取与固定 revision 见 [models/README](../models/README.md)。不安装 `src/vendor/mlx`。
+完整锁包含运行与基本冒烟依赖，默认测试只有 3 项 smoke；不需要官方参考权重或 Torch。模型获取与固定 revision 见 [models/README](../models/README.md)。不安装 `src/vendor/mlx`。
+
+双路输出还需要官方 BGE-M3 稀疏头。在项目根目录执行：
+
+```sh
+python deploy/fetch_sparse_head.py
+```
+
+脚本会校验官方 `sparse_linear.pt` 并生成 `models/bge-m3-mlx-8bit/sparse_linear.safetensors`；没有网络时可用 `--pt` 指定已下载文件。该文件是服务启动的前置条件，缺失时启动失败。
 
 ## 私有配置与本机启动
 
@@ -46,7 +54,13 @@ python -m bge_embedding --config "$PWD/config.toml"
 {"model":"bge-m3","input":["知识库文档","English query"],"encoding_format":"float"}
 ```
 
-接口只接受上述三个字段，SDK 客户端显式传 `encoding_format="float"`。原始输入不落盘，超长拒绝。启动失败退出并记录安全类别；运行期间不下载模型。
+接口只接受 `model`、`input`、`encoding_format` 和可选的 `return_sparse`，SDK 客户端显式传 `encoding_format="float"`。原始输入不落盘，超长拒绝。`return_sparse=true` 时每个结果额外返回 `sparse` 对象，键为 token id 字符串，值为正权重；默认不返回。示例：
+
+```json
+{"model":"bge-m3","input":["知识库文档"],"return_sparse":true}
+```
+
+启动失败退出并记录安全类别；运行期间不下载模型。
 
 ## 用户级 launchd
 
@@ -75,9 +89,9 @@ launchctl bootstrap gui/$(id -u) "$HOME/Library/LaunchAgents/local.bge-embedding
 服务启动后，在项目环境执行：
 
 ```sh
-python tests/verify_http.py --config "$PWD/config.toml"
+python tests/verify_http.py --config "$PWD/config.toml" --sparse --long
 ```
 
-脚本读取同一 TOML 中的 Key、地址和端口；目标机可用 `--launchd` 替代 `--config`，从 plist 找到配置文件。可另加 `--url` 覆盖探测地址，适用于从另一台机器连接。只检查健康状态、缺 Key 被拒绝、单条 / 两条批量成功及向量基本形状与数值。
+脚本读取同一 TOML 中的 Key、地址和端口；目标机可用 `--launchd` 替代 `--config`，从 plist 找到配置文件。可另加 `--url` 覆盖探测地址，适用于从另一台机器连接。默认检查健康状态、缺 Key 被拒绝、单条 / 两条批量成功及向量基本形状与数值；`--sparse` 额外请求并检查稀疏输出，`--long` 额外发送 8192-token 输入。
 
 按照用户要求，不默认执行参考模型比较、完整测试套件、极限长度、压力测试或故障注入。已有扩展测试退出默认执行范围；仅在出现相关问题并明确需要时使用。实际结果与未验证项见 [Plan](../docs/plans/0002-minimal-service.md)。

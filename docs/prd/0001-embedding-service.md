@@ -3,6 +3,7 @@
 - 状态：已确认，2026-10-15；2026-10-21 用户确认运行参数集中配置需求。
 - 确认来源：本次 Q1～Q14 问询。Q1～Q11 确认使用场景、接口方向及运行原则；Q13 接受最小接口规则并授权实施侧落实工程默认值，Q14 选择用户级 launchd；Docker 问题说明后，用户接受 Q12 原生 Python 方案，并强调本机 Miniconda / 目标机 Miniforge 均使用独立虚拟环境。
 - 关联：[ADR-0002](../adr/0002-bge-m3-mlx.md) · [ADR-0003](../adr/0003-native-python-runtime.md) · [SPEC-0001](../specs/0001-embedding-inference.md) · [PLAN-0002](../plans/0002-minimal-service.md)
+- 2026-10-21 范围变更：dense + sparse 双路输出由 [PRD-0002](0002-dense-sparse-embeddings.md) 定义；本文件其余需求继续有效。
 
 ## 背景与使用场景
 

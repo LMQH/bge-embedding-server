@@ -23,6 +23,23 @@ hf download mlx-community/bge-m3-mlx-8bit \
 
 应保留同一 revision 的配置、tokenizer 和权重索引。模型实现及 CLS pooling、归一化一致性要求见[参考资料](../docs/references/0001-mlx-framework-and-model-formats.md)。
 
+## BGE-M3 稀疏头
+
+当前 8bit 快照只包含 encoder / pooler，不含 sparse head。双路输出需要官方 BGE-M3 检查点单独提供的稀疏头：
+
+- 来源：[BAAI/bge-m3](https://huggingface.co/BAAI/bge-m3) 的 `sparse_linear.pt`。
+- Revision：`5617a9f61b028005a4858fdac845db406aefb181`。
+- 原始文件：3,516 字节；SHA-256 `45c93804d2142b8f6d7ec6914ae23a1eee9c6a1d27d83d908a20d2afb3595ad9`。
+- 内容：`weight`（1×1024）+ `bias`（1），fp16；不含主模型权重。
+
+在项目根目录运行：
+
+```sh
+python deploy/fetch_sparse_head.py
+```
+
+脚本下载并校验官方文件，转换为 `models/bge-m3-mlx-8bit/sparse_linear.safetensors`（4,251 字节）。离线或已下载时可用 `--pt /path/to/sparse_linear.pt`。不要将该文件命名为 `model*.safetensors`，否则 `mlx_embeddings` 会把它当作主模型权重加载。权重不纳入版本控制。
+
 ## 当前使用范围
 
 服务使用上面的现有 8bit 快照，未改动其配置、tokenizer 或权重。官方参考对照已按用户要求退出首版范围，额外下载的参考权重已移除；默认安装和部署不需要下载另一份模型，详见 [ADR-0004](../docs/adr/0004-minimal-verification.md)。早期对照的已执行摘要仅保留在 [PLAN-0002](../docs/plans/0002-minimal-service.md)。

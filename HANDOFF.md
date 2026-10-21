@@ -8,12 +8,14 @@
 
 首版已实现并部署到 Mac mini M4。[PLAN-0002](docs/plans/0002-minimal-service.md) 已完成；用户随后报告的长输入内存问题已修复并部署，定向证据见 [PLAN-0003](docs/plans/0003-fused-attention.md)。默认验收仍保持基本服务冒烟。
 
-2026-10-21 按用户要求，16 项运行参数已集中到私有 TOML，并已同步到 M4、迁移配置和重启服务。线上现为 1 个执行位 + 19 个等待位，总计 20 个位置。两机各自项目环境的 65 项相关检查通过，M4 及本机经 Tailscale 的真实 HTTP 基本冒烟均通过，详见 [PLAN-0005](docs/plans/0005-file-configuration.md)；队列扩充的前序记录见 [PLAN-0004](docs/plans/0004-queue-capacity.md)。继续使用现有服务，当前无待完成部署步骤。
+2026-10-21 按用户要求，16 项运行参数已集中到私有 TOML，并已同步到 M4、迁移配置和重启服务。线上现为 1 个执行位 + 19 个等待位，总计 20 个位置。两机各自项目环境的 65 项相关检查通过，M4 及本机经 Tailscale 的真实 HTTP 基本冒烟均通过，详见 [PLAN-0005](docs/plans/0005-file-configuration.md)；队列扩充的前序记录见 [PLAN-0004](docs/plans/0004-queue-capacity.md)。继续使用现有服务；双路输出的 M4 部署方案已落盘，当前明确不执行、无需审批。
+
+2026-10-21 新增 [PRD-0002](docs/prd/0002-dense-sparse-embeddings.md)，将 dense + sparse 双路输出纳入范围，采用 BGE-M3 原生稀疏头。本机实现、测试与文档已完成，[PLAN-0007](docs/plans/0007-dense-sparse-output.md) 记录了 8192 tokens 的本地证据；M4 未部署，线上仍只返回 dense。按用户要求，Plan、实现与测试已推送到 GitHub `main`，当前不执行 M4 部署。
 
 - 服务地址：`http://<TAILSCALE_IP>:8000`（Tailscale / 内网）。
 - 接口：`POST /v1/embeddings`，共享 API Key；`GET /healthz` 无需 Key。
 - 连接方式、请求参数与接口限制见 [推理服务连接与使用说明](docs/service-connection.md)。
-- 使用项目原有 BGE-M3 MLX 8bit 权重，返回 1024 维 dense；调用方负责文件解析与切分。
+- 使用项目原有 BGE-M3 MLX 8bit 权重，返回 1024 维 dense；本机版本可选 sparse，M4 线上未部署。调用方负责文件解析与切分。
 - 原生 Python / FastAPI / Uvicorn 单 worker，MLX Apple GPU；单模型串行、有界等待、必要错误和轮转日志。注意力强制走融合内核并逐层求值，保留原权重和双向语义。
 - M4 上由用户级 launchd 管理；需要相应用户保持登录，机器睡眠时不承诺可访问。未修改系统电源设置。
 
@@ -40,7 +42,8 @@
 
 用户明确要求“一切从简”，见 [ADR-0004](docs/adr/0004-minimal-verification.md)。官方参考对照及复杂测试已退出首版必做范围；额外参考权重、专用验证脚本及 Torch 专用依赖已移除。
 
-- 默认测试：2 项基本 smoke 通过。
+- 默认测试：3 项基本 smoke 通过。
+- 双路输出本机验证：72 项非 real 通过；2 项 real 通过；8192 tokens dense-only 5.133 秒 / 977.4 MiB，dense+sparse 4.777 秒 / 977.4 MiB，dense 最大绝对差 0.0；本机真实 HTTP 含 sparse 与 8192 tokens 冒烟通过（4.88 秒）。详见 [PLAN-0007](docs/plans/0007-dense-sparse-output.md)。M4 双路输出未部署、未实测。
 - 已通过本机到 M4 的真实 HTTP 调用：健康状态、缺 Key 返回 401、正确 Key 的单条 / 两条批量、1024 维有限归一化向量。
 - 针对实际内存问题新增 1 项定向回归：旧实现 2048-token Metal 活跃分配峰值 1674.8 MiB，修复后 677.3 MiB；本机回归通过，M4 独立测量一致。
 - M4 修复后 8192-token 样本推理约 4.79 秒，Metal 活跃分配峰值 977.4 MiB；真实 HTTP 返回 200 / 8192 tokens / 1024 维，约 4.71 秒。4 个可安全复测的修复前后样本余弦相似度均高于 0.999999999。
@@ -52,4 +55,4 @@
 
 先使用现有服务。只有实际问题或用户明确需求才增加实现、优化或对应测试；不要自动恢复参考评测、完整边界套件或复杂验收流程。
 
-2026-10-21 按用户要求初始化项目 Git，分支为 `main`，`origin` 关联 [LMQH/bge-embedding-server](https://github.com/LMQH/bge-embedding-server)。模型权重、缓存、凭据和独立上游 MLX 克隆继续排除在版本控制之外；初始化检查见 [PLAN-0001](docs/plans/0001-project-foundation.md)。README 仅保留总览与导航，后续状态在本文件维护。
+2026-10-21 按用户要求初始化项目 Git，分支为 `main`，`origin` 关联 [LMQH/bge-embedding-server](https://github.com/LMQH/bge-embedding-server)。模型权重、缓存、凭据和独立上游 MLX 克隆继续排除在版本控制之外；初始化检查见 [PLAN-0001](docs/plans/0001-project-foundation.md)。本次双路输出的 Plan、实现与测试已推送到 `origin/main`，提交历史见 GitHub；M4 未执行。README 仅保留总览与导航，后续状态在本文件维护。

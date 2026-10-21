@@ -12,10 +12,10 @@
 
 | 类型 | 回答的问题 | 当前文档 | 模板 |
 | --- | --- | --- | --- |
-| PRD | 为什么做、为谁做、范围与成功标准是什么 | [PRD-0001：嵌入推理服务](prd/0001-embedding-service.md) | [PRD 模板](prd/_template.md) |
-| ADR | 为什么选择某种方案，考虑过哪些替代方案 | [ADR-0001：SDD 开发理念](adr/0001-specification-driven-development.md)、[ADR-0002：BGE-M3 与 MLX](adr/0002-bge-m3-mlx.md)、[ADR-0003：原生 Python 与 conda](adr/0003-native-python-runtime.md)、[ADR-0004：首版基本冒烟](adr/0004-minimal-verification.md) | [ADR 模板](adr/_template.md) |
-| Spec | 系统必须表现出什么可验证行为 | [SPEC-0001：嵌入推理契约](specs/0001-embedding-inference.md) | [Spec 模板](specs/_template.md) |
-| Plan | 按什么顺序实施，如何验证与交付 | [PLAN-0001：项目初始化与设计收敛](plans/0001-project-foundation.md)、[PLAN-0002：实现轻量嵌入服务](plans/0002-minimal-service.md)、[PLAN-0003：长输入注意力修复](plans/0003-fused-attention.md)、[PLAN-0004：扩充等待队列](plans/0004-queue-capacity.md)、[PLAN-0005：统一文件配置](plans/0005-file-configuration.md)、[PLAN-0006：接口性能测试](plans/0006-performance-test.md) | [Plan 模板](plans/_template.md) |
+| PRD | 为什么做、为谁做、范围与成功标准是什么 | [PRD-0001：嵌入推理服务](prd/0001-embedding-service.md)、[PRD-0002：稠密与稀疏双路嵌入输出](prd/0002-dense-sparse-embeddings.md) | [PRD 模板](prd/_template.md) |
+| ADR | 为什么选择某种方案，考虑过哪些替代方案 | [ADR-0001：SDD 开发理念](adr/0001-specification-driven-development.md)、[ADR-0002：BGE-M3 与 MLX](adr/0002-bge-m3-mlx.md)、[ADR-0003：原生 Python 与 conda](adr/0003-native-python-runtime.md)、[ADR-0004：首版基本冒烟](adr/0004-minimal-verification.md)、[ADR-0005：稀疏输出采用 BGE-M3 原生稀疏头](adr/0005-native-sparse-head.md) | [ADR 模板](adr/_template.md) |
+| Spec | 系统必须表现出什么可验证行为 | [SPEC-0001：嵌入推理契约](specs/0001-embedding-inference.md)、[SPEC-0002：稠密与稀疏双路输出契约](specs/0002-dense-sparse-output.md) | [Spec 模板](specs/_template.md) |
+| Plan | 按什么顺序实施，如何验证与交付 | [PLAN-0001：项目初始化与设计收敛](plans/0001-project-foundation.md)、[PLAN-0002：实现轻量嵌入服务](plans/0002-minimal-service.md)、[PLAN-0003：长输入注意力修复](plans/0003-fused-attention.md)、[PLAN-0004：扩充等待队列](plans/0004-queue-capacity.md)、[PLAN-0005：统一文件配置](plans/0005-file-configuration.md)、[PLAN-0006：接口性能测试](plans/0006-performance-test.md)、[PLAN-0007：稠密与稀疏双路输出实施](plans/0007-dense-sparse-output.md) | [Plan 模板](plans/_template.md) |
 | Handoff | 当前进展、待定事项、阻塞与下一步是什么 | [项目进度与交接](../HANDOFF.md) | — |
 | 使用说明 | 如何连接和调用服务 | [推理服务连接与使用说明](service-connection.md) | — |
 | 参考资料 | 外部资料、技术事实与待验证事项是什么 | [MLX 框架、模型格式与官方资料](references/0001-mlx-framework-and-model-formats.md)、[源码接入与代码结构](references/0002-source-layout.md) | — |
