@@ -6,6 +6,7 @@
 .env.*
 !.env.example
 /config.toml
+/docs/service-connection.local.md
 
 # Local caches and model artifacts
 .cache/

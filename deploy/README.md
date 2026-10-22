@@ -68,7 +68,8 @@ python -m bge_embedding --config "$PWD/config.toml"
 
 ```sh
 launchctl bootstrap gui/$(id -u) "$HOME/Library/LaunchAgents/local.bge-embedding.plist"
-curl --fail http://<TAILSCALE_IP>:8000/healthz
+# BGE_BASE_URL 由部署方私下提供，例如 http://<TAILSCALE_IP>:8000
+curl --fail "${BGE_BASE_URL}/healthz"
 ```
 
 plist 只保存该机解释器和 `--config` 绝对路径等启动信息，Key 与运行参数统一来自 TOML。迁移旧服务时，先按下文 `bootout` 停止旧任务，再生成新 plist、编辑并校验配置，然后 bootstrap；保留原 `server.host`、端口及模型路径，以免意外改变服务地址。

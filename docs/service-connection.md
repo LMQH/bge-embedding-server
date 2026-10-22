@@ -1,5 +1,7 @@
 # 推理服务连接与使用说明
 
+本文中的 `<TAILSCALE_IP>`、`${REMOTE_PROJECT_DIR}` 均为脱敏占位符，不代表可直接使用的地址或路径。实际连接信息由部署方私下提供；如需本地记录，使用已被 Git 忽略的 `docs/service-connection.local.md`，不提交到仓库。API Key 保留在私有 `config.toml` 中。
+
 2026-10-21 已将配置化版本部署到 M4 并重启。双路输出已在本机实现并通过验证，但 M4 线上仍只返回 dense；当前不部署，以下限制与字段以线上为准，双路契约见 [SPEC-0002](specs/0002-dense-sparse-output.md)。配置和启动方式见 [部署说明](../deploy/README.md)。
 
 | 项目 | 配置 |

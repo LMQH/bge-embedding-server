@@ -96,16 +96,17 @@ cp -a src tests deploy docs HANDOFF.md config.toml \
   .cache/dual-output-YYYYMMDD-HHMMSS/
 chmod 700 .cache/dual-output-YYYYMMDD-HHMMSS
 
-# 1. 同步与校验（在本机执行，目标为 M4；具体主机名按可用访问方式）
+# 1. 同步与校验（在本机执行，目标为 M4）
+# REMOTE_SSH 与 REMOTE_PROJECT_DIR 从私有连接信息设置，不提交真实值。
 # 先 dry-run；确认输出只包含预期文件后，去掉 --dry-run 执行。
 rsync -avR --dry-run --exclude __pycache__ --exclude .pytest_cache --exclude .DS_Store \
   src/bge_embedding tests deploy docs models/README.md HANDOFF.md \
-  ${REMOTE_USER}@<M4>:${REMOTE_PROJECT_DIR}/
+  "${REMOTE_SSH}:${REMOTE_PROJECT_DIR}/"
 rsync -avR --exclude __pycache__ --exclude .pytest_cache --exclude .DS_Store \
   src/bge_embedding tests deploy docs models/README.md HANDOFF.md \
-  ${REMOTE_USER}@<M4>:${REMOTE_PROJECT_DIR}/
+  "${REMOTE_SSH}:${REMOTE_PROJECT_DIR}/"
 scp models/bge-m3-mlx-8bit/sparse_linear.safetensors \
-  ${REMOTE_USER}@<M4>:${REMOTE_PROJECT_DIR}/models/bge-m3-mlx-8bit/
+  "${REMOTE_SSH}:${REMOTE_PROJECT_DIR}/models/bge-m3-mlx-8bit/"
 
 # 2. 启动前检查
 python -m pytest -q
