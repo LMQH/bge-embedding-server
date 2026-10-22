@@ -14,6 +14,8 @@
 
 2026-10-21 新增 [PRD-0002](docs/prd/0002-dense-sparse-embeddings.md)，将 dense + sparse 双路输出纳入范围，采用 BGE-M3 原生稀疏头。本机实现、测试与文档已完成，[PLAN-0007](docs/plans/0007-dense-sparse-output.md) 记录了 8192 tokens 的本地证据；M4 未部署，线上仍只返回 dense。按用户要求，Plan、实现与测试已推送到 GitHub `main`，当前不执行 M4 部署。
 
+2026-10-22 新增 [PRD-0003](docs/prd/0003-result-cache.md)：进程内嵌入结果缓存（[ADR-0006](docs/adr/0006-in-memory-result-cache.md)，契约 [SPEC-0003](docs/specs/0003-result-cache.md)）。实现与 23 项新增测试全部通过，并按用户授权部署至 M4 线上验证通过；独立 code-review 审查通过并完成修复复验。按 PLAN-0006 同一标准复测延迟（缓存启用 / 禁用两轮）：三档 P50 25.1 / 273.9 / 2616 ms（基线）→ 4.6 / 7.1 / 6.8 ms（缓存启用），未命中路径无回退（945t 冷 273 ms ≈ 基线）；并发 20 由 662 请求 / 3.68 QPS 升至 135,047 请求 / 750 QPS（命中主导口径）；5xx 与预期外 429 均为 0，swap 无增长。配置增至 18 项（`[cache]` 开关与字节上限），本机与 M4 的私有配置均已更新。详细证据见 [PLAN-0009](docs/plans/0009-result-cache.md)。M4 线上现为缓存版本；本机公钥已装入 M4 `authorized_keys`，后续部署免密。
+
 - 服务地址：`http://<TAILSCALE_IP>:8000`（Tailscale / 内网）。
 - 接口：`POST /v1/embeddings`，共享 API Key；`GET /healthz` 无需 Key。
 - 连接方式、请求参数与接口限制见 [推理服务连接与使用说明](docs/service-connection.md)。

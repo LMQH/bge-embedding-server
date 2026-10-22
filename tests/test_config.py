@@ -30,12 +30,23 @@ from bge_embedding.config import load_config
     ('port = 8000\n', ''),
     ('[queue]', '[unknown]'),
     ('[server]', '[server'),
+    ('enabled = true', 'enabled = "yes"'),
+    ('enabled = true', 'enabled = 1'),
+    ('max_bytes = 268435456', 'max_bytes = 0'),
+    ('max_bytes = 268435456', 'max_bytes = 1.0'),
+    ('[cache]\n', ''),
+    ('enabled = true', 'enbled = true'),
 ])
 def test_invalid_configuration_is_rejected_without_values(config_file, before, after):
     config_file.write_text(config_file.read_text().replace(before, after))
     with pytest.raises(ValueError) as error:
         load_config(config_file)
     assert "test-key-sentinel-950d" not in str(error.value)
+
+
+def test_cache_configuration_loads(settings):
+    assert settings.cache.enabled is True
+    assert settings.cache.max_bytes == 268435456
 
 
 def test_paths_resolve_from_configuration_directory(config_file, monkeypatch, tmp_path):

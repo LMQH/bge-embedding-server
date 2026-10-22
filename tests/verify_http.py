@@ -17,6 +17,8 @@ def main():
                         help="Also request and check sparse output.")
     parser.add_argument("--long", action="store_true",
                         help="Also send an 8192-token input.")
+    parser.add_argument("--warm", action="store_true",
+                        help="Send one fresh text twice; the second must be an identical cache hit.")
     source = parser.add_mutually_exclusive_group(required=True)
     source.add_argument("--config")
     source.add_argument("--launchd", action="store_true")
@@ -61,6 +63,18 @@ def main():
             assert data["usage"]["prompt_tokens"] == data["usage"]["total_tokens"] > 0
             for item in data["data"]:
                 check_item(item)
+        if args.warm:
+            probe = dict(request, input="缓存冷热对比文本")
+            started = time.monotonic()
+            cold = client.post("/v1/embeddings", headers=headers, json=probe)
+            cold_seconds = time.monotonic() - started
+            started = time.monotonic()
+            warm = client.post("/v1/embeddings", headers=headers, json=probe)
+            warm_seconds = time.monotonic() - started
+            assert cold.status_code == warm.status_code == 200
+            assert warm.json()["data"] == cold.json()["data"]
+            check_item(warm.json()["data"][0])
+            print(f"PASS: warm cache, cold {cold_seconds:.3f}s -> warm {warm_seconds:.3f}s")
         if args.long:
             started = time.monotonic()
             response = client.post("/v1/embeddings", headers=headers,
@@ -73,7 +87,8 @@ def main():
             check_item(data["data"][0])
             print(f"PASS: 8192 tokens, {elapsed:.2f}s")
     print("PASS: health, authentication, single input, two-item batch, 1024 finite normalized values"
-          + (", sparse" if args.sparse else "") + (", 8192 tokens" if args.long else ""))
+          + (", sparse" if args.sparse else "") + (", warm cache" if args.warm else "")
+          + (", 8192 tokens" if args.long else ""))
 
 
 if __name__ == "__main__":

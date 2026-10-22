@@ -43,6 +43,12 @@ class MLXConfig:
 
 
 @dataclass(frozen=True)
+class CacheConfig:
+    enabled: bool
+    max_bytes: int
+
+
+@dataclass(frozen=True)
 class LoggingConfig:
     file: str
     max_bytes: int
@@ -58,6 +64,7 @@ class Config:
     queue: QueueConfig
     limits: LimitsConfig
     mlx: MLXConfig
+    cache: CacheConfig
     logging: LoggingConfig
 
 

@@ -5,6 +5,7 @@
 - 需求：[PRD-0001](../prd/0001-embedding-service.md)，REQ-001～REQ-012。
 - 决策：[ADR-0002](../adr/0002-bge-m3-mlx.md)、[ADR-0003](../adr/0003-native-python-runtime.md)。实施：[PLAN-0002](../plans/0002-minimal-service.md)。
 - 2026-10-21 范围变更：dense + sparse 双路输出由 [PRD-0002](../prd/0002-dense-sparse-embeddings.md) 纳入范围，扩展契约见 [SPEC-0002](0002-dense-sparse-output.md)；本契约继续描述 dense 基础行为，双路字段与 sparse 语义以 SPEC-0002 为准。
+- 2026-10-22 范围变更：嵌入结果缓存由 [PRD-0003](../prd/0003-result-cache.md) 纳入范围（已确认），附加行为契约见 [SPEC-0003](0003-result-cache.md)；配置项由 16 项增至 18 项。本契约继续有效；FIFO 与队列语义针对进入推理任务的请求，全命中请求绕过队列、`queue_full` / `queue_timeout` 仅适用于含未命中条目的请求，以 SPEC-0003 为准。
 
 ## 目标与运行前提
 

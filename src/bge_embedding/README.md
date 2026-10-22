@@ -5,6 +5,7 @@
 - `app.py`：模型生命周期、读取请求、鉴权、健康检查和调度调用。
 - `api.py`：严格输入规则、token 限制、响应与安全错误。
 - `scheduler.py`：单任务执行、有限 FIFO、排队超时和取消。
+- `cache.py`：进程内 LRU 结果缓存，token 哈希键与估算字节预算，仅事件循环线程访问。
 - `inference.py`：本地 8bit 加载、分词、强制融合双向注意力、逐层求值、原始 CLS + float32 L2。MLX 工作内存与缓存策略从配置加载，示例为 2 GiB / 256 MiB，均不是进程硬配额。
 
 只使用各机 `bge-embedding` conda 环境。完整包版本见根目录 `requirements.lock`，实际运行与启停见 [部署说明](../../deploy/README.md)。`src/vendor/mlx/` 仅供阅读，不从此目录安装依赖。

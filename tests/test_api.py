@@ -153,7 +153,7 @@ async def test_errors_and_logs_do_not_echo_secrets(caplog, settings):
         r = await client.post("/v1/embeddings", headers=AUTH, json=payload([TEXT, None]))
         assert r.status_code == 400
         model.fail = True
-        r = await client.post("/v1/embeddings", headers=AUTH, json=payload(TEXT))
+        r = await client.post("/v1/embeddings", headers=AUTH, json=payload(TEXT + "-fail"))
         assert r.status_code == 500
         assert r.json()["error"] == {"message": "Embedding inference failed.", "type": "server_error",
                                      "param": None, "code": "inference_failed"}
@@ -331,3 +331,102 @@ async def test_custom_request_limits_and_queue_settings(settings):
         finally:
             model.gate.set()
             assert (await active).status_code == 200
+
+
+@pytest.mark.smoke
+async def test_cache_hit_is_bit_identical_and_skips_inference(settings):
+    async with client_for(settings) as (client, model, _):
+        first = await client.post("/v1/embeddings", headers=AUTH, json=payload("你好"))
+        assert first.status_code == 200
+        inferred = len(model.calls)
+        second = await client.post("/v1/embeddings", headers=AUTH, json=payload("你好"))
+        assert second.status_code == 200
+        assert second.json() == first.json()
+        assert len(model.calls) == inferred
+
+
+async def test_partial_hit_infers_only_missing(settings):
+    class TokenEmbedder(FakeEmbedder):
+        def embed(self, tokens, return_sparse=False):
+            self.calls.append(tokens)
+            self.started.set()
+            assert self.gate.wait(10), "Test did not release inference"
+            return [Embedding([float(ids[0])] + [0.0] * 1023, None) for ids in tokens]
+
+    model = TokenEmbedder()
+    async with client_for(settings, model) as (client, _model, _):
+        first = await client.post("/v1/embeddings", headers=AUTH, json=payload("你好"))
+        assert first.status_code == 200
+        cached_lead = first.json()["data"][0]["embedding"][0]
+        before = len(model.calls)
+        r = await client.post("/v1/embeddings", headers=AUTH, json=payload(["你好", "English"]))
+        assert r.status_code == 200
+        data = r.json()["data"]
+        assert [item["index"] for item in data] == [0, 1]
+        assert data[0]["embedding"][0] == cached_lead
+        assert data[1]["embedding"][0] == float(ord("E"))
+        assert r.json()["usage"] == {"prompt_tokens": 13, "total_tokens": 13}
+        assert len(model.calls) == before + 1
+        assert model.calls[-1] == [[ord("E")] * 9]
+
+
+async def test_full_hit_bypasses_busy_scheduler(settings):
+    async with client_for(settings) as (client, model, _):
+        await client.post("/v1/embeddings", headers=AUTH, json=payload("你好"))
+        model.gate.clear()
+        try:
+            r = await client.post("/v1/embeddings", headers=AUTH, json=payload("你好"))
+        finally:
+            model.gate.set()
+        assert r.status_code == 200
+        assert r.json()["data"][0]["embedding"] == [1.0] + [0.0] * 1023
+        assert len(model.calls) == 1
+
+
+async def test_sparse_cache_respects_flag_and_roundtrip(settings):
+    async with client_for(settings) as (client, model, _):
+        sparse = await client.post("/v1/embeddings", headers=AUTH,
+                                   json=payload("你好", return_sparse=True))
+        dense = await client.post("/v1/embeddings", headers=AUTH, json=payload("你好"))
+        warm = await client.post("/v1/embeddings", headers=AUTH,
+                                 json=payload("你好", return_sparse=True))
+        assert sparse.json() == warm.json()
+        assert "sparse" not in dense.json()["data"][0]
+        assert len(model.calls) == 2
+
+
+async def test_cache_disabled_by_configuration(settings):
+    disabled = replace(settings, cache=replace(settings.cache, enabled=False))
+    async with client_for(disabled) as (client, model, _):
+        first = await client.post("/v1/embeddings", headers=AUTH, json=payload("你好"))
+        second = await client.post("/v1/embeddings", headers=AUTH, json=payload("你好"))
+        assert first.json() == second.json()
+        assert len(model.calls) == 2
+
+
+async def test_inference_failure_does_not_backfill(settings):
+    async with client_for(settings) as (client, model, _):
+        text = "失败不回填文本"
+        model.fail = True
+        r = await client.post("/v1/embeddings", headers=AUTH, json=payload(text))
+        assert r.status_code == 500
+        model.fail = False
+        before = len(model.calls)
+        assert (await client.post("/v1/embeddings", headers=AUTH, json=payload(text))).status_code == 200
+        assert len(model.calls) == before + 1
+
+
+async def test_client_disconnect_does_not_backfill(settings):
+    async with client_for(settings) as (client, model, _):
+        text = "断开不回填文本"
+        model.gate.clear()
+        task = asyncio.create_task(client.post("/v1/embeddings", headers=AUTH, json=payload(text)))
+        await until(model.started.is_set)
+        task.cancel()
+        with pytest.raises(asyncio.CancelledError):
+            await task
+        model.gate.set()
+        await asyncio.sleep(0.05)
+        before = len(model.calls)
+        assert (await client.post("/v1/embeddings", headers=AUTH, json=payload(text))).status_code == 200
+        assert len(model.calls) == before + 1

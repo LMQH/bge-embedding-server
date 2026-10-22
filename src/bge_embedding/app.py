@@ -11,6 +11,7 @@ from starlette.requests import ClientDisconnect
 from starlette.responses import JSONResponse, Response
 
 from .api import APIError, check_tokens, embedding_response, parse_body
+from .cache import EmbeddingCache
 from .scheduler import Scheduler
 
 log = logging.getLogger("bge_embedding")
@@ -30,6 +31,8 @@ def create_app(config, embedder_factory=None):
             app.state.embedder = await asyncio.get_running_loop().run_in_executor(executor, load)
             app.state.key = ("Bearer " + key).encode("utf-8")
             app.state.scheduler = Scheduler(app.state.embedder.embed, executor, config.queue)
+            app.state.cache = (EmbeddingCache(config.cache.max_bytes)
+                               if config.cache.enabled else None)
             log.info("startup ready")
             yield
         finally:
@@ -55,6 +58,7 @@ def create_app(config, embedder_factory=None):
         started = time.monotonic()
         status, code, size, total = 500, "inference_failed", 0, 0
         job = watcher = None
+        hits = 0
         scheduler = getattr(app.state, "scheduler", None)
         try:
             if scheduler is None or scheduler.closing:
@@ -71,12 +75,32 @@ def create_app(config, embedder_factory=None):
             size = len(texts)
             tokens = await asyncio.to_thread(app.state.embedder.tokenize, texts)
             total = check_tokens(tokens, config.limits)
-            job = scheduler.submit(tokens, return_sparse)
-            watcher = asyncio.create_task(disconnected(request))
-            done, _ = await asyncio.wait([job.result, watcher], return_when=asyncio.FIRST_COMPLETED)
-            if watcher in done:
-                raise ClientDisconnect()
-            response = embedding_response(job.result.result(), total, return_sparse)
+            cache = getattr(app.state, "cache", None)
+            cached = ([cache.lookup(item, return_sparse) for item in tokens]
+                      if cache is not None else None)
+            if cached is not None:
+                hits = sum(item is not None for item in cached)
+                pending = [item for item, found in zip(tokens, cached) if found is None]
+            else:
+                pending = tokens
+            if pending:
+                job = scheduler.submit(pending, return_sparse)
+                watcher = asyncio.create_task(disconnected(request))
+                done, _ = await asyncio.wait([job.result, watcher], return_when=asyncio.FIRST_COMPLETED)
+                if watcher in done:
+                    raise ClientDisconnect()
+                computed = job.result.result()
+                if cache is not None:
+                    cache.store(pending, computed, return_sparse)
+                if cached is None:
+                    result = computed
+                else:
+                    remaining = iter(computed)
+                    result = [next(remaining) if found is None else found
+                              for found in cached]
+            else:
+                result = cached
+            response = embedding_response(result, total, return_sparse)
             status, code = 200, "ok"
             return response
         except APIError as error:
@@ -98,8 +122,8 @@ def create_app(config, embedder_factory=None):
                 watcher.cancel()
             if job:
                 scheduler.abandon(job)
-            log.info("path=/v1/embeddings status=%d code=%s seconds=%.3f batch=%d tokens=%d",
-                     status, code, time.monotonic() - started, size, total)
+            log.info("path=/v1/embeddings status=%d code=%s seconds=%.3f batch=%d tokens=%d hits=%d",
+                     status, code, time.monotonic() - started, size, total, hits)
     return app
 
 
