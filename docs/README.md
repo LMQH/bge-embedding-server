@@ -18,7 +18,7 @@
 | Plan | 按什么顺序实施，如何验证与交付 | [PLAN-0001：项目初始化与设计收敛](plans/0001-project-foundation.md)、[PLAN-0002：实现轻量嵌入服务](plans/0002-minimal-service.md)、[PLAN-0003：长输入注意力修复](plans/0003-fused-attention.md)、[PLAN-0004：扩充等待队列](plans/0004-queue-capacity.md)、[PLAN-0005：统一文件配置](plans/0005-file-configuration.md)、[PLAN-0006：接口性能测试](plans/0006-performance-test.md)、[PLAN-0007：稠密与稀疏双路输出实施](plans/0007-dense-sparse-output.md)、[PLAN-0008：仓库连接信息脱敏与历史清理](plans/0008-repository-privacy.md)、[PLAN-0009：嵌入结果缓存实施](plans/0009-result-cache.md) | [Plan 模板](plans/_template.md) |
 | Handoff | 当前进展、待定事项、阻塞与下一步是什么 | [项目进度与交接](../HANDOFF.md) | — |
 | 使用说明 | 如何连接和调用服务 | [推理服务连接与使用说明](service-connection.md) | — |
-| 参考资料 | 外部资料、技术事实与待验证事项是什么 | [MLX 框架、模型格式与官方资料](references/0001-mlx-framework-and-model-formats.md)、[源码接入与代码结构](references/0002-source-layout.md) | — |
+| 参考资料 | 外部资料、技术事实与待验证事项是什么 | [MLX 框架、模型格式与官方资料](references/0001-mlx-framework-and-model-formats.md)、[源码接入与代码结构](references/0002-source-layout.md)、[当前服务的局限性](references/0003-service-limitations.md) | — |
 
 ## 工作流程
 

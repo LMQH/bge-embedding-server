@@ -4,6 +4,8 @@
 
 ## 当前状态
 
+2026-10-22 新增 [REF-0003：当前服务的局限性](docs/references/0003-service-limitations.md)，把模型、接口、容量、运维与验证层面的边界按“设计取舍 / 能力缺口 / 未验证风险”三层固化为文档，覆盖 22 条局限并给出影响排序；同步更新[文档中心](docs/README.md)索引与 README 的边界说明。本文是评估依据与快照，不构成 SLA、容量或效果承诺；本次不改变服务行为。
+
 2026-10-22 按用户要求将根目录 README 重写为技术产品介绍：以产品定位、核心能力、请求链路、快速开始、API 契约、M4 性能观测与适用边界组织内容，替代仅目录导航的旧版；性能数字引用 [PLAN-0006](docs/plans/0006-performance-test.md) / [PLAN-0009](docs/plans/0009-result-cache.md)，接口限制引用 [SPEC-0001](docs/specs/0001-embedding-inference.md) / [SPEC-0002](docs/specs/0002-dense-sparse-output.md)，版本基线取自 [requirements.lock](requirements.lock)。部署进度与验证证据继续在本文件及各 Plan 维护。文档检查记录见 [PLAN-0001](docs/plans/0001-project-foundation.md)，本次不改变服务行为。
 
 2026-10-22 已对当前文档中的真实内网地址、设备名、登录用户名及本机 / 目标机绝对路径脱敏，变量均为占位符，不再作为实际连接信息。已按用户授权重写并推送远端 `main`，重新克隆后的 Git 对象扫描通过；本地已同步新历史，移除 5 个旧 Codex 引用并清理 reflog / 不可达对象，扫描通过。详细范围与证据见 [PLAN-0008](docs/plans/0008-repository-privacy.md)。其他机器的旧克隆及 GitHub 缓存 / fork / PR 引用仍需分别处理，不能承诺外部副本已删除。
