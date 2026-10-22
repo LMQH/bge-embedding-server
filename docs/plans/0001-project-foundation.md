@@ -48,6 +48,10 @@
 
 2026-10-21（SDD 理念澄清）：按用户要求直接将 ADR-0001 修订为 SDD（Specification-Driven Development，规格驱动开发），文件更名为 `0001-specification-driven-development.md`，不保留旧理念正文或另建替代记录。同步 README、项目宪法、文档中心、Spec / Plan 模板和 HANDOFF，明确以已确认 Spec 驱动计划、实现与验收，行为变更先修订规格，纯文档与 Git 工作按目标检查。使用项目环境 Python 标准库检查 27 份项目 Markdown 的 145 个本地文件链接，全部可解析；旧术语与旧 ADR 路径残留检查、SDD 流程一致性检查及 `git diff --check` 通过。本次不改服务实现，不运行应用或模型测试。
 
+2026-10-22（README 重写）：按用户要求将根目录 README 改为能力概览、使用入口与文档导航，加入已有服务的最小 curl 请求，并链接安装、模型、接口及协作说明。使用已核实的 `bge-embedding` 项目环境 Python 标准库检查 README 本地链接、示例 JSON、默认长度限制、稀疏请求字段及真实地址 / 用户路径残留，均通过；`git diff --check` 通过。本次仅修改文档，不运行应用或模型测试，不改变服务行为；文案等待用户审阅反馈。
+
+2026-10-22（README 反馈修订）：按用户纠正明确面向 macOS / Apple Silicon，将 Mac mini M4 16GB 列为真实生产部署与实测示例。新增主要版本表，区分运行基线、锁定依赖、conda 环境约定与实测系统版本；链接环境声明、完整依赖锁及部署 / 性能证据。使用项目环境 Python 标准库核对 23 个本地链接、8 项依赖精确版本、服务包版本、Python 环境声明及隐私约束，通过；`git diff --check` 通过。未运行应用测试或重新实测硬件。
+
 ## 后续交付条件
 
 源码来源记录见 [src/README](../../src/README.md)，服务文件布局建议见[源码接入与代码结构](../references/0002-source-layout.md)。源码落盘不等于推理环境或服务已可运行。

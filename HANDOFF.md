@@ -4,6 +4,8 @@
 
 ## 当前状态
 
+2026-10-22 按用户要求重写根目录 README，补充能力概览、最小调用示例，以及按使用目的组织的文档导航；按用户反馈将定位明确为面向 macOS，Mac mini M4 16GB 作为真实生产部署与实测示例，并列明 Python、MLX、API 框架等锁定版本及 conda 环境约定。部署进度与验证证据继续在本文件及各 Plan 维护。文档检查记录见 [PLAN-0001](docs/plans/0001-project-foundation.md)，本次不改变服务行为。
+
 2026-10-22 已对当前文档中的真实内网地址、设备名、登录用户名及本机 / 目标机绝对路径脱敏，变量均为占位符，不再作为实际连接信息。已按用户授权重写并推送远端 `main`，重新克隆后的 Git 对象扫描通过；本地已同步新历史，移除 5 个旧 Codex 引用并清理 reflog / 不可达对象，扫描通过。详细范围与证据见 [PLAN-0008](docs/plans/0008-repository-privacy.md)。其他机器的旧克隆及 GitHub 缓存 / fork / PR 引用仍需分别处理，不能承诺外部副本已删除。
 
 2026-10-21 按用户明确纠正，将开发理念统一为 SDD（规格驱动开发）：以已确认 Spec 驱动计划、实现与验收。依据见 [ADR-0001](docs/adr/0001-specification-driven-development.md)，流程见 [文档中心](docs/README.md)，文档调整与验证记录见 [PLAN-0001](docs/plans/0001-project-foundation.md)。本次只调整开发方法说明，不改变服务行为或既有验证结论。
