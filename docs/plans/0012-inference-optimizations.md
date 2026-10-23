@@ -42,7 +42,7 @@
 
 ## 验证记录
 
-基线参考使用当前已提交代码（`254f99a` 之后、未改 attention dtype）生成；原始数据只保存在本机 `.cache/opt/`，不入库。
+P0 基线在 `8cdaf66`（FP16 attention 之前）生成；原始数据保存在本机 `.cache/opt/`，汇总和可审查原始 JSON 已归档到 [`0012-evidence/`](0012-evidence/README.md)。
 
 待逐项回填：
 
