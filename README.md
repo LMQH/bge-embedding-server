@@ -39,7 +39,7 @@ MLX / Metal
 JSON 响应（dense / dense + sparse）
 ```
 
-单 worker、单模型实例；批内逐条推理，不承诺 GPU 合批——优先保证单机资源可预测，而不是通用高并发。缓存只驻留进程内存，重启即清空。
+单 worker、单模型实例；同一请求内的未命中条目按长度分桶、右 padding 后合批前向，减少每请求固定开销；不跨请求合批，也不增加执行位——优先保证单机资源可预测，而不是通用高并发。缓存只驻留进程内存，重启即清空。合批对短/中批有效，对 1k 以上长块基本无收益，见 [PLAN-0011](docs/plans/0011-batch-inference.md)。
 
 选择 BGE-M3 + MLX 的原因很直接：BGE-M3 原生同时提供 dense 与 sparse 信号，MLX 则直接利用 Apple Silicon 的 Metal 与统一内存；不引入第二个稀疏模型，也不依赖外部向量服务，延迟、内存和隐私边界都留在同一个进程里。依据见 [ADR-0002](docs/adr/0002-bge-m3-mlx.md) 和 [ADR-0005](docs/adr/0005-native-sparse-head.md)。
 
@@ -198,6 +198,7 @@ curl -s http://127.0.0.1:8000/v1/embeddings \
 - 8192 tokens 冷推理约 4.8 秒；无缓存时进程 RSS 峰值约 630 MiB，缓存版本在长时间负载后约 1.3 GiB（含模型、MLX 分配器缓存与结果缓存），16GB 机器仍有充足余量。
 - 命中主导的 20 并发混合负载观测到 750 QPS；冷推理路径约 4 QPS 量级，两者不可直接比较。
 - 以上均为 2026-10-21 / 10-22 的观测值，不是 SLA、容量或吞吐承诺；缓存收益取决于实际重复率。方法与原始数据见 [PLAN-0006](docs/plans/0006-performance-test.md)、[PLAN-0009](docs/plans/0009-result-cache.md)。
+- 2026-10-23 在当前 Mac mini M4 16GB 执行环境的独立进程实测批内合批（非线上服务）：16×25 tokens 约 3.3x、16×256 约 1.18x、16×512 约 1.05x，16×1024 / 16×2048 / 4×8192 约 1.0x，混合长度约 0.97x；峰值最高 977.4 MiB。合批主要改善短/中批，不改变 1k 以上长块的 GPU 计算量；证据见 [PLAN-0011](docs/plans/0011-batch-inference.md)。
 
 ## 适用场景与边界
 

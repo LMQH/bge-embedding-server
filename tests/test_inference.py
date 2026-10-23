@@ -1,4 +1,5 @@
 """Actual model checks are opt-in and use the private service configuration."""
+import math
 import os
 
 import numpy as np
@@ -31,3 +32,26 @@ def test_real_embedder_single_batch_and_lengths():
 
     for length in (8192, 8193):
         assert len(model.tokenize(["test " * (length - 2)])[0]) == length
+
+
+def test_real_embedder_varied_length_batches_match_single():
+    from bge_embedding.inference import Embedder
+    from bge_embedding.config import load_config
+    config = load_config(os.environ["BGE_CONFIG"])
+    model = Embedder(config.model.path, config.mlx)
+    lengths = [25, 64, 256, 512, 1024, 25, 128]
+    ids = model.tokenize(["test " * (length - 2) for length in lengths])
+
+    batch = np.asarray([item.dense for item in model.embed(ids)])
+    single = np.asarray([model.embed([item])[0].dense for item in ids])
+    assert batch.shape == (len(lengths), 1024) and np.isfinite(batch).all()
+    assert np.max(np.abs(np.linalg.norm(batch, axis=1) - 1)) <= 1e-5
+    assert np.all(np.sum(batch * single, axis=1) >= 0.999999)
+
+    sparse_batch = model.embed(ids, return_sparse=True)
+    sparse_single = [model.embed([item], return_sparse=True)[0] for item in ids]
+    for batched, alone in zip(sparse_batch, sparse_single):
+        assert set(batched.sparse) == set(alone.sparse)
+        for key in batched.sparse:
+            assert math.isclose(batched.sparse[key], alone.sparse[key],
+                                rel_tol=1e-4, abs_tol=1e-6)

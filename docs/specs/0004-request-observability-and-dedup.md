@@ -52,7 +52,7 @@ path=/v1/embeddings status=200 code=ok seconds=0.031 batch=3 tokens=9 hits=0 wai
 ## 约束
 
 - 不新增配置项，配置总数保持 18 项；不新增运行时依赖、端点或后台任务。
-- 单 worker、单模型串行、1 个执行位 + 19 个等待位、30 秒排队超时与既有请求上限均不变。
+- 单 worker、单模型、请求级串行、批内合批、1 个执行位 + 19 个等待位、30 秒排队超时与既有请求上限均不变。
 - 日志写入沿用现有轮转与安全过滤；新增字段不得绕过 `SafeServerLog` 的异常脱敏。
 - 验证按 ADR-0004 保持最小：定向单元测试 + 真实服务冒烟；不恢复压力、故障注入或效果评测。
 
@@ -71,4 +71,4 @@ path=/v1/embeddings status=200 code=ok seconds=0.031 batch=3 tokens=9 hits=0 wai
 
 - 无阻塞性未决项。M4 部署与生产观察需单独授权，不在本契约内。
 - 实施与验证记录见 [PLAN-0010](../plans/0010-request-optimizations.md)。
-- 跨请求合并、执行超时与 GPU 合批不在本契约范围；是否推进由上线后的观测数据决定。
+- 跨请求合并与执行超时不在本契约范围；GPU 合批已由 [SPEC-0001](0001-embedding-inference.md) / [PLAN-0011](../plans/0011-batch-inference.md) 单独实施；其余事项是否推进由上线后的观测数据决定。

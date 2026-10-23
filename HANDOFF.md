@@ -6,6 +6,8 @@
 
 2026-10-23 按用户指示完成首批请求优化（O1/O2/O4）：请求日志追加 `wait_ms` / `exec_ms` / `ahead` / `dedup`；同一请求内重复文本只推理一次，响应顺序与 `usage` 不变；429 增加 `Retry-After: 1`。新增 [PRD-0004](docs/prd/0004-request-optimizations.md)、[SPEC-0004](docs/specs/0004-request-observability-and-dedup.md)、[PLAN-0010](docs/plans/0010-request-optimizations.md)，配置仍为 18 项。本机 99 项非 real、2 项 real 测试通过；本机服务已通过 launchd 重启加载新版本并完成真实 HTTP 与性能实测。M4 未部署，M4 线上行为仍以旧版本为准；部署需另行授权。
 
+2026-10-23 按用户指定“单 worker + 真合批”完成批内合批：同一请求内的未命中条目按 token 长度分桶，右 padding 后一次前向；每组合批后的 padding token 不超过 8192，单条超预算时单独执行。外部 API、输出顺序、`usage`、错误码、缓存与 FIFO 不变；执行位仍为 1，不跨请求合批，未新增配置项。更新 [SPEC-0001](docs/specs/0001-embedding-inference.md)，新增 [ADR-0007](docs/adr/0007-batch-inference.md) 与 [PLAN-0011](docs/plans/0011-batch-inference.md)。当前 Mac mini M4 16GB 上 103 项非 real、3 项 real 测试通过；基准显示 16×25 约 3.3x、16×256 约 1.18x、16×512 约 1.05x，16×1024 / 16×2048 / 4×8192 约 1.0x，混合长度约 0.97x，峰值最高 977.4 MiB。结论：合批对短/中批有效，1M token 按 1k 块入库仍约 5 分钟，不会因合批出现数量级提升。当前常驻服务尚未重启加载该版本，新合批未生效。
+
 2026-10-22 新增 [REF-0003：当前服务的局限性](docs/references/0003-service-limitations.md)，把模型、接口、容量、运维与验证层面的边界按“设计取舍 / 能力缺口 / 未验证风险”三层固化为文档，覆盖 22 条局限并给出影响排序；同步更新[文档中心](docs/README.md)索引与 README 的边界说明。本文是评估依据与快照，不构成 SLA、容量或效果承诺；本次不改变服务行为。
 
 2026-10-22 按用户要求将根目录 README 重写为技术产品介绍：以产品定位、核心能力、请求链路、快速开始、API 契约、M4 性能观测与适用边界组织内容，替代仅目录导航的旧版；性能数字引用 [PLAN-0006](docs/plans/0006-performance-test.md) / [PLAN-0009](docs/plans/0009-result-cache.md)，接口限制引用 [SPEC-0001](docs/specs/0001-embedding-inference.md) / [SPEC-0002](docs/specs/0002-dense-sparse-output.md)，版本基线取自 [requirements.lock](requirements.lock)。部署进度与验证证据继续在本文件及各 Plan 维护。文档检查记录见 [PLAN-0001](docs/plans/0001-project-foundation.md)，本次不改变服务行为。
@@ -33,14 +35,16 @@
 
 | 项目 | 已核实事实 |
 | --- | --- |
-| 本机 | M5、32GB、macOS 26.5.1；Miniconda 的 bge-embedding，Python 3.12.15 / arm64 |
-| 目标机 | M4、16GB、macOS 26.5.1；Miniforge 的 bge-embedding，Python 3.12.15 / arm64 |
+| 本机（当前执行环境） | Mac mini、Apple M4、16GB、macOS 26.5.1；Miniconda 的 bge-embedding，Python 3.12.15 / arm64 |
+| 目标机 | Mac mini、M4、16GB、macOS 26.5.1；Miniforge 的 bge-embedding，Python 3.12.15 / arm64 |
 | 目标目录 | ${REMOTE_PROJECT_DIR} |
 | 目标解释器 | ${REMOTE_CONDA_ROOT}/envs/bge-embedding/bin/python |
 | 常驻配置 | ${REMOTE_HOME}/Library/LaunchAgents/local.bge-embedding.plist，权限 600，通过 --config 引用私有 TOML |
 | 运行配置 | ${REMOTE_PROJECT_DIR}/config.toml，权限 600，保存 Key 及其余 15 项运行参数；修改后重启生效 |
 | 日志 | ${REMOTE_PROJECT_DIR}/logs/service.log，5 MiB / 2 备份；2026-10-21 从 ~/Library/Logs 迁入项目，旧文件留存原处未删除 |
-| 依赖 | 两机使用同一带 wheel 哈希的 requirements.lock，pip check 均通过，无全局安装 |
+| 依赖 | 当前执行环境与目标机使用同一带 wheel 哈希的 requirements.lock，pip check 均通过，无全局安装 |
+
+2026-10-23 复核：当前 agent 执行环境是 Mac mini、Apple M4、16GB（`sysctl` 核实），不是 M5 / 32GB。仓库中 2026-10-21 / 22 的部分 Plan 仍保留当时开发机 M5 的历史记录；本轮合批测试与数据均在上述 Mac mini M4 16GB 上取得，且使用独立进程，未重启常驻服务。
 
 启动、停止、获取私有配置及基本调用见 [部署说明](deploy/README.md)。Key 未打印、未写入仓库；用户提供的登录密码未使用或保存。
 
@@ -61,11 +65,14 @@
 - 已按 PLAN-0006 完成延迟基线、并发容量与资源峰值测试（2026-10-21）；仍未做故障注入、30 秒排队超时实测、soak、8192 全长、整机重启或重新登录测试；不承诺容量或吞吐。launchd 启动 / 重启选项已配置，手动卸载与加载已实际执行。
 - 2026-10-21 按 [PLAN-0006](docs/plans/0006-performance-test.md) 完成 5 指标 × 3 场景性能测试并回填：5xx 与预期外 429 均为 0，无 swap 增长；RSS 峰值约 630 MiB、Metal 5341 峰值 838.2 MiB，三档延迟 P50 约 25.1 / 273.9 / 2616 ms。结果仅作观测，仍不构成容量、吞吐或 SLA 承诺；原始证据备份在本机 `.cache/perf/m4/`。
 - 2026-10-23 请求优化验证与部署：99 项非 real、2 项 real 通过；本机服务经 launchd 重启部署，真实 HTTP 冒烟通过；25 / 945 / 5341 tokens 冷 P50 48.9 / 270.0 / 2458.7 ms，命中 P50 1.7 / 2.2 / 5.9 ms；3 条相同 5349-token 输入墙钟 2.48 s（`exec_ms=2460`、`dedup=2`），3 条不同 7.40 s；20 并发排队为 19×200 + 1×429 `queue_full`（`Retry-After: 1`），`ahead` 0–19；测试后 footprint 1.2 GiB、峰值 1.4 GiB。详见 [PLAN-0010](docs/plans/0010-request-optimizations.md)。M4 未部署。
+- 2026-10-23 批内真合批验证：当前 Mac mini M4 16GB 上 103 项非 real、3 项 real 通过；16×25 / 256 / 512 / 1024 / 2048 与 4×8192 的逐条 vs 合批对照，加速约 3.32x / 1.18x / 1.05x / 1.01x / 1.00x / 1.00x，混合长度约 0.97x；Metal 峰值最高 977.4 MiB，dense 余弦均 ≥0.999999。未做当前常驻服务的 HTTP 合批验证；详见 [PLAN-0011](docs/plans/0011-batch-inference.md)。
 
 ## 后续工作原则
 
 先使用现有服务。只有实际问题或用户明确需求才增加实现、优化或对应测试；不要自动恢复参考评测、完整边界套件或复杂验收流程。
 
-2026-10-23 首批优化后，先观察日志中的 `wait_ms` / `exec_ms` / 429 分布与缓存命中，再决定是否推进跨请求合并、准入控制或 GPU 合批；M4 部署需另行授权。
+2026-10-23 首批优化后，先观察日志中的 `wait_ms` / `exec_ms` / 429 分布与缓存命中，再决定是否推进跨请求合并或准入控制；M4 部署需另行授权。
+
+2026-10-23 批内真合批已按 [PLAN-0011](docs/plans/0011-batch-inference.md) 完成，单 worker、不跨请求、不新增配置。后续按实际批量请求的长度分布观察 `exec_ms`，再决定是否调整 8192 padding 预算或“小组合批”启发式；多 worker、跨请求合批与 M4 部署仍需另行授权。
 
 2026-10-21 按用户要求初始化项目 Git，分支为 `main`，`origin` 关联 [LMQH/bge-embedding-server](https://github.com/LMQH/bge-embedding-server)。模型权重、缓存、凭据和独立上游 MLX 克隆继续排除在版本控制之外；初始化检查见 [PLAN-0001](docs/plans/0001-project-foundation.md)。本次双路输出的 Plan、实现与测试已推送到 `origin/main`，提交历史见 GitHub；M4 未执行。README 仅保留总览与导航，后续状态在本文件维护。

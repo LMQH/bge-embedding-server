@@ -3,10 +3,11 @@
 - 状态：已确认，2026-10-15（实施基线；2026-10-15 按用户要求收缩验证范围；2026-10-21 用户明确将等待位扩充到 19，总计 20 个位置）。
 - 确认依据：Q1～Q14 及最终原生环境确认；用户在 Q13 接受最小规则并授权落实字段默认值、错误码与基本容量限制。下列具体默认值和数值门槛由实施侧制定，不冒充用户逐项指定或实测结果。
 - 需求：[PRD-0001](../prd/0001-embedding-service.md)，REQ-001～REQ-012。
-- 决策：[ADR-0002](../adr/0002-bge-m3-mlx.md)、[ADR-0003](../adr/0003-native-python-runtime.md)。实施：[PLAN-0002](../plans/0002-minimal-service.md)。
+- 决策：[ADR-0002](../adr/0002-bge-m3-mlx.md)、[ADR-0003](../adr/0003-native-python-runtime.md)、[ADR-0007](../adr/0007-batch-inference.md)。实施：[PLAN-0002](../plans/0002-minimal-service.md)。
 - 2026-10-21 范围变更：dense + sparse 双路输出由 [PRD-0002](../prd/0002-dense-sparse-embeddings.md) 纳入范围，扩展契约见 [SPEC-0002](0002-dense-sparse-output.md)；本契约继续描述 dense 基础行为，双路字段与 sparse 语义以 SPEC-0002 为准。
 - 2026-10-22 范围变更：嵌入结果缓存由 [PRD-0003](../prd/0003-result-cache.md) 纳入范围（已确认），附加行为契约见 [SPEC-0003](0003-result-cache.md)；配置项由 16 项增至 18 项。本契约继续有效；FIFO 与队列语义针对进入推理任务的请求，全命中请求绕过队列、`queue_full` / `queue_timeout` 仅适用于含未命中条目的请求，以 SPEC-0003 为准。
 - 2026-10-23 范围变更：请求完成日志追加 `wait_ms` / `exec_ms` / `ahead` / `dedup`，429 增加 `Retry-After: 1`；详见 [SPEC-0004](0004-request-observability-and-dedup.md)。本契约的日志字段与过载响应头以 SPEC-0004 补充为准，其余行为不变。
+- 2026-10-23 范围变更：按用户指定“单 worker + 真合批”，同一请求内的未命中条目由逐条前向改为按长度分桶的右 padding 合批；外部 API、输出顺序、`usage`、错误码、缓存与 FIFO 不变，执行位仍为 1，不做跨请求合批。实施见 [PLAN-0011](../plans/0011-batch-inference.md)。
 
 ## 目标与运行前提
 
@@ -21,8 +22,16 @@
 - token 数按模型 tokenizer 加入特殊 token 后、padding 前计数。单条最多 8192 tokens，按实际编码检查；禁止 tokenizer 静默截断。
 - 使用正确 attention mask；如使用 padding，固定为右 padding。取原始 last_hidden_state 的第 0 个 token（CLS），转换 float32 后 L2 归一化，不使用 mean pooling 或 pooler_output。
 - 每条输出恰好 1024 个有限数值；归一化结果以 JSON 数字数组返回。非有限数值或异常输出视为推理故障。
-- 首版批量可在同一执行任务中逐条推理，完成整个请求后再处理下一个请求；不承诺 GPU 合批。
+- 同一执行任务内的未命中条目按长度接近程度分桶；桶内右 padding 后一次前向。每个合批组 padding 后的 token 总数不超过 8192，同组最长与最短长度不超过 1.25 倍；超出预算的条目单独执行。分组只影响执行方式，不改变输出顺序、`usage`、错误语义或缓存键。
 - 长输入修复采用 MLX `scaled_dot_product_attention(force_fused=True)`，保持双向全局注意力和 additive mask；融合内核不可用时按推理失败处理，不退回完整注意力矩阵。每层注意力结果立即求值，控制跨层中间张量的存活。
+
+## 批内合批（2026-10-23 增补）
+
+- 仅在同一请求的未命中条目内合批；不跨请求、不改变单 worker / 单模型实例 / FIFO 队列。全命中请求、去重逻辑和缓存行为沿用 SPEC-0003、SPEC-0004。
+- 分组按 token 长度排序后贪心装入，受 8192 padding 后 token 预算、16 条上限和 1.25 倍长度比约束；分组结果不对外暴露，也不保证稳定。
+- padding 使用 tokenizer 的 pad token，固定右 padding；attention mask 必须屏蔽 padding。`usage` 只统计原始 token，不统计 padding。
+- 合批结果必须满足既有 dense / sparse 契约。与逐条执行相比，dense 向量余弦相似度 ≥0.999999；sparse 的键集合一致，权重相对误差 ≤1e-4（绝对误差 ≤1e-6）。
+- 合批异常与单条异常一样使整个请求返回 500 `inference_failed`，不返回部分结果；不得因合批改变 400、401、413、429、503 的触发条件。
 
 ## API 与兼容子集
 
@@ -110,6 +119,9 @@
 | AC-002 | 健康检查就绪；正确 Key 的单条和小批量返回成功，顺序与 usage 合理；无 Key 被拒绝 |
 | AC-003 | 在目标 M4 的独立 conda 环境启动服务；提供用户级 launchd 启停方式 |
 | AC-006 | 确认两机项目解释器与依赖，启动命令不依赖 base 或开发机路径 |
+| AC-007 | 同一请求含 16 条 25–2048 tokens 的混合输入；合批与逐条结果对照；顺序、index、`usage` 与 sparse 契约不变 | dense 余弦 ≥0.999999；sparse 键集合一致；无部分结果 |
+| AC-008 | 合批分组受 8192 padding token 预算、16 条上限和 1.25 倍长度比约束；4×8192 与 16×1024 均按预算拆组 | 分组不超预算；单条路径保留；Metal 峰值不超过 1.0 GiB（本机） |
+| AC-009 | 16×25、16×256、16×512、16×1024、16×2048 与 4×8192 基准；1k/2k 与逐条对照 | 1k/2k 墙钟不劣化超过 5%；短/中批有可测收益；无 5xx |
 
 此前由实施侧加入的官方参考模型对照、余弦阈值、完整边界套件、复杂队列 / 取消测试、故障注入和日志哨兵验收不再是首版必做项；AC-004、AC-005 原复杂验收场景撤销。已执行结果可留在 Plan 作为历史事实，不据此追加工作。后续只有实际问题或用户明确需求才增加对应测试。
 

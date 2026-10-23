@@ -13,6 +13,32 @@ class Embedding:
     sparse: dict[str, float] | None = None
 
 
+# Bound one padded forward: a 16 x 512 group is exactly 8192 padded tokens.
+# Larger groups showed no throughput gain on 1024+ token inputs and increased peak memory.
+_BATCH_TOKEN_LIMIT = 8192
+_BATCH_SIZE_LIMIT = 16
+_BATCH_LENGTH_RATIO = 1.25
+
+
+def batch_groups(lengths: list[int]) -> list[list[int]]:
+    """Group indices by similar length within the padded-token budget."""
+    order = sorted(range(len(lengths)), key=lambda index: (lengths[index], index))
+    groups, current = [], []
+    for index in order:
+        length = lengths[index]
+        if current:
+            first = lengths[current[0]]
+            if (len(current) >= _BATCH_SIZE_LIMIT
+                    or length > first * _BATCH_LENGTH_RATIO
+                    or length * (len(current) + 1) > _BATCH_TOKEN_LIMIT):
+                groups.append(current)
+                current = []
+        current.append(index)
+    if current:
+        groups.append(current)
+    return groups
+
+
 class FusedSelfAttention(nn.Module):
     """Inference-only replacement for mlx-embeddings 0.1.0 XLM-R attention."""
 
@@ -69,6 +95,10 @@ class Embedder:
             raise ValueError("Local sparse head is invalid.")
         self.sparse_weight, self.sparse_bias = weight, bias
         self.special_ids = set(self.tokenizer.all_special_ids)
+        pad_token_id = self.tokenizer.pad_token_id
+        if pad_token_id is None:
+            raise ValueError("Tokenizer padding token is required.")
+        self.pad_token_id = int(pad_token_id)
         mx.eval(self.sparse_weight, self.sparse_bias)
 
     def tokenize(self, texts: list[str]) -> list[list[int]]:
@@ -78,28 +108,45 @@ class Embedder:
 
     def embed(self, token_ids: list[list[int]],
               return_sparse: bool = False) -> list[Embedding]:
-        results = []
-        for ids in token_ids:
-            inputs = mx.array([ids])
-            output = self.model(inputs, attention_mask=mx.ones(inputs.shape, dtype=mx.int32))
-            hidden = output.last_hidden_state
-            cls = hidden[:, 0, :].astype(mx.float32)
-            vector = cls / mx.sqrt(mx.sum(cls * cls, axis=-1, keepdims=True))
-            if return_sparse:
-                logits = mx.maximum(
-                    (hidden.astype(mx.float32) @ self.sparse_weight.T
-                     + self.sparse_bias).squeeze(-1), 0)
-                mx.eval(vector, logits)
-                sparse = self._sparse(ids, np.asarray(logits)[0])
-            else:
-                mx.eval(vector)
-                sparse = None
-            values = np.asarray(vector)[0]
-            if (values.shape != (1024,) or not np.isfinite(values).all()
-                    or abs(float(np.linalg.norm(values)) - 1) > 1e-5):
-                raise RuntimeError("Invalid embedding output.")
-            results.append(Embedding(values.tolist(), sparse))
+        results = [None] * len(token_ids)
+        for group in batch_groups([len(ids) for ids in token_ids]):
+            vectors, sparse_rows = self._forward([token_ids[index] for index in group],
+                                                 return_sparse)
+            for index, vector, sparse in zip(group, vectors, sparse_rows):
+                results[index] = Embedding(vector.tolist(), sparse)
         return results
+
+    def _forward(self, token_ids: list[list[int]], return_sparse: bool):
+        batch = len(token_ids)
+        length = max(map(len, token_ids))
+        input_ids = np.full((batch, length), self.pad_token_id, dtype=np.int32)
+        attention_mask = np.zeros((batch, length), dtype=np.int32)
+        for row, ids in enumerate(token_ids):
+            input_ids[row, :len(ids)] = ids
+            attention_mask[row, :len(ids)] = 1
+
+        output = self.model(mx.array(input_ids), attention_mask=mx.array(attention_mask))
+        hidden = output.last_hidden_state
+        cls = hidden[:, 0, :].astype(mx.float32)
+        vectors = cls / mx.sqrt(mx.sum(cls * cls, axis=-1, keepdims=True))
+        if return_sparse:
+            logits = mx.maximum(
+                (hidden.astype(mx.float32) @ self.sparse_weight.T
+                 + self.sparse_bias).squeeze(-1), 0)
+            mx.eval(vectors, logits)
+            sparse_values = np.asarray(logits)
+        else:
+            mx.eval(vectors)
+            sparse_values = None
+
+        values = np.asarray(vectors)
+        if (values.shape != (batch, 1024) or not np.isfinite(values).all()
+                or np.any(np.abs(np.linalg.norm(values, axis=1) - 1) > 1e-5)):
+            raise RuntimeError("Invalid embedding output.")
+        sparse_rows = ([self._sparse(ids, sparse_values[row, :len(ids)])
+                        for row, ids in enumerate(token_ids)]
+                       if return_sparse else [None] * batch)
+        return values, sparse_rows
 
     def _sparse(self, ids: list[int], weights: np.ndarray) -> dict[str, float]:
         if weights.shape != (len(ids),) or not np.isfinite(weights).all():

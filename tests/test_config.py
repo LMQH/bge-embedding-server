@@ -106,7 +106,7 @@ def test_configured_mlx_limits_reach_runtime(settings, monkeypatch):
     from bge_embedding import inference
     calls = {}
     model = SimpleNamespace(encoder=SimpleNamespace(layer=[]), eval=lambda: None)
-    tokenizer = SimpleNamespace(all_special_ids=[0, 1, 2, 3])
+    tokenizer = SimpleNamespace(all_special_ids=[0, 1, 2, 3], pad_token_id=1)
     monkeypatch.setattr(mlx_embeddings, "load", lambda *args, **kwargs: (model, tokenizer))
     monkeypatch.setattr(inference.mx, "set_memory_limit", lambda value: calls.update(memory=value))
     monkeypatch.setattr(inference.mx, "set_cache_limit", lambda value: calls.update(cache=value))
