@@ -54,4 +54,4 @@ def test_real_embedder_varied_length_batches_match_single():
         assert set(batched.sparse) == set(alone.sparse)
         for key in batched.sparse:
             assert math.isclose(batched.sparse[key], alone.sparse[key],
-                                rel_tol=1e-4, abs_tol=1e-6)
+                                rel_tol=2e-3, abs_tol=5e-4)

@@ -10,6 +10,8 @@
 
 2026-10-23 按用户要求完成 600 秒连续入库：`16×512`、dense-only、固定 512-token 合成输入、独立进程，不经过 HTTP/缓存/队列。260 批 / 2,129,920 tokens / 602.07 秒，平均 3,537.7 tok/s；首 30 秒 3,713.9，约 2 分钟后稳定在 3,512–3,532，稳定段斜率约 `-0.002 tok/s²`；峰值 977.4 MiB，RSS 峰值 1,292 MiB，swap 前后均为 41.5 MiB used，`pmset` 未记录热/性能警告。结论：未观察到明显持续热降频；该测试不代表 HTTP、队列、真实语料或容量承诺。
 
+2026-10-23 用户确认四项后续优化方向：FP16 attention、减少每层 `mx.eval`、`mx.compile` / 图融合、跨请求微合批（10–20ms）。已建立 [PLAN-0012](docs/plans/0012-inference-optimizations.md) 作为待办与执行顺序：先冻结基线，再依次做 FP16、eval 频率、compile，最后在 ADR/Spec 确认后做跨请求微合批。P0/P1 已完成：FP16 attention 在 16×256/512/1024 约快 18–19%，4×8192 约快 21%，峰值 977.4→783.8 MiB；dense 对 FP32 基线最低余弦 0.9999706，sparse 容差调整为 2e-3 / 5e-4；103 项非 real、3 项 real 通过。P2（减少逐层 eval）与 P3（mx.compile）已测试并否决：eval 间隔无稳定收益，N=4 峰值超 1.2 GiB；compile 固定 shape 可快 7–15%，但需关闭逐层 eval、峰值 1.2–1.5 GiB，且 shapeless 不同 shape 失败。当前保留 FP16 + 每层 eval；P4 跨请求微合批待先写 ADR/Spec，未部署。
+
 2026-10-22 新增 [REF-0003：当前服务的局限性](docs/references/0003-service-limitations.md)，把模型、接口、容量、运维与验证层面的边界按“设计取舍 / 能力缺口 / 未验证风险”三层固化为文档，覆盖 22 条局限并给出影响排序；同步更新[文档中心](docs/README.md)索引与 README 的边界说明。本文是评估依据与快照，不构成 SLA、容量或效果承诺；本次不改变服务行为。
 
 2026-10-22 按用户要求将根目录 README 重写为技术产品介绍：以产品定位、核心能力、请求链路、快速开始、API 契约、M4 性能观测与适用边界组织内容，替代仅目录导航的旧版；性能数字引用 [PLAN-0006](docs/plans/0006-performance-test.md) / [PLAN-0009](docs/plans/0009-result-cache.md)，接口限制引用 [SPEC-0001](docs/specs/0001-embedding-inference.md) / [SPEC-0002](docs/specs/0002-dense-sparse-output.md)，版本基线取自 [requirements.lock](requirements.lock)。部署进度与验证证据继续在本文件及各 Plan 维护。文档检查记录见 [PLAN-0001](docs/plans/0001-project-foundation.md)，本次不改变服务行为。

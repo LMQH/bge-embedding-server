@@ -24,13 +24,14 @@
 - 每条输出恰好 1024 个有限数值；归一化结果以 JSON 数字数组返回。非有限数值或异常输出视为推理故障。
 - 同一执行任务内的未命中条目按长度接近程度分桶；桶内右 padding 后一次前向。每个合批组 padding 后的 token 总数不超过 8192，同组最长与最短长度不超过 1.25 倍；超出预算的条目单独执行。分组只影响执行方式，不改变输出顺序、`usage`、错误语义或缓存键。
 - 长输入修复采用 MLX `scaled_dot_product_attention(force_fused=True)`，保持双向全局注意力和 additive mask；融合内核不可用时按推理失败处理，不退回完整注意力矩阵。每层注意力结果立即求值，控制跨层中间张量的存活。
+- attention 的 Q/K/V 与 additive mask 使用 FP16，以利用 M4 GPU 的 FP16 吞吐；CLS、L2 归一化和 sparse 头仍在 FP32 计算或输出。FP16 引起的数值差异受合批容差约束。
 
 ## 批内合批（2026-10-23 增补）
 
 - 仅在同一请求的未命中条目内合批；不跨请求、不改变单 worker / 单模型实例 / FIFO 队列。全命中请求、去重逻辑和缓存行为沿用 SPEC-0003、SPEC-0004。
 - 分组按 token 长度排序后贪心装入，受 8192 padding 后 token 预算、16 条上限和 1.25 倍长度比约束；分组结果不对外暴露，也不保证稳定。
 - padding 使用 tokenizer 的 pad token，固定右 padding；attention mask 必须屏蔽 padding。`usage` 只统计原始 token，不统计 padding。
-- 合批结果必须满足既有 dense / sparse 契约。与逐条执行相比，dense 向量余弦相似度 ≥0.999999；sparse 的键集合一致，权重相对误差 ≤1e-4（绝对误差 ≤1e-6）。
+- 合批结果必须满足既有 dense / sparse 契约。与逐条执行相比，dense 向量余弦相似度 ≥0.999999；sparse 的键集合一致，权重相对误差 ≤2e-3（绝对误差 ≤5e-4）。FP16 attention 的舍入会带来这一量级差异；dense-only 路径仍使用 FP16，sparse 路径不单独退回 FP32。
 - 合批异常与单条异常一样使整个请求返回 500 `inference_failed`，不返回部分结果；不得因合批改变 400、401、413、429、503 的触发条件。
 
 ## API 与兼容子集
