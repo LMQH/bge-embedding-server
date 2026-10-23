@@ -49,6 +49,16 @@ class TokenEmbedder(FakeEmbedder):
         return [Embedding([float(ids[0])] + [0.0] * 1023, None) for ids in tokens]
 
 
+class GatedTokenEmbedder(TokenEmbedder):
+    def embed(self, tokens, return_sparse=False):
+        self.calls.append(tokens)
+        self.started.set()
+        assert self.gate.wait(10), "Test did not release inference"
+        return [Embedding([float(ids[0])] + [0.0] * 1023,
+                          {str(ids[0]): 0.5, str(ids[1]): 0.25} if return_sparse else None)
+                for ids in tokens]
+
+
 @asynccontextmanager
 async def client_for(settings, model=None):
     model = model or FakeEmbedder()
@@ -175,7 +185,7 @@ async def until(predicate):
 
 
 async def test_http_fifo_overload_health_and_shutdown(settings):
-    model = FakeEmbedder()
+    model = GatedTokenEmbedder()
     model.gate.clear()
     async with client_for(settings, model) as (client, _, app):
         async def post(text):
@@ -193,8 +203,14 @@ async def test_http_fifo_overload_health_and_shutdown(settings):
         assert rejected.headers["retry-after"] == "1"
         assert (await client.get("/healthz")).status_code == 200
         model.gate.set()
-        assert all(r.status_code == 200 for r in await asyncio.gather(active, *waiting))
-        assert [x[0][0] for x in model.calls] == list(map(ord, "abcdefghijklmnopqrst"))
+        responses = await asyncio.gather(active, *waiting)
+        assert all(r.status_code == 200 for r in responses)
+        for response, text in zip(responses, "abcdefghijklmnopqrst"):
+            assert response.json()["data"][0]["embedding"][0] == float(ord(text))
+        # The first job runs alone; the remaining 19 FIFO waiters are split
+        # into one 16-item micro-batch and one 3-item micro-batch.
+        assert [len(call) for call in model.calls] == [1, 16, 3]
+        assert [ids[0] for call in model.calls for ids in call] == list(map(ord, "abcdefghijklmnopqrst"))
         app.state.scheduler.begin_shutdown()
         assert (await post("z")).status_code == 503
         assert (await client.get("/healthz")).status_code == 503
@@ -499,3 +515,59 @@ async def test_retry_after_only_on_overload(settings):
         r = await client.post("/v1/embeddings", headers={"Authorization": "Bearer wrong"},
                               json=payload("a"))
         assert r.status_code == 401 and "retry-after" not in r.headers
+
+
+async def test_micro_batch_merges_only_same_output_mode(settings):
+    model = GatedTokenEmbedder()
+    model.gate.clear()
+    async with client_for(settings, model) as (client, _, app):
+        async def post(text, sparse=False):
+            return await client.post("/v1/embeddings", headers=AUTH,
+                                     json=payload(text, return_sparse=sparse))
+
+        active = asyncio.create_task(post("a"))
+        await until(model.started.is_set)
+        waiters = [asyncio.create_task(post("b")),
+                   asyncio.create_task(post("c")),
+                   asyncio.create_task(post("d", sparse=True))]
+        await until(lambda: len(app.state.scheduler.waiting) == 3)
+        model.gate.set()
+        responses = await asyncio.gather(active, *waiters)
+        assert all(r.status_code == 200 for r in responses)
+        assert [len(call) for call in model.calls] == [1, 2, 1]
+        assert [ids[0] for call in model.calls for ids in call] == list(map(ord, "abcd"))
+        assert all("sparse" not in r.json()["data"][0] for r in responses[:3])
+        assert responses[3].json()["data"][0]["sparse"]
+        assert responses[3].json()["data"][0]["embedding"][0] == float(ord("d"))
+
+
+async def test_micro_batch_failure_retries_each_request(settings):
+    class CombinedFlaky(GatedTokenEmbedder):
+        def embed(self, tokens, return_sparse=False):
+            self.calls.append(tokens)
+            self.started.set()
+            assert self.gate.wait(10), "Test did not release inference"
+            if len(tokens) > 1:
+                raise RuntimeError("combined failure")
+            result = []
+            for ids in tokens:
+                sparse = {str(ids[0]): 0.5, str(ids[1]): 0.25} if return_sparse else None
+                result.append(Embedding([float(ids[0])] + [0.0] * 1023, sparse))
+            return result
+
+    model = CombinedFlaky()
+    model.gate.clear()
+    async with client_for(settings, model) as (client, _, app):
+        async def post(text):
+            return await client.post("/v1/embeddings", headers=AUTH, json=payload(text))
+
+        active = asyncio.create_task(post("a"))
+        await until(model.started.is_set)
+        waiters = [asyncio.create_task(post("b")), asyncio.create_task(post("c"))]
+        await until(lambda: len(app.state.scheduler.waiting) == 2)
+        model.gate.set()
+        responses = await asyncio.gather(active, *waiters)
+        assert all(r.status_code == 200 for r in responses)
+        assert [len(call) for call in model.calls] == [1, 2, 1, 1]
+        for response, text in zip(responses, "abc"):
+            assert response.json()["data"][0]["embedding"][0] == float(ord(text))

@@ -39,7 +39,7 @@ MLX / Metal
 JSON 响应（dense / dense + sparse）
 ```
 
-单 worker、单模型实例；同一请求内的未命中条目按长度分桶、右 padding 后合批前向，减少每请求固定开销；不跨请求合批，也不增加执行位——优先保证单机资源可预测，而不是通用高并发。缓存只驻留进程内存，重启即清空。合批对短/中批有效，对 1k 以上长块基本无收益，见 [PLAN-0011](docs/plans/0011-batch-inference.md)。
+单 worker、单模型实例；同一请求内的未命中条目按长度分桶、右 padding 后合批前向，减少每请求固定开销；等待队列存在同 `return_sparse` 的短请求时，按最多 15ms 窗口跨请求微合批；不增加执行位——优先保证单机资源可预测，而不是通用高并发。缓存只驻留进程内存，重启即清空。合批对短/中批有效，对 1k 以上长块基本无收益，见 [PLAN-0011](docs/plans/0011-batch-inference.md)。
 
 选择 BGE-M3 + MLX 的原因很直接：BGE-M3 原生同时提供 dense 与 sparse 信号，MLX 则直接利用 Apple Silicon 的 Metal 与统一内存；不引入第二个稀疏模型，也不依赖外部向量服务，延迟、内存和隐私边界都留在同一个进程里。依据见 [ADR-0002](docs/adr/0002-bge-m3-mlx.md) 和 [ADR-0005](docs/adr/0005-native-sparse-head.md)。
 

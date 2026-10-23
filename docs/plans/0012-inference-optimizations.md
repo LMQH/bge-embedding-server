@@ -37,8 +37,8 @@
 | 已完成 | P1 FP16 attention：Q/K/V 与 additive mask 使用 FP16；dense/sparse 共用该路径 | `src/bge_embedding/inference.py`、`tests/test_inference.py`、`docs/specs/0001-embedding-inference.md` | dense 对 P0 余弦 ≥0.9999；sparse 键一致、权重误差 ≤2e-3 / 5e-4；16×256/512 至少一项提速 ≥3%；1k/2k/8k 回退 ≤3%；无 5xx |
 | 已完成（否决） | P2 减少逐层 `mx.eval`：按层号每 N 层求值，先试 N=2/3/4 | `src/bge_embedding/inference.py`、`.cache/opt/` | 峰值 <1.2 GiB；1k/2k/8k 回退 ≤3%；dense 与 P1 一致；无异常；无稳定收益则回退 |
 | 已完成（否决） | P3 `mx.compile` / 图融合：只编译稳定 shape 的 forward；失败或收益 <3% 则放弃 | `src/bge_embedding/inference.py`、`.cache/opt/` | 16×256/512 提速 ≥3%；1k/2k 回退 ≤3%；峰值不高于 P2；测试通过 |
-| 待开始 | P4a 跨请求微合批设计：新增 ADR（替代 ADR-0007 中“不做跨请求”部分）与 SPEC-0001 增补；确定窗口、上限、公平性、失败语义 | `docs/adr/`、`docs/specs/` | 决策与契约先确认；明确只合并等待中请求，不改变 API |
-| 待开始 | P4b 实现跨请求微合批：调度器在 10–20ms 窗口内合并短请求，按请求拆分结果 | `src/bge_embedding/scheduler.py`、`src/bge_embedding/app.py`、`tests/` | P95 延迟不高于基线 + 窗口；短查询吞吐提升；429/排队语义不变 |
+| 已完成 | P4a 跨请求微合批设计：新增 ADR-0008（替代 ADR-0007 中“不做跨请求”部分）与 SPEC-0001 增补；确认窗口、上限、公平性、失败语义 | `docs/adr/0008-cross-request-micro-batching.md`、`docs/specs/0001-embedding-inference.md` | 决策与契约先确认；只合并等待中请求，不改变 API |
+| 进行中 | P4b 实现跨请求微合批：调度器在 15ms 窗口内合并短请求，按请求拆分结果；失败逐请求重试 | `src/bge_embedding/scheduler.py`、`tests/test_api.py` | P95（多次运行中位数）不高于基线 + 20ms；短查询吞吐提升；429/排队语义不变；全部测试通过 |
 
 ## 验证记录
 
@@ -76,8 +76,7 @@
   - 关闭逐层 `mx.eval` 是编译的前提；峰值在 16×512 已超过 1.2 GiB，4×8192 达 1.5 GiB。
   - `shapeless=True` 在当前模型上因 reshape 失败，无法用一份编译图覆盖不同 batch/length；只能按 shape 编译，服务混合请求会产生首次编译延迟和缓存管理成本。
   - 结论：不纳入当前实现；保留逐层 `mx.eval`。若后续要做，需先解决固定 shape 预编译/回收和内存门槛，不能直接替换主路径。
-- P4a：待开始。先写 ADR 与 SPEC 增补，不写实现。
-- P4：待设计。
+- P4a：已完成。ADR-0008 与 SPEC-0001 增补已写入；窗口 15ms、同 `return_sparse`、FIFO、16 条 / 8192 token、失败逐请求重试；不新增配置。
 
 ## 交付与遗留事项
 
@@ -85,10 +84,10 @@
 - 不改变生产默认值前不重启常驻服务；任何部署需另行授权。
 - 跨请求微合批涉及调度语义，未完成 ADR/Spec 前不写实现。
 
-## P4 设计待确认（不写实现）
+## P4 实施约束（已确认）
 
-- 触发：执行位空闲时立即执行；仅当等待队列非空时才等待一个 10–20ms 窗口（建议 15ms），避免给单请求增加固定延迟。
-- 合并：只合并 `return_sparse` 相同的等待作业；FIFO，先到先合并；总条数与原始 token 上限是多少（沿用 16 条 / 8192 token 还是另设）需要确认，超过上限的作业留到下一批。
-- 失败：合并推理失败时是整体返回 `inference_failed`，还是逐作业重试以保持故障隔离，需要确认；后者会增加故障时开销。
-- 配置：建议先使用固定 15ms 常量，不新增配置项；只有出现运维调参需求时再提升为配置。
-- 不改变：API、`usage`、缓存/去重、429/503 触发条件、单 worker、单模型实例和 FIFO 顺序；窗口带来的额外等待只作用于已被排队的请求。
+- 触发：执行位切换时，只有队列头与其 `return_sparse` 相同才等待最多 15ms；队列已能填满上限时立即执行，不为单请求固定加窗。
+- 合并：FIFO 前缀，最多 16 条 / 8192 原始 token；不跨 `return_sparse`；超限作业留到下一批。
+- 失败：合并失败后逐请求重试；只有单请求也失败才返回 500。
+- 队列容量仍为 1 个执行中 + 19 个等待位置，合批作业计入执行中容量；不新增配置项。
+- 不改变 API、`usage`、缓存/去重、429/503 触发条件和顺序语义；没有等待者时不产生合批收益。
