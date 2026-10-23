@@ -42,6 +42,13 @@ class FakeEmbedder:
         return result
 
 
+class TokenEmbedder(FakeEmbedder):
+    def embed(self, tokens, return_sparse=False):
+        self.calls.append(tokens)
+        self.started.set()
+        return [Embedding([float(ids[0])] + [0.0] * 1023, None) for ids in tokens]
+
+
 @asynccontextmanager
 async def client_for(settings, model=None):
     model = model or FakeEmbedder()
@@ -183,6 +190,7 @@ async def test_http_fifo_overload_health_and_shutdown(settings):
         rejected = await post("u")
         assert rejected.status_code == 429
         assert rejected.json()["error"]["code"] == "queue_full"
+        assert rejected.headers["retry-after"] == "1"
         assert (await client.get("/healthz")).status_code == 200
         model.gate.set()
         assert all(r.status_code == 200 for r in await asyncio.gather(active, *waiting))
@@ -215,7 +223,8 @@ async def test_client_disconnect_releases_queue_but_not_active_slot(settings):
         assert [x[0][0] for x in model.calls] == list(map(ord, "ac"))
 
 
-async def test_queue_timeout_and_shutdown_waiters(settings):
+async def test_queue_timeout_and_shutdown_waiters(caplog, settings):
+    caplog.set_level(logging.INFO, logger="bge_embedding")
     model = FakeEmbedder()
     model.gate.clear()
     async with client_for(settings, model) as (client, _, app):
@@ -225,6 +234,10 @@ async def test_queue_timeout_and_shutdown_waiters(settings):
         app.state.scheduler.wait_seconds = 0.03
         r = await client.post("/v1/embeddings", headers=AUTH, json=payload("b"))
         assert r.status_code == 429 and r.json()["error"]["code"] == "queue_timeout"
+        assert r.headers["retry-after"] == "1"
+        line = [record.getMessage() for record in caplog.records
+                if "code=queue_timeout" in record.getMessage()][-1]
+        assert "exec_ms=0" in line
         assert not app.state.scheduler.waiting
         app.state.scheduler.wait_seconds = 30
         queued = asyncio.create_task(client.post("/v1/embeddings", headers=AUTH, json=payload("c")))
@@ -430,3 +443,59 @@ async def test_client_disconnect_does_not_backfill(settings):
         before = len(model.calls)
         assert (await client.post("/v1/embeddings", headers=AUTH, json=payload(text))).status_code == 200
         assert len(model.calls) == before + 1
+
+
+@pytest.mark.parametrize("cache_enabled", [True, False])
+async def test_duplicate_texts_are_inferred_once(cache_enabled, caplog, settings):
+    caplog.set_level(logging.INFO, logger="bge_embedding")
+    if not cache_enabled:
+        settings = replace(settings, cache=replace(settings.cache, enabled=False))
+    model = TokenEmbedder()
+    async with client_for(settings, model) as (client, _, _):
+        r = await client.post("/v1/embeddings", headers=AUTH, json=payload(["a", "b", "a"]))
+        assert r.status_code == 200
+        data = r.json()["data"]
+        assert [item["index"] for item in data] == [0, 1, 2]
+        assert [item["embedding"][0] for item in data] == [97.0, 98.0, 97.0]
+        assert len(model.calls) == 1
+        assert model.calls[0] == [[97, 97, 97], [98, 98, 98]]
+        assert r.json()["usage"] == {"prompt_tokens": 9, "total_tokens": 9}
+    line = [record.getMessage() for record in caplog.records
+            if record.getMessage().startswith("path=/v1/embeddings")][-1]
+    assert "batch=3" in line and "dedup=1" in line
+
+
+async def test_request_log_includes_queue_and_exec_metrics(caplog, settings):
+    caplog.set_level(logging.INFO, logger="bge_embedding")
+    model = FakeEmbedder()
+    model.gate.clear()
+    async with client_for(settings, model) as (client, _, app):
+        active = asyncio.create_task(client.post("/v1/embeddings", headers=AUTH, json=payload("a")))
+        await until(model.started.is_set)
+        queued = asyncio.create_task(client.post("/v1/embeddings", headers=AUTH, json=payload("b")))
+        await until(lambda: len(app.state.scheduler.waiting) == 1)
+        model.gate.set()
+        assert (await active).status_code == 200
+        assert (await queued).status_code == 200
+
+    lines = [record.getMessage() for record in caplog.records
+             if record.getMessage().startswith("path=/v1/embeddings")]
+    assert len(lines) == 2
+    metrics = {}
+    for line in lines:
+        fields = dict(part.split("=", 1) for part in line.split() if "=" in part)
+        assert {"wait_ms", "exec_ms", "ahead", "dedup"} <= fields.keys()
+        assert all(fields[name].isdigit() for name in ("wait_ms", "exec_ms", "ahead", "dedup"))
+        metrics[int(fields["ahead"])] = fields
+    assert set(metrics) == {0, 1}
+    assert int(metrics[1]["wait_ms"]) >= 0
+    assert int(metrics[1]["exec_ms"]) >= 0
+
+
+async def test_retry_after_only_on_overload(settings):
+    async with client_for(settings) as (client, model, _):
+        r = await client.post("/v1/embeddings", headers=AUTH, json=payload(""))
+        assert r.status_code == 400 and "retry-after" not in r.headers
+        r = await client.post("/v1/embeddings", headers={"Authorization": "Bearer wrong"},
+                              json=payload("a"))
+        assert r.status_code == 401 and "retry-after" not in r.headers

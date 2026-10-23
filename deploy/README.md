@@ -16,7 +16,7 @@ python -m pip check
 python -m pytest -q
 ```
 
-完整锁包含运行与基本冒烟依赖，默认测试只有 3 项 smoke；不需要官方参考权重或 Torch。模型获取与固定 revision 见 [models/README](../models/README.md)。不安装 `src/vendor/mlx`。
+完整锁包含运行与基本冒烟依赖，默认测试只有 4 项 smoke；不需要官方参考权重或 Torch。模型获取与固定 revision 见 [models/README](../models/README.md)。不安装 `src/vendor/mlx`。
 
 双路输出还需要官方 BGE-M3 稀疏头。在项目根目录执行：
 

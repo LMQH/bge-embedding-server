@@ -12,6 +12,10 @@ class Job:
     return_sparse: bool
     result: asyncio.Future
     timer: asyncio.TimerHandle | None = None
+    enqueued_at: float = 0.0
+    started_at: float | None = None
+    finished_at: float | None = None
+    ahead: int = 0
 
 
 class Scheduler:
@@ -31,6 +35,8 @@ class Scheduler:
             raise APIError("queue_full")
         loop = asyncio.get_running_loop()
         job = Job(tokens, return_sparse, loop.create_future())
+        job.enqueued_at = loop.time()
+        job.ahead = len(self.waiting) + (1 if self.active is not None else 0)
         if self.active is None:
             self.active = job
             self.task = asyncio.create_task(self._run())
@@ -57,6 +63,7 @@ class Scheduler:
     async def _run(self):
         while self.active is not None:
             job = self.active
+            job.started_at = asyncio.get_running_loop().time()
             try:
                 value = await asyncio.get_running_loop().run_in_executor(
                     self.executor, self.infer, job.tokens, job.return_sparse)
@@ -66,6 +73,8 @@ class Scheduler:
             else:
                 if not job.result.done():
                     job.result.set_result(value)
+            finally:
+                job.finished_at = asyncio.get_running_loop().time()
             self.active = self.waiting.popleft() if self.waiting else None
             if self.active and self.active.timer:
                 self.active.timer.cancel()

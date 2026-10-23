@@ -1,8 +1,10 @@
 # 项目进度与交接
 
-更新日期：2026-10-22。
+更新日期：2026-10-23。
 
 ## 当前状态
+
+2026-10-23 按用户指示完成首批请求优化（O1/O2/O4）：请求日志追加 `wait_ms` / `exec_ms` / `ahead` / `dedup`；同一请求内重复文本只推理一次，响应顺序与 `usage` 不变；429 增加 `Retry-After: 1`。新增 [PRD-0004](docs/prd/0004-request-optimizations.md)、[SPEC-0004](docs/specs/0004-request-observability-and-dedup.md)、[PLAN-0010](docs/plans/0010-request-optimizations.md)，配置仍为 18 项。本机 99 项非 real、2 项 real 测试通过；本机服务已通过 launchd 重启加载新版本并完成真实 HTTP 与性能实测。M4 未部署，M4 线上行为仍以旧版本为准；部署需另行授权。
 
 2026-10-22 新增 [REF-0003：当前服务的局限性](docs/references/0003-service-limitations.md)，把模型、接口、容量、运维与验证层面的边界按“设计取舍 / 能力缺口 / 未验证风险”三层固化为文档，覆盖 22 条局限并给出影响排序；同步更新[文档中心](docs/README.md)索引与 README 的边界说明。本文是评估依据与快照，不构成 SLA、容量或效果承诺；本次不改变服务行为。
 
@@ -50,7 +52,7 @@
 
 用户明确要求“一切从简”，见 [ADR-0004](docs/adr/0004-minimal-verification.md)。官方参考对照及复杂测试已退出首版必做范围；额外参考权重、专用验证脚本及 Torch 专用依赖已移除。
 
-- 默认测试：3 项基本 smoke 通过。
+- 默认测试：4 项基本 smoke 通过。
 - 双路输出本机验证：72 项非 real 通过；2 项 real 通过；8192 tokens dense-only 5.133 秒 / 977.4 MiB，dense+sparse 4.777 秒 / 977.4 MiB，dense 最大绝对差 0.0；本机真实 HTTP 含 sparse 与 8192 tokens 冒烟通过（4.88 秒）。详见 [PLAN-0007](docs/plans/0007-dense-sparse-output.md)。M4 双路输出未部署、未实测。
 - 已通过本机到 M4 的真实 HTTP 调用：健康状态、缺 Key 返回 401、正确 Key 的单条 / 两条批量、1024 维有限归一化向量。
 - 针对实际内存问题新增 1 项定向回归：旧实现 2048-token Metal 活跃分配峰值 1674.8 MiB，修复后 677.3 MiB；本机回归通过，M4 独立测量一致。
@@ -58,9 +60,12 @@
 - 内存测量期间无新增 swap 写出；8192 样本有 32 页系统级 swap 读入，原有 swap 仍在，不能称系统完全无 swap。2 GiB 工作指导值 / 256 MiB 缓存回收目标不是硬配额，见 Plan 的口径与限制。
 - 已按 PLAN-0006 完成延迟基线、并发容量与资源峰值测试（2026-10-21）；仍未做故障注入、30 秒排队超时实测、soak、8192 全长、整机重启或重新登录测试；不承诺容量或吞吐。launchd 启动 / 重启选项已配置，手动卸载与加载已实际执行。
 - 2026-10-21 按 [PLAN-0006](docs/plans/0006-performance-test.md) 完成 5 指标 × 3 场景性能测试并回填：5xx 与预期外 429 均为 0，无 swap 增长；RSS 峰值约 630 MiB、Metal 5341 峰值 838.2 MiB，三档延迟 P50 约 25.1 / 273.9 / 2616 ms。结果仅作观测，仍不构成容量、吞吐或 SLA 承诺；原始证据备份在本机 `.cache/perf/m4/`。
+- 2026-10-23 请求优化验证与部署：99 项非 real、2 项 real 通过；本机服务经 launchd 重启部署，真实 HTTP 冒烟通过；25 / 945 / 5341 tokens 冷 P50 48.9 / 270.0 / 2458.7 ms，命中 P50 1.7 / 2.2 / 5.9 ms；3 条相同 5349-token 输入墙钟 2.48 s（`exec_ms=2460`、`dedup=2`），3 条不同 7.40 s；20 并发排队为 19×200 + 1×429 `queue_full`（`Retry-After: 1`），`ahead` 0–19；测试后 footprint 1.2 GiB、峰值 1.4 GiB。详见 [PLAN-0010](docs/plans/0010-request-optimizations.md)。M4 未部署。
 
 ## 后续工作原则
 
 先使用现有服务。只有实际问题或用户明确需求才增加实现、优化或对应测试；不要自动恢复参考评测、完整边界套件或复杂验收流程。
+
+2026-10-23 首批优化后，先观察日志中的 `wait_ms` / `exec_ms` / 429 分布与缓存命中，再决定是否推进跨请求合并、准入控制或 GPU 合批；M4 部署需另行授权。
 
 2026-10-21 按用户要求初始化项目 Git，分支为 `main`，`origin` 关联 [LMQH/bge-embedding-server](https://github.com/LMQH/bge-embedding-server)。模型权重、缓存、凭据和独立上游 MLX 克隆继续排除在版本控制之外；初始化检查见 [PLAN-0001](docs/plans/0001-project-foundation.md)。本次双路输出的 Plan、实现与测试已推送到 `origin/main`，提交历史见 GitHub；M4 未执行。README 仅保留总览与导航，后续状态在本文件维护。

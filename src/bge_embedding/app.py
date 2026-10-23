@@ -58,7 +58,7 @@ def create_app(config, embedder_factory=None):
         started = time.monotonic()
         status, code, size, total = 500, "inference_failed", 0, 0
         job = watcher = None
-        hits = 0
+        hits = dedup = 0
         scheduler = getattr(app.state, "scheduler", None)
         try:
             if scheduler is None or scheduler.closing:
@@ -83,21 +83,28 @@ def create_app(config, embedder_factory=None):
                 pending = [item for item, found in zip(tokens, cached) if found is None]
             else:
                 pending = tokens
-            if pending:
-                job = scheduler.submit(pending, return_sparse)
+            unique = {}
+            for item in pending:
+                key = tuple(item)
+                if key in unique:
+                    dedup += 1
+                else:
+                    unique[key] = item
+            if unique:
+                job = scheduler.submit(list(unique.values()), return_sparse)
                 watcher = asyncio.create_task(disconnected(request))
                 done, _ = await asyncio.wait([job.result, watcher], return_when=asyncio.FIRST_COMPLETED)
                 if watcher in done:
                     raise ClientDisconnect()
                 computed = job.result.result()
                 if cache is not None:
-                    cache.store(pending, computed, return_sparse)
-                if cached is None:
-                    result = computed
-                else:
-                    remaining = iter(computed)
-                    result = [next(remaining) if found is None else found
-                              for found in cached]
+                    cache.store(list(unique.values()), computed, return_sparse)
+                by_key = {tuple(ids): embedding
+                          for ids, embedding in zip(unique.values(), computed)}
+                result = ([found if found is not None else by_key[tuple(item)]
+                           for item, found in zip(tokens, cached)]
+                          if cached is not None
+                          else [by_key[tuple(item)] for item in tokens])
             else:
                 result = cached
             response = embedding_response(result, total, return_sparse)
@@ -122,8 +129,20 @@ def create_app(config, embedder_factory=None):
                 watcher.cancel()
             if job:
                 scheduler.abandon(job)
-            log.info("path=/v1/embeddings status=%d code=%s seconds=%.3f batch=%d tokens=%d hits=%d",
-                     status, code, time.monotonic() - started, size, total, hits)
+            now = time.monotonic()
+            if job is not None:
+                started_at = job.started_at
+                wait_ms = max(0, int(((started_at if started_at is not None else now)
+                                      - job.enqueued_at) * 1000))
+                exec_ms = (max(0, int(((job.finished_at if job.finished_at is not None else now)
+                                       - started_at) * 1000))
+                           if started_at is not None else 0)
+                ahead = job.ahead
+            else:
+                wait_ms = exec_ms = ahead = 0
+            log.info("path=/v1/embeddings status=%d code=%s seconds=%.3f batch=%d tokens=%d hits=%d wait_ms=%d exec_ms=%d ahead=%d dedup=%d",
+                     status, code, now - started, size, total, hits, wait_ms, exec_ms, ahead,
+                     dedup if job is not None else 0)
     return app
 
 

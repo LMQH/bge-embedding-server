@@ -15,6 +15,8 @@ ERRORS = {
     "inference_failed": (500, "Embedding inference failed.", "server_error"),
 }
 
+RETRY_AFTER_SECONDS = "1"
+
 
 class APIError(Exception):
     def __init__(self, code, param=None):
@@ -23,8 +25,11 @@ class APIError(Exception):
 
     def response(self):
         status, message, kind = ERRORS[self.code]
+        headers = ({"Retry-After": RETRY_AFTER_SECONDS}
+                   if self.code in ("queue_full", "queue_timeout") else None)
         return JSONResponse({"error": {"message": message, "type": kind,
-                                      "param": self.param, "code": self.code}}, status)
+                                      "param": self.param, "code": self.code}},
+                            status, headers=headers)
 
 
 def parse_body(body: bytes, limits) -> tuple[list[str], bool]:

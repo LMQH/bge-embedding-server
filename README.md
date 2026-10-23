@@ -14,8 +14,8 @@
 - **Apple GPU 原生推理**：8bit BGE-M3 直接运行在 M 系列芯片的 Metal 上，一台 Mac mini 即可对外服务。
 - **一次前向，两路信号**：开启 `return_sparse` 时，dense 与 sparse 共享同一次模型前向，便于做语义 + 词面混合检索。
 - **为单机设计的有界性**：单 worker、单模型串行执行；1 个执行位 + 19 个等待位；请求体、批量与 token 均有上限，过载明确返回 429。
-- **重复请求走缓存**：进程内 LRU 按 token 哈希复用结果，全命中请求不占用执行位或等待位。
-- **可运维**：18 项参数集中在一个私有 TOML（[示例](config.example.toml)），启动时严格校验；`GET /healthz` 探活；launchd 常驻；轮转日志只记录安全元数据。
+- **重复请求走缓存**：进程内 LRU 按 token 哈希复用结果，全命中请求不占用执行位或等待位；同一请求内的重复文本只推理一次。
+- **可运维**：18 项参数集中在一个私有 TOML（[示例](config.example.toml)），启动时严格校验；`GET /healthz` 探活；launchd 常驻；轮转日志只记录安全元数据，并含请求级排队与执行耗时。
 
 ## 工作方式
 
@@ -181,7 +181,7 @@ curl -s http://127.0.0.1:8000/v1/embeddings \
 | 503 | `model_unavailable` | 服务未就绪或正在关闭 |
 | 500 | `inference_failed` | 推理异常或输出不符合数值契约 |
 
-错误响应使用固定安全描述，不回显用户文本、Key 或本地路径；日志同样只记录安全元数据。
+错误响应使用固定安全描述，不回显用户文本、Key 或本地路径；日志同样只记录安全元数据。429 响应带 `Retry-After: 1`，调用方应按该值退避后重试；日志新增请求级 `wait_ms` / `exec_ms` / `ahead` / `dedup` 字段。本机已启用；M4 线上启用范围见 [项目进度与交接](HANDOFF.md)。
 
 以上为示例基线，可在私有 TOML 中调整；执行位与 worker 固定为 1。完整字段规则、失败语义与验收场景见 [SPEC-0001](docs/specs/0001-embedding-inference.md) 和 [SPEC-0002](docs/specs/0002-dense-sparse-output.md)。双路输出需要目标机部署对应版本并准备稀疏头；当前线上启用范围以 [项目进度与交接](HANDOFF.md) 为准。
 

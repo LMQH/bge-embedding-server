@@ -4,6 +4,8 @@
 
 2026-10-21 已将配置化版本部署到 M4 并重启。双路输出已在本机实现并通过验证，但 M4 线上仍只返回 dense；当前不部署，以下限制与字段以线上为准，双路契约见 [SPEC-0002](specs/0002-dense-sparse-output.md)。配置和启动方式见 [部署说明](../deploy/README.md)。
 
+2026-10-23 的请求日志字段、请求内去重与 429 `Retry-After: 1` 已在本机部署并验证，M4 未部署；下表仍以 M4 线上行为为准，本机差异见 [PLAN-0010](plans/0010-request-optimizations.md)。
+
 | 项目 | 配置 |
 |---|---|
 | 访问地址 | `http://<TAILSCALE_IP>:8000` |
