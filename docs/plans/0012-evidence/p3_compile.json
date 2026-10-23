@@ -1,0 +1,12 @@
+{
+  "probe": "mx.compile full model forward, per-layer mx.eval disabled for tracing",
+  "shapes": [
+    {"case": "16x25", "uncompiled_s": 0.0951, "compiled_s": 0.0810, "peak_mib": 766.8},
+    {"case": "16x256", "uncompiled_s": 0.8661, "compiled_s": 0.8050, "peak_mib": 1204.5},
+    {"case": "16x512", "uncompiled_s": 1.8277, "compiled_s": 1.6770, "peak_mib": 1231.7},
+    {"case": "16x1024", "uncompiled_s": 3.9037, "compiled_s": 3.6110, "peak_mib": 1215.8},
+    {"case": "4x8192", "uncompiled_s": 15.4401, "compiled_s": 14.8050, "peak_mib": 1536.0}
+  ],
+  "shapeless": "ValueError: reshape cannot cover different shapes",
+  "decision": "rejected"
+}

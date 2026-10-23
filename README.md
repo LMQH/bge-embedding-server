@@ -201,6 +201,7 @@ curl -s http://127.0.0.1:8000/v1/embeddings \
 - 2026-10-23 在当前 Mac mini M4 16GB 执行环境的独立进程实测批内合批（非线上服务）：16×25 tokens 约 3.3x、16×256 约 1.18x、16×512 约 1.05x，16×1024 / 16×2048 / 4×8192 约 1.0x，混合长度约 0.97x；峰值最高 977.4 MiB。合批主要改善短/中批，不改变 1k 以上长块的 GPU 计算量；证据见 [PLAN-0011](docs/plans/0011-batch-inference.md)。
 - 2026-10-23 600 秒连续入库（16×512、dense-only、独立进程）：260 批 / 2,129,920 tokens / 602 秒，平均 3,537.7 tokens/s，稳定段约 3,522 tokens/s，1M token 约 4.7 分钟；峰值 977.4 MiB、RSS 1,292 MiB，未观察到持续热降频。该测试不经过 HTTP、缓存或队列，不代表端到端容量；证据见 [PLAN-0011](docs/plans/0011-batch-inference.md)。
 - 2026-10-23 FP16 attention 后，同一独立进程的批内合批绝对耗时进一步下降：16×256 1.07→0.87 秒、16×512 2.24→1.83 秒、4×8192 19.61→15.44 秒，峰值 977.4→783.8 MiB；dense 相对 FP32 基线最低余弦 0.9999706。合批加速比与 600 秒 soak 仍是 FP16 前的数据，未重测；证据见 [PLAN-0012](docs/plans/0012-inference-optimizations.md)。
+- 2026-10-23 跨请求微合批（15ms 窗口、同 `return_sparse`、FIFO、最多 16 条 / 8192 token）在真实模型、进程内 ASGI、缓存开启、唯一短文本下：20 并发单条 25-token 请求 P95 约 380→146ms、墙钟约 0.40→0.15 秒；16 并发 4 条请求 P95 约 417→399ms、墙钟约 0.45→0.41 秒。没有并发等待者时不产生收益；该数据不是 HTTP 线上 SLA，证据见 [PLAN-0012](docs/plans/0012-inference-optimizations.md) 与[原始样本](docs/plans/0012-evidence/README.md)。
 
 ## 适用场景与边界
 

@@ -1,0 +1,15 @@
+{
+  "baseline_vs_fp16": {
+    "lengths": [25, 64, 256, 512, 1024, 25, 128],
+    "min_dense_cosine": 0.9999705546802622,
+    "max_dense_abs_delta": 0.0007918423507362604,
+    "max_sparse_rel_error": 0.0008464,
+    "max_sparse_abs_error": 0.0001981
+  },
+  "batch_vs_single_fp16": {
+    "min_dense_cosine": 0.999999,
+    "max_sparse_rel_error": 0.0010635433841417194,
+    "max_sparse_abs_error": 0.00024011731147766113
+  },
+  "test_result": {"non_real_passed": 105, "real_passed": 3}
+}

@@ -1,6 +1,6 @@
 # PLAN-0012：推理服务算法与 Infra 优化
 
-- 状态：进行中（2026-10-23；用户确认方向，按项实施）
+- 状态：已完成（2026-10-23；P1 采纳，P2/P3 否决，P4 完成；未部署）
 - 关联：[SPEC-0001](../specs/0001-embedding-inference.md)、[ADR-0007](../adr/0007-batch-inference.md)、[PLAN-0011](0011-batch-inference.md)
 - 后续关联：跨请求微合批需新增 ADR 与 SPEC-0001 增补后才能编码。
 
@@ -38,7 +38,7 @@
 | 已完成（否决） | P2 减少逐层 `mx.eval`：按层号每 N 层求值，先试 N=2/3/4 | `src/bge_embedding/inference.py`、`.cache/opt/` | 峰值 <1.2 GiB；1k/2k/8k 回退 ≤3%；dense 与 P1 一致；无异常；无稳定收益则回退 |
 | 已完成（否决） | P3 `mx.compile` / 图融合：只编译稳定 shape 的 forward；失败或收益 <3% 则放弃 | `src/bge_embedding/inference.py`、`.cache/opt/` | 16×256/512 提速 ≥3%；1k/2k 回退 ≤3%；峰值不高于 P2；测试通过 |
 | 已完成 | P4a 跨请求微合批设计：新增 ADR-0008（替代 ADR-0007 中“不做跨请求”部分）与 SPEC-0001 增补；确认窗口、上限、公平性、失败语义 | `docs/adr/0008-cross-request-micro-batching.md`、`docs/specs/0001-embedding-inference.md` | 决策与契约先确认；只合并等待中请求，不改变 API |
-| 进行中 | P4b 实现跨请求微合批：调度器在 15ms 窗口内合并短请求，按请求拆分结果；失败逐请求重试 | `src/bge_embedding/scheduler.py`、`tests/test_api.py` | P95（多次运行中位数）不高于基线 + 20ms；短查询吞吐提升；429/排队语义不变；全部测试通过 |
+| 已完成 | P4b 实现跨请求微合批：调度器在 15ms 窗口内合并短请求，按请求拆分结果；失败逐请求重试 | `src/bge_embedding/scheduler.py`、`tests/test_api.py` | P95（多次运行中位数）不高于基线 + 20ms；短查询吞吐提升；429/排队语义不变；全部测试通过 |
 
 ## 验证记录
 
@@ -77,6 +77,16 @@
   - `shapeless=True` 在当前模型上因 reshape 失败，无法用一份编译图覆盖不同 batch/length；只能按 shape 编译，服务混合请求会产生首次编译延迟和缓存管理成本。
   - 结论：不纳入当前实现；保留逐层 `mx.eval`。若后续要做，需先解决固定 shape 预编译/回收和内存门槛，不能直接替换主路径。
 - P4a：已完成。ADR-0008 与 SPEC-0001 增补已写入；窗口 15ms、同 `return_sparse`、FIFO、16 条 / 8192 token、失败逐请求重试；不新增配置。
+- P4b：已完成。真实模型、进程内 ASGI、缓存开启、唯一短文本，基线 3 次 / 最终 10 次：
+
+  | 场景 | 基线 P95 | 最终 P95 | 基线墙钟 | 最终墙钟 |
+  | --- | ---: | ---: | ---: | ---: |
+  | 20 并发 × 1 条 × 25 token | 380.0 ms | 146.4 ms | 0.403 s | 0.153 s |
+  | 16 并发 × 4 条 × 25 token | 417.4 ms | 399.0 ms | 0.448 s | 0.406 s |
+
+  - 20 并发单条：P95 约降 61%，墙钟约降 62%；16 并发 4 条：P95 约降 4%，墙钟约降 9%。
+  - 最终 P95 最大观测 235.2 / 415.6 ms，均低于“基线中位 P95 + 20ms”（400.0 / 437.4 ms）；全部 200，无 5xx。
+  - 105 项非 real、3 项 real 测试通过。证据与原始样本见 [`0012-evidence/`](0012-evidence/README.md)；该数据是进程内基准，不是 HTTP 线上 SLA。
 
 ## 交付与遗留事项
 
