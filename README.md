@@ -199,6 +199,7 @@ curl -s http://127.0.0.1:8000/v1/embeddings \
 - 命中主导的 20 并发混合负载观测到 750 QPS；冷推理路径约 4 QPS 量级，两者不可直接比较。
 - 以上均为 2026-10-21 / 10-22 的观测值，不是 SLA、容量或吞吐承诺；缓存收益取决于实际重复率。方法与原始数据见 [PLAN-0006](docs/plans/0006-performance-test.md)、[PLAN-0009](docs/plans/0009-result-cache.md)。
 - 2026-10-23 在当前 Mac mini M4 16GB 执行环境的独立进程实测批内合批（非线上服务）：16×25 tokens 约 3.3x、16×256 约 1.18x、16×512 约 1.05x，16×1024 / 16×2048 / 4×8192 约 1.0x，混合长度约 0.97x；峰值最高 977.4 MiB。合批主要改善短/中批，不改变 1k 以上长块的 GPU 计算量；证据见 [PLAN-0011](docs/plans/0011-batch-inference.md)。
+- 2026-10-23 600 秒连续入库（16×512、dense-only、独立进程）：260 批 / 2,129,920 tokens / 602 秒，平均 3,537.7 tokens/s，稳定段约 3,522 tokens/s，1M token 约 4.7 分钟；峰值 977.4 MiB、RSS 1,292 MiB，未观察到持续热降频。该测试不经过 HTTP、缓存或队列，不代表端到端容量；证据见 [PLAN-0011](docs/plans/0011-batch-inference.md)。
 
 ## 适用场景与边界
 

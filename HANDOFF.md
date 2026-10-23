@@ -8,6 +8,8 @@
 
 2026-10-23 按用户指定“单 worker + 真合批”完成批内合批：同一请求内的未命中条目按 token 长度分桶，右 padding 后一次前向；每组合批后的 padding token 不超过 8192，单条超预算时单独执行。外部 API、输出顺序、`usage`、错误码、缓存与 FIFO 不变；执行位仍为 1，不跨请求合批，未新增配置项。更新 [SPEC-0001](docs/specs/0001-embedding-inference.md)，新增 [ADR-0007](docs/adr/0007-batch-inference.md) 与 [PLAN-0011](docs/plans/0011-batch-inference.md)。当前 Mac mini M4 16GB 上 103 项非 real、3 项 real 测试通过；基准显示 16×25 约 3.3x、16×256 约 1.18x、16×512 约 1.05x，16×1024 / 16×2048 / 4×8192 约 1.0x，混合长度约 0.97x，峰值最高 977.4 MiB。结论：合批对短/中批有效，1M token 按 1k 块入库仍约 5 分钟，不会因合批出现数量级提升。当前常驻服务尚未重启加载该版本，新合批未生效。
 
+2026-10-23 按用户要求完成 600 秒连续入库：`16×512`、dense-only、固定 512-token 合成输入、独立进程，不经过 HTTP/缓存/队列。260 批 / 2,129,920 tokens / 602.07 秒，平均 3,537.7 tok/s；首 30 秒 3,713.9，约 2 分钟后稳定在 3,512–3,532，稳定段斜率约 `-0.002 tok/s²`；峰值 977.4 MiB，RSS 峰值 1,292 MiB，swap 前后均为 41.5 MiB used，`pmset` 未记录热/性能警告。结论：未观察到明显持续热降频；该测试不代表 HTTP、队列、真实语料或容量承诺。
+
 2026-10-22 新增 [REF-0003：当前服务的局限性](docs/references/0003-service-limitations.md)，把模型、接口、容量、运维与验证层面的边界按“设计取舍 / 能力缺口 / 未验证风险”三层固化为文档，覆盖 22 条局限并给出影响排序；同步更新[文档中心](docs/README.md)索引与 README 的边界说明。本文是评估依据与快照，不构成 SLA、容量或效果承诺；本次不改变服务行为。
 
 2026-10-22 按用户要求将根目录 README 重写为技术产品介绍：以产品定位、核心能力、请求链路、快速开始、API 契约、M4 性能观测与适用边界组织内容，替代仅目录导航的旧版；性能数字引用 [PLAN-0006](docs/plans/0006-performance-test.md) / [PLAN-0009](docs/plans/0009-result-cache.md)，接口限制引用 [SPEC-0001](docs/specs/0001-embedding-inference.md) / [SPEC-0002](docs/specs/0002-dense-sparse-output.md)，版本基线取自 [requirements.lock](requirements.lock)。部署进度与验证证据继续在本文件及各 Plan 维护。文档检查记录见 [PLAN-0001](docs/plans/0001-project-foundation.md)，本次不改变服务行为。
