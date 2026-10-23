@@ -10,7 +10,7 @@
 
 2026-10-23 按用户要求完成 600 秒连续入库：`16×512`、dense-only、固定 512-token 合成输入、独立进程，不经过 HTTP/缓存/队列。260 批 / 2,129,920 tokens / 602.07 秒，平均 3,537.7 tok/s；首 30 秒 3,713.9，约 2 分钟后稳定在 3,512–3,532，稳定段斜率约 `-0.002 tok/s²`；峰值 977.4 MiB，RSS 峰值 1,292 MiB，swap 前后均为 41.5 MiB used，`pmset` 未记录热/性能警告。结论：未观察到明显持续热降频；该测试不代表 HTTP、队列、真实语料或容量承诺。
 
-2026-10-23 用户确认四项后续优化方向（FP16 attention、减少每层 `mx.eval`、`mx.compile` / 图融合、跨请求微合批），并要求留存每项测试数据与提升记录。已建立 [PLAN-0012](docs/plans/0012-inference-optimizations.md)，版本化证据在 [0012-evidence](docs/plans/0012-evidence/README.md)。P1 FP16 采纳：16×256/512/1024 约快 18–19%，4×8192 约快 21%，峰值 977.4→783.8 MiB，dense 对 FP32 基线最低余弦 0.9999706，sparse 容差调整到 2e-3 / 5e-4。P2（eval 间隔）与 P3（固定 shape compile）因无稳定收益、内存超门槛或 shapeless 不兼容而否决。P4 跨请求微合批已实现并通过 [ADR-0008](docs/adr/0008-cross-request-micro-batching.md) / [SPEC-0001](docs/specs/0001-embedding-inference.md)：15ms 窗口、同 `return_sparse`、FIFO、16 条 / 8192 token、失败逐请求重试；20 并发单条 P95 约 380→146ms，16 并发 4 条 P95 约 417→399ms（进程内 ASGI，不是线上 SLA）。当前 105 项非 real、3 项 real 通过；常驻服务未重启，部署需另行授权。
+2026-10-23 用户确认四项后续优化方向（FP16 attention、减少每层 `mx.eval`、`mx.compile` / 图融合、跨请求微合批），并要求留存每项测试数据与提升记录。已建立 [PLAN-0012](docs/plans/0012-inference-optimizations.md)，版本化证据在 [0012-evidence](docs/plans/0012-evidence/README.md)。P1 FP16 采纳：16×256/512/1024 约快 18–19%，4×8192 约快 21%，峰值 977.4→783.8 MiB，dense 对 FP32 基线最低余弦 0.9999706，sparse 容差调整到 2e-3 / 5e-4。P2（eval 间隔）与 P3（固定 shape compile）因无稳定收益、内存超门槛或 shapeless 不兼容而否决。P4 跨请求微合批已实现并通过 [ADR-0008](docs/adr/0008-cross-request-micro-batching.md) / [SPEC-0001](docs/specs/0001-embedding-inference.md)：15ms 窗口、同 `return_sparse`、FIFO、16 条 / 8192 token、失败逐请求重试；20 并发单条 P95 约 380→146ms，16 并发 4 条 P95 约 417→399ms（进程内 ASGI，不是线上 SLA）。当前 105 项非 real、3 项 real 通过。经用户授权，本机 launchd 已于 2026-10-23 17:52 左右重启加载该版本（PID 68942），健康检查 ready；真实 HTTP 冒烟 `--sparse --long --warm` 通过，8192 tokens 约 3.74 秒。重启后真实回环 HTTP 并发：20 并发单条 P95 中位 174ms、16 并发 4 条 P95 中位 329ms，均 200。M4 目标机未部署。
 
 2026-10-22 新增 [REF-0003：当前服务的局限性](docs/references/0003-service-limitations.md)，把模型、接口、容量、运维与验证层面的边界按“设计取舍 / 能力缺口 / 未验证风险”三层固化为文档，覆盖 22 条局限并给出影响排序；同步更新[文档中心](docs/README.md)索引与 README 的边界说明。本文是评估依据与快照，不构成 SLA、容量或效果承诺；本次不改变服务行为。
 
@@ -48,7 +48,7 @@
 | 日志 | ${REMOTE_PROJECT_DIR}/logs/service.log，5 MiB / 2 备份；2026-10-21 从 ~/Library/Logs 迁入项目，旧文件留存原处未删除 |
 | 依赖 | 当前执行环境与目标机使用同一带 wheel 哈希的 requirements.lock，pip check 均通过，无全局安装 |
 
-2026-10-23 复核：当前 agent 执行环境是 Mac mini、Apple M4、16GB（`sysctl` 核实），不是 M5 / 32GB。仓库中 2026-10-21 / 22 的部分 Plan 仍保留当时开发机 M5 的历史记录；本轮合批测试与数据均在上述 Mac mini M4 16GB 上取得，且使用独立进程，未重启常驻服务。
+2026-10-23 复核：当前 agent 执行环境是 Mac mini、Apple M4、16GB（`sysctl` 核实），不是 M5 / 32GB。仓库中 2026-10-21 / 22 的部分 Plan 仍保留当时开发机 M5 的历史记录；本轮合批测试与数据均在上述 Mac mini M4 16GB 上取得；2026-10-23 17:52 后本机 launchd 已重启加载 FP16 + 跨请求微合批版本。
 
 启动、停止、获取私有配置及基本调用见 [部署说明](deploy/README.md)。Key 未打印、未写入仓库；用户提供的登录密码未使用或保存。
 
@@ -70,6 +70,7 @@
 - 2026-10-21 按 [PLAN-0006](docs/plans/0006-performance-test.md) 完成 5 指标 × 3 场景性能测试并回填：5xx 与预期外 429 均为 0，无 swap 增长；RSS 峰值约 630 MiB、Metal 5341 峰值 838.2 MiB，三档延迟 P50 约 25.1 / 273.9 / 2616 ms。结果仅作观测，仍不构成容量、吞吐或 SLA 承诺；原始证据备份在本机 `.cache/perf/m4/`。
 - 2026-10-23 请求优化验证与部署：99 项非 real、2 项 real 通过；本机服务经 launchd 重启部署，真实 HTTP 冒烟通过；25 / 945 / 5341 tokens 冷 P50 48.9 / 270.0 / 2458.7 ms，命中 P50 1.7 / 2.2 / 5.9 ms；3 条相同 5349-token 输入墙钟 2.48 s（`exec_ms=2460`、`dedup=2`），3 条不同 7.40 s；20 并发排队为 19×200 + 1×429 `queue_full`（`Retry-After: 1`），`ahead` 0–19；测试后 footprint 1.2 GiB、峰值 1.4 GiB。详见 [PLAN-0010](docs/plans/0010-request-optimizations.md)。M4 未部署。
 - 2026-10-23 批内真合批验证：当前 Mac mini M4 16GB 上 103 项非 real、3 项 real 通过；16×25 / 256 / 512 / 1024 / 2048 与 4×8192 的逐条 vs 合批对照，加速约 3.32x / 1.18x / 1.05x / 1.01x / 1.00x / 1.00x，混合长度约 0.97x；Metal 峰值最高 977.4 MiB，dense 余弦均 ≥0.999999。未做当前常驻服务的 HTTP 合批验证；详见 [PLAN-0011](docs/plans/0011-batch-inference.md)。
+- 2026-10-23 本机部署与并发验证：用户授权后 `launchctl bootout/bootstrap` 重启 launchd 服务；`verify_http.py --config config.toml --sparse --long --warm` 通过（冷/热缓存 0.073/0.001 s，8192 tokens 3.74 s）。重启后真实回环 HTTP 3 次：20 并发单条 25-token P95 中位 174 ms、墙钟 0.182 s；16 并发 4 条 P95 中位 329 ms、墙钟 0.335 s；全部 200。M4 未部署，且该并发数据不是 SLA。证据见 [PLAN-0012](docs/plans/0012-inference-optimizations.md) / [0012-evidence](docs/plans/0012-evidence/README.md)。
 
 ## 后续工作原则
 
