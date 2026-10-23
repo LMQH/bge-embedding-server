@@ -30,4 +30,4 @@
 
 - [项目宪法](../../AGENTS.md)
 - [文档中心与 SDD 流程](../README.md)
-- [初始化与治理记录](../plans/0001-project-foundation.md)
+- [项目进度与交接](../../HANDOFF.md)

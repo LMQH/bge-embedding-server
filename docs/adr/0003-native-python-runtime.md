@@ -48,7 +48,7 @@
 
 ## 关联与依据
 
-- [PRD-0001](../prd/0001-embedding-service.md) · [SPEC-0001](../specs/0001-embedding-inference.md) · [PLAN-0002](../plans/0002-minimal-service.md)
+- [PRD-0001](../prd/0001-embedding-service.md) · [SPEC-0001](../specs/0001-embedding-inference.md) · [HANDOFF](../../HANDOFF.md)
 - [MLX 官方安装文档](https://ml-explore.github.io/mlx/build/html/install.html)
 - [mlx-embeddings 固定版本源码](https://github.com/Blaizzy/mlx-embeddings/tree/32981fa4e8064ed664b52071789dd18271fe4206)
 - [Miniforge 官方仓库](https://github.com/conda-forge/miniforge) · [conda 环境中使用 pip](https://docs.conda.io/projects/conda/en/stable/user-guide/tasks/manage-environments.html#using-pip-in-an-environment)

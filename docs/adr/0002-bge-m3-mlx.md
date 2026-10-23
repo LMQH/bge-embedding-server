@@ -37,4 +37,4 @@
 
 - [PRD-0001](../prd/0001-embedding-service.md)
 - [SPEC-0001](../specs/0001-embedding-inference.md)
-- [PLAN-0001](../plans/0001-project-foundation.md)
+- [HANDOFF：项目进度与交接](../../HANDOFF.md)

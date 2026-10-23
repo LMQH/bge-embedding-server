@@ -3,7 +3,7 @@
 - 状态：已确认，2026-10-15（实施基线；2026-10-15 按用户要求收缩验证范围；2026-10-21 用户明确将等待位扩充到 19，总计 20 个位置）。
 - 确认依据：Q1～Q14 及最终原生环境确认；用户在 Q13 接受最小规则并授权落实字段默认值、错误码与基本容量限制。下列具体默认值和数值门槛由实施侧制定，不冒充用户逐项指定或实测结果。
 - 需求：[PRD-0001](../prd/0001-embedding-service.md)，REQ-001～REQ-012。
-- 决策：[ADR-0002](../adr/0002-bge-m3-mlx.md)、[ADR-0003](../adr/0003-native-python-runtime.md)、[ADR-0007](../adr/0007-batch-inference.md)。实施：[PLAN-0002](../plans/0002-minimal-service.md)。
+- 决策：[ADR-0002](../adr/0002-bge-m3-mlx.md)、[ADR-0003](../adr/0003-native-python-runtime.md)、[ADR-0007](../adr/0007-batch-inference.md)。实施记录：[HANDOFF](../../HANDOFF.md)。
 - 2026-10-21 范围变更：dense + sparse 双路输出由 [PRD-0002](../prd/0002-dense-sparse-embeddings.md) 纳入范围，扩展契约见 [SPEC-0002](0002-dense-sparse-output.md)；本契约继续描述 dense 基础行为，双路字段与 sparse 语义以 SPEC-0002 为准。
 - 2026-10-22 范围变更：嵌入结果缓存由 [PRD-0003](../prd/0003-result-cache.md) 纳入范围（已确认），附加行为契约见 [SPEC-0003](0003-result-cache.md)；配置项由 16 项增至 18 项。本契约继续有效；FIFO 与队列语义针对进入推理任务的请求，全命中请求绕过队列、`queue_full` / `queue_timeout` 仅适用于含未命中条目的请求，以 SPEC-0003 为准。
 - 2026-10-23 范围变更：请求完成日志追加 `wait_ms` / `exec_ms` / `ahead` / `dedup`，429 增加 `Retry-After: 1`；详见 [SPEC-0004](0004-request-observability-and-dedup.md)。本契约的日志字段与过载响应头以 SPEC-0004 补充为准，其余行为不变。
@@ -111,7 +111,7 @@
 
 ## 启动、配置与日志
 
-- 2026-10-21 用户确认将运行参数集中到 TOML，实施见 [PLAN-0005](../plans/0005-file-configuration.md)。服务通过 `python -m bge_embedding --config <文件>` 启动，不再读取 `BGE_MODEL_PATH` / `BGE_API_KEY` / `BGE_HOST` / `BGE_PORT` 作为服务配置。配置完整示例见 [config.example.toml](../../config.example.toml)，其中 Key 留空，实际文件不入库，权限设为 600。
+- 2026-10-21 用户确认将运行参数集中到 TOML；服务通过 `python -m bge_embedding --config <文件>` 启动，不再读取 `BGE_MODEL_PATH` / `BGE_API_KEY` / `BGE_HOST` / `BGE_PORT` 作为服务配置。配置完整示例见 [config.example.toml](../../config.example.toml)，其中 Key 留空，实际文件不入库，权限设为 600。
 - 配置包括监听地址与端口、Key、模型路径、等待位与等待超时、请求体 / 批量条数 / 单条及单请求总 token 上限、MLX 工作内存指导值与缓存回收目标、日志文件 / 轮转大小 / 备份数 / 级别，共 16 项。上文容量及内存数值为示例基线，实际采用配置值；执行位和 worker 固定为 1，总位置数为 `1 + queue.max_waiting`。
 - 启动时一次性加载和校验；缺项、未知项、错误类型、非正数、非法端口、空 Key / 路径、非法日志级别或不可用模型文件均拒绝启动。单条 token 上限不得超过 BGE-M3 tokenizer 与 XLM-R 位置编码共同支持的长度。路径支持 `~`，相对路径以配置文件所在目录为基准。修改后重启生效，不提供热加载或环境变量覆盖，错误不回显配置值。
 - 模型加载和必要配置校验完成后才提供就绪服务；缺 Key、文件缺失或加载失败应明确报错并退出，不在请求内反复重试下载。

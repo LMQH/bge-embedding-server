@@ -181,9 +181,9 @@ curl -s http://127.0.0.1:8000/v1/embeddings \
 | 503 | `model_unavailable` | 服务未就绪或正在关闭 |
 | 500 | `inference_failed` | 推理异常或输出不符合数值契约 |
 
-错误响应使用固定安全描述，不回显用户文本、Key 或本地路径；日志同样只记录安全元数据。429 响应带 `Retry-After: 1`，调用方应按该值退避后重试；日志新增请求级 `wait_ms` / `exec_ms` / `ahead` / `dedup` 字段。本机已启用；M4 线上启用范围见 [项目进度与交接](HANDOFF.md)。
+错误响应使用固定安全描述，不回显用户文本、Key 或本地路径；日志同样只记录安全元数据。429 响应带 `Retry-After: 1`，调用方应按该值退避后重试；日志记录请求级 `wait_ms` / `exec_ms` / `ahead` / `dedup` 字段。已随 2026-10-23 版本在两机启用，见 [项目进度与交接](HANDOFF.md)。
 
-以上为示例基线，可在私有 TOML 中调整；执行位与 worker 固定为 1。完整字段规则、失败语义与验收场景见 [SPEC-0001](docs/specs/0001-embedding-inference.md) 和 [SPEC-0002](docs/specs/0002-dense-sparse-output.md)。双路输出需要目标机部署对应版本并准备稀疏头；当前线上启用范围以 [项目进度与交接](HANDOFF.md) 为准。
+以上为示例基线，可在私有 TOML 中调整；执行位与 worker 固定为 1。完整字段规则、失败语义与验收场景见 [SPEC-0001](docs/specs/0001-embedding-inference.md) 和 [SPEC-0002](docs/specs/0002-dense-sparse-output.md)。双路输出已在两机上线（M4 线上启用 `return_sparse`）；线上启用范围以 [项目进度与交接](HANDOFF.md) 为准。
 
 ## 性能观测
 

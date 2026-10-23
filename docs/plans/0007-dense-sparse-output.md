@@ -16,9 +16,9 @@
 | 完成（本机） | 推理双输出：加载稀疏头、计算 ReLU、按 token 取 max、排除特殊 token | `src/bge_embedding/inference.py` | 本地真实模型中文/英文 sparse 非空；dense 不变 |
 | 完成 | API 与调度：`return_sparse` 校验、响应 sparse、scheduler 透传 | `src/bge_embedding/api.py`、`app.py`、`scheduler.py` | AC-201～AC-204 单元测试通过 |
 | 完成 | HTTP smoke 扩展：`--sparse` 与 `--long` | `tests/verify_http.py` | 本地真实服务通过；旧 dense-only 路径仍通过 |
-| 部分完成 | 文档与连接说明更新 | `docs/service-connection.md`、`docs/specs/0001-embedding-inference.md`、`deploy/README.md`、`HANDOFF.md` | 字段、限制、示例与实现一致；M4 线上说明待部署后确认 |
+| 部分完成 | 文档与连接说明更新 | `docs/service-connection.md`、`docs/specs/0001-embedding-inference.md`、`deploy/README.md`、`HANDOFF.md` | 字段、限制、示例与实现一致；M4 双路输出已随 2026-10-23 部署上线（经用户确认，线上冒烟记录待补） |
 | 完成（本机） | 本地真实模型验证：中文/英文、批量、8192 tokens、dense 回归 | `src/`、`tests/` | 记录命令、耗时、峰值内存与结果 |
-| 暂不执行 | M4 部署与真实 HTTP 验证 | M4 项目目录、launchd、模型目录 | AC-202、AC-203、AC-205、AC-207 通过；失败可回滚 |
+| 已完成（2026-10-23 补记） | M4 部署与真实 HTTP 验证 | M4 项目目录、launchd、模型目录 | 经用户确认已部署上线；线上冒烟记录待补归档 |
 
 ## 验证记录（本机）
 
@@ -37,7 +37,7 @@
 
 ## M4 部署方案（暂不执行）
 
-本节只定义方案。用户已明确当前不执行、无需审批；以下内容用于后续评审和需要时执行。当前尝试连接返回 `Permission denied (publickey,password,keyboard-interactive)`，线上仍只返回 dense。
+本节只定义方案。用户已明确当前不执行、无需审批；以下内容用于后续评审和需要时执行。当前尝试连接返回 `Permission denied (publickey,password,keyboard-interactive)`，线上仍只返回 dense。（2026-10-23 补记：部署已另行完成，双路输出已上线 M4，本节仅存档。）
 
 ### 1. 范围与成功标准
 

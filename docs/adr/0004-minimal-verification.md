@@ -12,4 +12,4 @@
 
 ## 后果
 
-已执行结果保留为历史证据；未执行或取消的检查不报告为通过。仅凭基本冒烟不能声称所有极限场景已经验证。更新 [Spec](../specs/0001-embedding-inference.md) 与 [Plan](../plans/0002-minimal-service.md) 作为当前实施依据。
+已执行结果保留为历史证据；未执行或取消的检查不报告为通过。仅凭基本冒烟不能声称所有极限场景已经验证。更新 [Spec](../specs/0001-embedding-inference.md) 与 [HANDOFF](../../HANDOFF.md) 作为当前实施依据。

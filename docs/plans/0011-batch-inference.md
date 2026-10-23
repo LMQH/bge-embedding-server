@@ -1,6 +1,6 @@
 # PLAN-0011：单 worker 批内真合批
 
-- 状态：已完成（2026-10-23；本机实现与验证完成，未部署）
+- 状态：已完成（2026-10-23；本机实现与验证完成；同日已随最新版本部署上线 M4，经用户确认）
 - 关联：[ADR-0007](../adr/0007-batch-inference.md)、[SPEC-0001](../specs/0001-embedding-inference.md)、[PLAN-0003](0003-fused-attention.md)、[PLAN-0006](0006-performance-test.md)
 - 来源：用户 2026-10-23 指定方向“单 worker + 真合批”，用于改善批量入库吞吐；不增加执行位、不改变外部 API。
 

@@ -42,4 +42,4 @@ python deploy/fetch_sparse_head.py
 
 ## 当前使用范围
 
-服务使用上面的现有 8bit 快照，未改动其配置、tokenizer 或权重。官方参考对照已按用户要求退出首版范围，额外下载的参考权重已移除；默认安装和部署不需要下载另一份模型，详见 [ADR-0004](../docs/adr/0004-minimal-verification.md)。早期对照的已执行摘要仅保留在 [PLAN-0002](../docs/plans/0002-minimal-service.md)。
+服务使用上面的现有 8bit 快照，未改动其配置、tokenizer 或权重。官方参考对照已按用户要求退出首版范围，额外下载的参考权重已移除；默认安装和部署不需要下载另一份模型，详见 [ADR-0004](../docs/adr/0004-minimal-verification.md)。

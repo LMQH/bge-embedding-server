@@ -2,7 +2,7 @@
 
 - 状态：已确认，2026-10-15；2026-10-21 用户确认运行参数集中配置需求。
 - 确认来源：本次 Q1～Q14 问询。Q1～Q11 确认使用场景、接口方向及运行原则；Q13 接受最小接口规则并授权实施侧落实工程默认值，Q14 选择用户级 launchd；Docker 问题说明后，用户接受 Q12 原生 Python 方案，并强调本机 Miniconda / 目标机 Miniforge 均使用独立虚拟环境。
-- 关联：[ADR-0002](../adr/0002-bge-m3-mlx.md) · [ADR-0003](../adr/0003-native-python-runtime.md) · [SPEC-0001](../specs/0001-embedding-inference.md) · [PLAN-0002](../plans/0002-minimal-service.md)
+- 关联：[ADR-0002](../adr/0002-bge-m3-mlx.md) · [ADR-0003](../adr/0003-native-python-runtime.md) · [SPEC-0001](../specs/0001-embedding-inference.md) · [HANDOFF](../../HANDOFF.md)
 - 2026-10-21 范围变更：dense + sparse 双路输出由 [PRD-0002](0002-dense-sparse-embeddings.md) 定义；本文件其余需求继续有效。
 
 ## 背景与使用场景
@@ -28,7 +28,7 @@
 | REQ-009 | 拒绝空文本、纯空白、空数组、错误类型及超长输入；批量任一输入无效整批拒绝并定位，成功按序返回 | Spec AC-002：有效与无效混合批次、错误定位和输出顺序 |
 | REQ-010 | 不保存输入文本和向量；日志不记录正文、向量或 Key | Spec 日志约定：不持久化正文与向量；撤销专门哨兵验收 |
 | REQ-011 | 开发、安装、测试及服务运行使用两机各自的项目 conda 环境 | Spec AC-006：Miniconda / Miniforge 的 bge-embedding 环境、解释器及依赖核验 |
-| REQ-012 | 16 项运行参数集中于一个私有 TOML，启动统一加载校验，修改后重启生效；单执行位及接口、模型语义保持固定 | Spec 启动配置契约；[PLAN-0005](../plans/0005-file-configuration.md) 的配置与集成检查 |
+| REQ-012 | 16 项运行参数集中于一个私有 TOML，启动统一加载校验，修改后重启生效；单执行位及接口、模型语义保持固定 | Spec 启动配置契约；[HANDOFF](../../HANDOFF.md) 环境与运行位置 |
 
 ## 首版范围与约束
 

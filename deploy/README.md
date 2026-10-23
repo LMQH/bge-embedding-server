@@ -1,6 +1,6 @@
 # 原生 macOS 运行与部署
 
-执行依据：[SPEC-0001](../docs/specs/0001-embedding-inference.md)、[PLAN-0002](../docs/plans/0002-minimal-service.md)。仅支持原生 arm64 macOS；当前锁定 MLX wheel 要求 macOS 26 或以上。使用本机 Miniconda / 目标机 Miniforge 各自的 `bge-embedding` 环境，不复制环境目录。
+执行依据：[SPEC-0001](../docs/specs/0001-embedding-inference.md)。仅支持原生 arm64 macOS；当前锁定 MLX wheel 要求 macOS 26 或以上。使用本机 Miniconda / 目标机 Miniforge 各自的 `bge-embedding` 环境，不复制环境目录。
 
 ## 建立环境
 
@@ -95,4 +95,4 @@ python tests/verify_http.py --config "$PWD/config.toml" --sparse --long
 
 脚本读取同一 TOML 中的 Key、地址和端口；目标机可用 `--launchd` 替代 `--config`，从 plist 找到配置文件。可另加 `--url` 覆盖探测地址，适用于从另一台机器连接。默认检查健康状态、缺 Key 被拒绝、单条 / 两条批量成功及向量基本形状与数值；`--sparse` 额外请求并检查稀疏输出，`--long` 额外发送 8192-token 输入。
 
-按照用户要求，不默认执行参考模型比较、完整测试套件、极限长度、压力测试或故障注入。已有扩展测试退出默认执行范围；仅在出现相关问题并明确需要时使用。实际结果与未验证项见 [Plan](../docs/plans/0002-minimal-service.md)。
+按照用户要求，不默认执行参考模型比较、完整测试套件、极限长度、压力测试或故障注入。已有扩展测试退出默认执行范围；仅在出现相关问题并明确需要时使用。实际结果与未验证项见 [HANDOFF](../HANDOFF.md)。

@@ -1,6 +1,6 @@
 # MLX 源码接入与服务代码结构
 
-更新日期：2026-10-21。首版部署与后续本地改动的状态见 [HANDOFF](../../HANDOFF.md)，配置化证据见 [PLAN-0005](../plans/0005-file-configuration.md)。
+更新日期：2026-10-21。首版部署与后续本地改动的状态见 [HANDOFF](../../HANDOFF.md)。
 
 ## 实际布局
 

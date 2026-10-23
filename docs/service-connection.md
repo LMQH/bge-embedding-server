@@ -2,9 +2,9 @@
 
 本文中的 `<TAILSCALE_IP>`、`${REMOTE_PROJECT_DIR}` 均为脱敏占位符，不代表可直接使用的地址或路径。实际连接信息由部署方私下提供；如需本地记录，使用已被 Git 忽略的 `docs/service-connection.local.md`，不提交到仓库。API Key 保留在私有 `config.toml` 中。
 
-2026-10-21 已将配置化版本部署到 M4 并重启。双路输出已在本机实现并通过验证，但 M4 线上仍只返回 dense；当前不部署，以下限制与字段以线上为准，双路契约见 [SPEC-0002](specs/0002-dense-sparse-output.md)。配置和启动方式见 [部署说明](../deploy/README.md)。
+2026-10-21 已将配置化版本部署到 M4 并重启。2026-10-23 经用户确认，M4 已部署最新版本，双路输出已上线：线上支持 `return_sparse`，以下限制与字段以线上为准，双路契约见 [SPEC-0002](specs/0002-dense-sparse-output.md)。配置和启动方式见 [部署说明](../deploy/README.md)。
 
-2026-10-23 的请求日志字段、请求内去重与 429 `Retry-After: 1` 已在本机部署并验证，M4 未部署；下表仍以 M4 线上行为为准，本机差异见 [PLAN-0010](plans/0010-request-optimizations.md)。
+2026-10-23 的请求日志字段（`wait_ms` / `exec_ms` / `ahead` / `dedup`）、请求内去重与 429 `Retry-After: 1` 已随该版本上线 M4；背景见 [PLAN-0010](plans/0010-request-optimizations.md)。
 
 | 项目 | 配置 |
 |---|---|
@@ -25,10 +25,10 @@
 | 批量总长度上限 | **32768 tokens／请求**，包含各条特殊 token |
 | 请求体大小上限 | **1 MiB（1,048,576 字节）** |
 | 输入校验 | 任一条输入无效或超限，整批失败 |
-| 向量输出 | **1024 维 dense 浮点向量**，采用 CLS 池化与 L2 归一化 |
+| 向量输出 | **1024 维 dense 浮点向量**，采用 CLS 池化与 L2 归一化；可选 `return_sparse=true` 返回 token 级稀疏权重，契约见 [SPEC-0002](specs/0002-dense-sparse-output.md) |
 | 输出顺序 | 与输入顺序一致，通过 `data[i].index` 对应 |
 | Token 用量 | `usage.prompt_tokens` 和 `usage.total_tokens`，均为整批输入 token 总数 |
-| 推理并发 | 单 worker，最多 **1 个请求执行推理**；M4 线上批内文本逐条处理；本机代码已实现批内合批但未部署，见 [PLAN-0011](plans/0011-batch-inference.md) |
+| 推理并发 | 单 worker，最多 **1 个请求执行推理**；批内文本按长度分桶合批，等待中的兼容请求按 15ms 窗口跨请求微合批（16 条 / 8192 token 上限），见 [SPEC-0001](specs/0001-embedding-inference.md)、[PLAN-0011](plans/0011-batch-inference.md)、[PLAN-0012](plans/0012-inference-optimizations.md) |
 | 等待队列 | 最多 **19 个等待请求**，加上 1 个执行中请求，总计 **20 个位置**，FIFO |
 | 排队超时 | **30 秒**，指等待时间，不是推理执行时限 |
 | 过载响应 | 队列满或排队超时返回 **HTTP 429** |

@@ -2,7 +2,7 @@
 
 整理日期：2026-10-15。
 
-本文汇总本次查阅的官方文档与讨论结论，作为参考资料，不新增或替代项目决策。模型选型以 [ADR-0002：BGE-M3 与 MLX](../adr/0002-bge-m3-mlx.md) 为准，原生 Python 运行方案见 [ADR-0003](../adr/0003-native-python-runtime.md)。本文保留设计阶段的技术资料；实际安装与运行结果见 [PLAN-0002](../plans/0002-minimal-service.md)。验证范围以用户最新确认的 [ADR-0004](../adr/0004-minimal-verification.md) 为准，链接指向的在线文档可能继续更新。
+本文汇总本次查阅的官方文档与讨论结论，作为参考资料，不新增或替代项目决策。模型选型以 [ADR-0002：BGE-M3 与 MLX](../adr/0002-bge-m3-mlx.md) 为准，原生 Python 运行方案见 [ADR-0003](../adr/0003-native-python-runtime.md)。本文保留设计阶段的技术资料；实际安装与运行结果见 [HANDOFF](../../HANDOFF.md)。验证范围以用户最新确认的 [ADR-0004](../adr/0004-minimal-verification.md) 为准，链接指向的在线文档可能继续更新。
 
 ## 1. MLX 的定位
 

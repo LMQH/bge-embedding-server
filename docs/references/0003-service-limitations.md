@@ -1,8 +1,8 @@
 # 当前服务的局限性
 
-更新日期：2026-10-23。本文记录当前版本（M4 线上 dense-only、本机 dense + sparse）的能力边界，用于技术评估、接入决策与容量规划。
+更新日期：2026-10-23。本文记录当前版本（两机均为 dense + sparse 双路输出、FP16 + 批内合批 + 跨请求微合批）的能力边界，用于技术评估、接入决策与容量规划。
 
-2026-10-23 已在本机实施并部署 O1（请求日志观测）、O2（请求内去重）、O4（429 `Retry-After`），见 [SPEC-0004](../specs/0004-request-observability-and-dedup.md) / [PLAN-0010](../plans/0010-request-optimizations.md)；同一日按用户指定实现单 worker 批内真合批（不跨请求），见 [SPEC-0001](../specs/0001-embedding-inference.md) / [PLAN-0011](../plans/0011-batch-inference.md)；合批代码尚未重启到常驻服务。下列条目已按当前代码更新，未部署部分以 [HANDOFF](../../HANDOFF.md) 为准。
+2026-10-23 已实施并部署 O1（请求日志观测）、O2（请求内去重）、O4（429 `Retry-After`），见 [SPEC-0004](../specs/0004-request-observability-and-dedup.md) / [PLAN-0010](../plans/0010-request-optimizations.md)；同一日实现单 worker 批内真合批，见 [SPEC-0001](../specs/0001-embedding-inference.md) / [PLAN-0011](../plans/0011-batch-inference.md)；FP16 attention 与跨请求微合批见 [PLAN-0012](../plans/0012-inference-optimizations.md) / [ADR-0008](../adr/0008-cross-request-micro-batching.md)。经用户确认，上述能力均已随 2026-10-23 的部署上线 M4 线上。下列条目已按当前版本更新。
 
 本文是**快照与分析**，不是服务承诺，也不替代行为契约；与 [SPEC-0001](../specs/0001-embedding-inference.md)、[SPEC-0002](../specs/0002-dense-sparse-output.md)、[SPEC-0003](../specs/0003-result-cache.md) 冲突时以 Spec 为准。面向使用者的“适合 / 不负责”概览见 [README](../../README.md) 的适用场景与边界。
 
@@ -50,9 +50,9 @@ sparse 为 `ReLU(W·h + b)` 的逐位置权重，同一 token 取最大权重，
 
 ## 二、接口、服务与容量层
 
-### L-08 单 worker 串行推理，批内合批但不跨请求【取舍】
+### L-08 单 worker 串行推理，批内合批 + 跨请求微合批【取舍】
 
-一个进程、一个模型实例、一个推理线程；本机代码在同一请求内对未命中条目按长度分桶、右 padding 后合批前向，不跨请求合批，也不增加执行位（[SPEC-0001](../specs/0001-embedding-inference.md)、[inference.py](../../src/bge_embedding/inference.py)）；当前常驻服务仍是旧版逐条，未加载合批。合批主要摊薄每请求固定开销：当前 Mac mini M4 16GB 执行环境的独立进程观测 16×25 tokens 约 3.3x、16×256 约 1.18x、16×512 约 1.05x，16×1024 / 16×2048 / 4×8192 约 1.0x，混合长度约 0.97x；因此 1k 以上长块的吞吐仍由单条 GPU 计算决定，不会随 batch=16 线性改善。M4 同机 batch=1 观测 P50 约 25.1 / 273.9 / 2616 ms（25 / 945 / 5341 tokens，合成语料），冷路径约 4 QPS 量级。这些是观测值，不是 SLA 或容量承诺；合批的详细证据见 [PLAN-0011](../plans/0011-batch-inference.md)。
+一个进程、一个模型实例、一个推理线程；同一请求内未命中条目按长度分桶、右 padding 后合批前向，等待中的兼容请求按 15ms 窗口跨请求微合批（16 条 / 8192 token 上限，失败逐请求重试），不增加执行位（[SPEC-0001](../specs/0001-embedding-inference.md)、[inference.py](../../src/bge_embedding/inference.py)、[ADR-0008](../adr/0008-cross-request-micro-batching.md)）。合批主要摊薄每请求固定开销：当前 Mac mini M4 16GB 执行环境的独立进程观测 16×25 tokens 约 3.3x、16×256 约 1.18x、16×512 约 1.05x，16×1024 / 16×2048 / 4×8192 约 1.0x，混合长度约 0.97x；因此 1k 以上长块的吞吐仍由单条 GPU 计算决定，不会随 batch=16 线性改善。M4 同机 batch=1 观测 P50 约 25.1 / 273.9 / 2616 ms（25 / 945 / 5341 tokens，合成语料），冷路径约 4 QPS 量级。这些是观测值，不是 SLA 或容量承诺；合批的详细证据见 [PLAN-0011](../plans/0011-batch-inference.md) 与 [PLAN-0012](../plans/0012-inference-optimizations.md)。
 
 ### L-09 执行阶段没有硬超时，只有排队超时【缺口】
 
@@ -60,7 +60,7 @@ sparse 为 `ReLU(W·h + b)` 的逐位置权重，同一 token 取最大权重，
 
 ### L-10 队列满立即返回 429，无背压与优先级【缺口】
 
-1 个执行位 + 19 个等待位，队列满时直接 429 `queue_full`（[scheduler.py](../../src/bge_embedding/scheduler.py)），不排队、不降级；本机版本已带 `Retry-After: 1`，M4 未部署。没有按调用方、按长度或按请求类型的优先级；共享 Key 下任一调用方都能占满全部位置。重试、退避、批量拆分仍必须由调用方实现。
+1 个执行位 + 19 个等待位，队列满时直接 429 `queue_full` 并附 `Retry-After: 1`（[scheduler.py](../../src/bge_embedding/scheduler.py)），不排队、不降级。没有按调用方、按长度或按请求类型的优先级；共享 Key 下任一调用方都能占满全部位置。重试、退避、批量拆分仍必须由调用方实现。
 
 ### L-11 客户端断开不取消已开始的 GPU 计算【取舍】
 
@@ -117,7 +117,7 @@ sparse 为 `ReLU(W·h + b)` 的逐位置权重，同一 token 取最大权重，
 
 ### L-22 验证范围未覆盖故障、长稳与部分部署路径【未验证】
 
-已完成的验证以基本冒烟、定向回归与性能观测为主；未做故障注入、30 秒排队超时实测、soak、整机重启或重新登录、M4 上的 sparse 部署。性能数据来自客户端与服务端同机、`batch=1`、固定合成语料，不能外推到真实并发与混合负载。因此当前不承诺容量、吞吐、可用性或恢复时间。详见 [HANDOFF](../../HANDOFF.md) 的当前验证范围与各 Plan。
+已完成的验证以基本冒烟、定向回归与性能观测为主；未做故障注入、30 秒排队超时实测、soak、整机重启或重新登录；M4 已于 2026-10-23 部署最新版本（含 sparse），但线上部署冒烟记录尚未单独归档。性能数据来自客户端与服务端同机、`batch=1`、固定合成语料，不能外推到真实并发与混合负载。因此当前不承诺容量、吞吐、可用性或恢复时间。详见 [HANDOFF](../../HANDOFF.md) 的当前验证范围与各 Plan。
 
 ## 影响排序与候选方向
 
