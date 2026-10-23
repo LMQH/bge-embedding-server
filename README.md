@@ -159,7 +159,16 @@ curl -s http://127.0.0.1:8000/v1/embeddings \
 }
 ```
 
-同一 token 多次出现取最大权重，特殊 token 不出现；不做额外的归一化或截断。`BGE_API_KEY` 从私有 `config.toml` 的 `auth.api_key` 读取，不要写进仓库或共享文档。
+同一 token 多次出现取最大权重，特殊 token 不出现；不做额外的归一化或截断。sparse 的键是 **token id**，不是词面：调用方需自行用 BGE-M3 的 tokenizer（XLM-RoBERTa 词表）映射回文本，例如：
+
+```python
+from transformers import AutoTokenizer
+tok = AutoTokenizer.from_pretrained("models/bge-m3-mlx-8bit")  # 或官方 BAAI/bge-m3
+words = {tok.convert_ids_to_tokens(int(k)): v for k, v in sparse.items()}
+# {'知识': 0.3436, '库': 0.24, ...}
+```
+
+`transformers` 不是本服务的依赖，映射在调用方完成。`BGE_API_KEY` 从私有 `config.toml` 的 `auth.api_key` 读取，不要写进仓库或共享文档。
 
 这是 OpenAI Embeddings 风格的**兼容子集**，不是完整兼容：不支持 `dimensions`、`user`、模型列表、base64 输出等；使用 OpenAI SDK 时请显式传 `encoding_format="float"`。
 
@@ -195,13 +204,13 @@ curl -s http://127.0.0.1:8000/v1/embeddings \
 | 945 tokens | 273.9 ms | 7.1 ms |
 | 5341 tokens | 2616 ms | 6.8 ms |
 
-- 8192 tokens 冷推理约 4.8 秒；无缓存时进程 RSS 峰值约 630 MiB，缓存版本在长时间负载后约 1.3 GiB（含模型、MLX 分配器缓存与结果缓存），16GB 机器仍有充足余量。
-- 命中主导的 20 并发混合负载观测到 750 QPS；冷推理路径约 4 QPS 量级，两者不可直接比较。
-- 以上均为 2026-10-21 / 10-22 的观测值，不是 SLA、容量或吞吐承诺；缓存收益取决于实际重复率。方法与原始数据见 [PLAN-0006](docs/plans/0006-performance-test.md)、[PLAN-0009](docs/plans/0009-result-cache.md)。
-- 2026-10-23 在当前 Mac mini M4 16GB 执行环境的独立进程实测批内合批（非线上服务）：16×25 tokens 约 3.3x、16×256 约 1.18x、16×512 约 1.05x，16×1024 / 16×2048 / 4×8192 约 1.0x，混合长度约 0.97x；峰值最高 977.4 MiB。合批主要改善短/中批，不改变 1k 以上长块的 GPU 计算量；证据见 [PLAN-0011](docs/plans/0011-batch-inference.md)。
-- 2026-10-23 600 秒连续入库（16×512、dense-only、独立进程）：260 批 / 2,129,920 tokens / 602 秒，平均 3,537.7 tokens/s，稳定段约 3,522 tokens/s，1M token 约 4.7 分钟；峰值 977.4 MiB、RSS 1,292 MiB，未观察到持续热降频。该测试不经过 HTTP、缓存或队列，不代表端到端容量；证据见 [PLAN-0011](docs/plans/0011-batch-inference.md)。
-- 2026-10-23 FP16 attention 后，同一独立进程的批内合批绝对耗时进一步下降：16×256 1.07→0.87 秒、16×512 2.24→1.83 秒、4×8192 19.61→15.44 秒，峰值 977.4→783.8 MiB；dense 相对 FP32 基线最低余弦 0.9999706。合批加速比与 600 秒 soak 仍是 FP16 前的数据，未重测；证据见 [PLAN-0012](docs/plans/0012-inference-optimizations.md)。
-- 2026-10-23 跨请求微合批（15ms 窗口、同 `return_sparse`、FIFO、最多 16 条 / 8192 token）在真实模型、进程内 ASGI、缓存开启、唯一短文本下：20 并发单条 25-token 请求 P95 约 380→146ms、墙钟约 0.40→0.15 秒；16 并发 4 条请求 P95 约 417→399ms、墙钟约 0.45→0.41 秒。重启后真实回环 HTTP 的 20 并发单条 P95 中位 174ms、16 并发 4 条 P95 中位 329ms。没有并发等待者时不产生收益；该数据不是 HTTP 线上 SLA，证据见 [PLAN-0012](docs/plans/0012-inference-optimizations.md) 与[原始样本](docs/plans/0012-evidence/README.md)。
+以上均为同机观测值，不是 SLA、容量或吞吐承诺。要点：
+
+- 8192 tokens 冷推理约 4.8 秒；进程峰值内存约 0.6–1.3 GiB（视缓存负载），16GB 机器余量充足。冷推理路径约 4 QPS 量级；命中主导的 20 并发混合负载观测到 750 QPS，两者不可直接比较。
+- 批内合批对短/中批有效（16×25 约 3.3x、16×256 约 1.18x），1k 以上长块约 1.0x；FP16 attention 再快 18–21%，峰值 977→784 MiB。600 秒连续入库约 3538 tokens/s，未见热降频。
+- 跨请求微合批：20 并发单条 P95 约 380→146ms（进程内 ASGI，非线上 SLA）；无并发等待者时无收益。
+
+方法与原始数据见 [PLAN-0006](docs/plans/0006-performance-test.md)、[PLAN-0009](docs/plans/0009-result-cache.md)、[PLAN-0011](docs/plans/0011-batch-inference.md)、[PLAN-0012](docs/plans/0012-inference-optimizations.md) 与[0012-evidence](docs/plans/0012-evidence/README.md)。缓存收益取决于实际重复率。
 
 ## 适用场景与边界
 

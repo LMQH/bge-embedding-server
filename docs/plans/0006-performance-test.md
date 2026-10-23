@@ -1,7 +1,7 @@
 # PLAN-0006：接口性能测试
 
 - 状态：已完成（2026-10-21 执行并回填；结果仅作观测，不构成 SLA、容量或吞吐承诺）
-- 关联：[PRD-0001](../prd/0001-embedding-service.md) · [SPEC-0001](../specs/0001-embedding-inference.md) · [ADR-0004](../adr/0004-minimal-verification.md) · [PLAN-0004](0004-queue-capacity.md) · [PLAN-0005](0005-file-configuration.md)
+- 关联：[PRD-0001](../prd/0001-embedding-service.md) · [SPEC-0001](../specs/0001-embedding-inference.md) · [ADR-0004](../adr/0004-minimal-verification.md)
 - 目的：用 5 个通用指标和 3 组场景评价当前 M4 接口性能；结果只作观测和能力边界，不写成 SLA、容量或吞吐承诺。
 
 ## 目标与前置条件

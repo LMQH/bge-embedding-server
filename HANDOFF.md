@@ -57,5 +57,6 @@ v1.0.0 定版。服务已在两机上线同一版本：本机与 Mac mini M4 16G
 ## 仓库治理（v1.0.0）
 
 - 文档遵循 [SDD 流程](docs/README.md)：PRD 定需求、ADR 记决策、Spec 定契约、Plan 留验证证据；行为变更先改 Spec。
+- 定版时已删除纯过程性 Plan（初始化、首版搭建、队列扩容、配置迁移、历史清理），结论已并入本文；`docs/service-connection.md` 只保留当前线上契约，历史部署补记由本文承载。
 - 仓库不含模型权重、缓存、凭据与日志；私有连接信息只存在于被忽略的 `config.toml` 与 `docs/service-connection.local.md`。
 - Git 仓库：`main` 分支，`origin` 关联 GitHub（见 `git remote -v`）；定版以 `v1.0.0` tag 为准。

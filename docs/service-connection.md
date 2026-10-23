@@ -1,10 +1,6 @@
 # 推理服务连接与使用说明
 
-本文中的 `<TAILSCALE_IP>`、`${REMOTE_PROJECT_DIR}` 均为脱敏占位符，不代表可直接使用的地址或路径。实际连接信息由部署方私下提供；如需本地记录，使用已被 Git 忽略的 `docs/service-connection.local.md`，不提交到仓库。API Key 保留在私有 `config.toml` 中。
-
-2026-10-21 已将配置化版本部署到 M4 并重启。2026-10-23 经用户确认，M4 已部署最新版本，双路输出已上线：线上支持 `return_sparse`，以下限制与字段以线上为准，双路契约见 [SPEC-0002](specs/0002-dense-sparse-output.md)。配置和启动方式见 [部署说明](../deploy/README.md)。
-
-2026-10-23 的请求日志字段（`wait_ms` / `exec_ms` / `ahead` / `dedup`）、请求内去重与 429 `Retry-After: 1` 已随该版本上线 M4；背景见 [PLAN-0010](plans/0010-request-optimizations.md)。
+本文描述 **v1.0.0 线上契约**（本机与 M4 同版本）。历史部署记录见 [HANDOFF](../HANDOFF.md)。本文中的 `<TAILSCALE_IP>`、`${REMOTE_PROJECT_DIR}` 均为脱敏占位符，不代表可直接使用的地址或路径。实际连接信息由部署方私下提供；如需本地记录，使用已被 Git 忽略的 `docs/service-connection.local.md`，不提交到仓库。API Key 保留在私有 `config.toml` 中。配置和启动方式见 [部署说明](../deploy/README.md)。
 
 | 项目 | 配置 |
 |---|---|
