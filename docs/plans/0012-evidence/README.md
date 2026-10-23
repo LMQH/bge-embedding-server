@@ -9,6 +9,7 @@
 | `baseline_bench.json` | P0：FP32 attention、合批路径的 16×25/256/512/1024、4×8192、混合长度耗时与峰值 |
 | `fp16_bench.json` | P1：FP16 attention 的同场景耗时与峰值 |
 | `quality_summary.json` | P1：dense/sparse 对 FP32 基线及合批对单条的误差；最终测试计数 |
+| `baseline_quality.npz`、`fp16_quality.npz`、`*_sparse.json` | P0/P1：7 个长度样本的原始 dense 向量与 sparse 权重；仅用于审计数值差异 |
 | `eval2_bench.json`、`eval3_bench.json`、`eval4_bench.json` | P2：每 2/3/4 层 `mx.eval` 的耗时与峰值 |
 | `p2_eval.json` | P2：关键数字汇总与否决结论 |
 | `p3_compile.json` | P3：固定 shape `mx.compile` 的耗时/峰值与 `shapeless` 失败结论 |
