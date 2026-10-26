@@ -1,6 +1,6 @@
 # PLAN-0013：sparse 输出改为 Milvus 可直插形态
 
-- 状态：已完成（本机与目标机）；线上进程重启待单独授权
+- 状态：已完成（本机与目标机，已部署重启并复验）
 - 关联 PRD / ADR / Spec：[PRD-0002](../prd/0002-dense-sparse-embeddings.md) REQ-013、REQ-016；[ADR-0005](../adr/0005-native-sparse-head.md)（决策不变）；[SPEC-0002](../specs/0002-dense-sparse-output.md) AC-202、AC-203、AC-210；[SPEC-0003](../specs/0003-result-cache.md) AC-305
 
 ## 目标与前置条件
@@ -20,6 +20,7 @@
 | 完成 | 补齐官方稀疏头 | `models/bge-m3-mlx-8bit/sparse_linear.safetensors` | 脚本校验 SHA-256 后生成 4251 字节文件 |
 | 完成 | pymilvus 形状校验（AC-210） | 临时 venv，pymilvus 3.0.2 | `sparse_rows_to_proto` 通过并回读一致 |
 | 完成 | 目标机代码仓同步与真机复验（AC-202） | 目标机仓库 `main` 至 79ec36f | 版本一致、非 real 测试与真实推理测试通过、稀疏头 SHA-256 与来源机一致 |
+| 完成 | 目标机部署重启（用户 2026-10-26 授权） | `launchctl kickstart -k gui/$(id -u)/local.bge-embedding` | 新进程就绪；`verify_http.py --launchd --sparse --long` 全 PASS，8192 tokens 3.68 s |
 
 ## 验证记录
 
@@ -36,7 +37,9 @@
 | 目标机权重 | 两机 `shasum -a 256 sparse_linear.safetensors` | 均为 `e4c8a5ad…a2b`，4251 字节，无需重传 |
 | 目标机非 real | `pytest -q -m "not real"` | 109 passed，3 deselected |
 | 目标机真实推理 | `BGE_REAL_TESTS=1 BGE_CONFIG=config.toml pytest tests/test_inference.py -m real` | 2 passed；测试后可用内存约 1.5 GB |
-| 线上进程现状 | 目标机 `POST /v1/embeddings` `return_sparse=true` | 仍返回旧字符串键对象（进程持有旧代码，未重启） |
+| 重启前线上响应 | 目标机 `POST /v1/embeddings` `return_sparse=true` | 旧进程返回字符串键对象 `{"6": 0.0959, ...}` |
+| 重启后线上响应 | 同一请求 | `[[21001, 0.1883], [30094, 0.2461], ...]`，中文 3 项 / 英文 8 项，与本机真实推理结果逐位一致 |
+| 线上输出校验 | 取目标机真实响应，本地 pymilvus 3.0.2 校验 | `entity_is_sparse_matrix` True；2 行 24 / 64 字节；回读值与响应 float32 一致 |
 
 说明：临时 TOML 指向仓库内模型目录，日志写入 `/tmp`，未改动私有配置；冒烟服务绑定 `127.0.0.1:18080`，结束后已停止。pymilvus 仅装在 `/tmp` 临时 venv，未加入项目依赖。
 
@@ -44,6 +47,7 @@
 
 - 已交付：代码、测试、Spec/文档、本机稀疏头与上述证据。破坏性变更，旧客户端需按 SPEC-0002 更新。
 - 目标机已同步：代码 `79ec36f`，权重同一 SHA-256；用户未跟踪文件未被改动。
-- 目标机线上仍运行字符串键版本，进程未重启；部署与重启属独立授权项，重启后需执行 `tests/verify_http.py --launchd --sparse --long` 复验。
+- 目标机已部署重启并复验；旧字符串键客户端需按 SPEC-0002 更新，否则解析失败。
+- 版本口径未决：线上运行的是 `v1.0.0` 之后的主分支提交，尚未打新 tag 或提升 `pyproject.toml` 版本。
 - 空 sparse（`[]`）保留返回，但 Milvus 拒绝空稀疏行，调用方入库前需跳过。
 - Milvus 落库为 float32，检索分数与响应权重存在 float32 舍入差异。
