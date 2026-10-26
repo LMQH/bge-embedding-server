@@ -24,10 +24,10 @@ def test_lookup_miss_then_hit_roundtrip():
 
 def test_sparse_flag_isolates_entries():
     cache = EmbeddingCache(1 << 20)
-    cache.store([[1, 2]], [embedding({"3": 0.5})], True)
+    cache.store([[1, 2]], [embedding([[3, 0.5]])], True)
     assert cache.lookup([1, 2], False) is None
     found = cache.lookup([1, 2], True)
-    assert found == embedding({"3": 0.5})
+    assert found == embedding([[3, 0.5]])
 
 
 def test_lru_eviction_keeps_budget():
@@ -51,7 +51,7 @@ def test_lookup_refreshes_recency():
 
 def test_oversized_entry_is_not_cached():
     cache = EmbeddingCache(DENSE_BYTES)
-    cache.store([[1]], [Embedding([0.5] * 1024, {"x" * 4096: 0.5})], True)
+    cache.store([[1]], [Embedding([0.5] * 1024, [[i, 0.5] for i in range(1000)])], True)
     assert cache.lookup([1], True) is None
     assert cache.estimated_bytes == 0
 
@@ -59,7 +59,7 @@ def test_oversized_entry_is_not_cached():
 def test_sparse_entries_count_toward_budget():
     cache = EmbeddingCache(DENSE_BYTES * 2)
     for i in range(3):
-        cache.store([[i]], [Embedding([0.5] * 1024, {"t" * 100: 0.5})], True)
+        cache.store([[i]], [Embedding([0.5] * 1024, [[t, 0.5] for t in range(100)])], True)
     assert cache.lookup([0], True) is None
     assert cache.lookup([2], True) is not None
 
@@ -75,7 +75,7 @@ def test_store_refreshes_existing_entry_budget():
     cache = EmbeddingCache(DENSE_BYTES * 2)
     cache.store([[1]], [embedding()], False)
     cache.store([[2]], [embedding()], False)
-    cache.store([[1]], [embedding({"k": 0.5})], False)
+    cache.store([[1]], [embedding([[1, 0.5]])], False)
     assert cache.lookup([2], False) is None
-    assert cache.lookup([1], False).sparse == {"k": 0.5}
+    assert cache.lookup([1], False).sparse == [[1, 0.5]]
     assert cache.estimated_bytes <= DENSE_BYTES * 2

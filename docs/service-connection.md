@@ -21,7 +21,7 @@
 | 批量总长度上限 | **32768 tokens／请求**，包含各条特殊 token |
 | 请求体大小上限 | **1 MiB（1,048,576 字节）** |
 | 输入校验 | 任一条输入无效或超限，整批失败 |
-| 向量输出 | **1024 维 dense 浮点向量**，采用 CLS 池化与 L2 归一化；可选 `return_sparse=true` 返回 token 级稀疏权重，契约见 [SPEC-0002](specs/0002-dense-sparse-output.md) |
+| 向量输出 | **1024 维 dense 浮点向量**，采用 CLS 池化与 L2 归一化；可选 `return_sparse=true` 返回 token 级稀疏权重，形态为 `[[token_id, weight], ...]`，可直接作为 Milvus `SPARSE_FLOAT_VECTOR` 字段值插入，契约见 [SPEC-0002](specs/0002-dense-sparse-output.md) |
 | 输出顺序 | 与输入顺序一致，通过 `data[i].index` 对应 |
 | Token 用量 | `usage.prompt_tokens` 和 `usage.total_tokens`，均为整批输入 token 总数 |
 | 推理并发 | 单 worker，最多 **1 个请求执行推理**；批内文本按长度分桶合批，等待中的兼容请求按 15ms 窗口跨请求微合批（16 条 / 8192 token 上限），见 [SPEC-0001](specs/0001-embedding-inference.md)、[PLAN-0011](plans/0011-batch-inference.md)、[PLAN-0012](plans/0012-inference-optimizations.md) |

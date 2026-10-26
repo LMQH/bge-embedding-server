@@ -54,7 +54,7 @@ python -m bge_embedding --config "$PWD/config.toml"
 {"model":"bge-m3","input":["知识库文档","English query"],"encoding_format":"float"}
 ```
 
-接口只接受 `model`、`input`、`encoding_format` 和可选的 `return_sparse`，SDK 客户端显式传 `encoding_format="float"`。原始输入不落盘，超长拒绝。`return_sparse=true` 时每个结果额外返回 `sparse` 对象，键为 token id 字符串，值为正权重；默认不返回。示例：
+接口只接受 `model`、`input`、`encoding_format` 和可选的 `return_sparse`，SDK 客户端显式传 `encoding_format="float"`。原始输入不落盘，超长拒绝。`return_sparse=true` 时每个结果额外返回 `sparse` 数组，元素为 `[token_id, weight]`，可直接作为 Milvus `SPARSE_FLOAT_VECTOR` 字段值；默认不返回。示例：
 
 ```json
 {"model":"bge-m3","input":["知识库文档"],"return_sparse":true}

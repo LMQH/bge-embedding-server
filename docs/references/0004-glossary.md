@@ -1,11 +1,11 @@
 # 术语表
 
-更新日期：2026-10-23。覆盖本文档与接口中的项目自定术语；通用概念（如 transformer、tokenize）不在此列。
+更新日期：2026-10-26。覆盖本文档与接口中的项目自定术语；通用概念（如 transformer、tokenize）不在此列。
 
 | 术语 | 含义 |
 | --- | --- |
 | dense | 每条输入一个 1024 维浮点向量，CLS 池化 + L2 归一化，用于语义相似度 |
-| sparse | 每条输入一组 token 级正权重（`ReLU(W·h + b)`，同 token 取最大），键为十进制 token id 字符串；用于词面 / BM25 风格混合检索。契约见 [SPEC-0002](../specs/0002-dense-sparse-output.md) |
+| sparse | 每条输入一组 token 级正权重（`ReLU(W·h + b)`，同 token 取最大），以 `[token_id, weight]` 二元数组列表表示；可直接作为 Milvus `SPARSE_FLOAT_VECTOR` 字段值。用于词面 / BM25 风格混合检索。契约见 [SPEC-0002](../specs/0002-dense-sparse-output.md) |
 | 稀疏头 | 产生 sparse 输出的小投影层（`sparse_linear.safetensors`），是服务启动前置；见 [模型说明](../../models/README.md) |
 | 执行位 | 同时执行模型前向的请求槽位，固定为 1（单 worker 单模型串行） |
 | 等待位 | 执行位之外的有界 FIFO 等待槽位，默认 19；等待超 30 秒返回 429 `queue_timeout` |

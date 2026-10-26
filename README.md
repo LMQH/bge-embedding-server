@@ -148,23 +148,23 @@ curl -s http://127.0.0.1:8000/v1/embeddings \
 
 每条 dense 恰好 1024 个有限数值，已完成 L2 归一化；`data` 按输入顺序排列，`index` 从 0 开始；`usage` 为整批输入 token 总数。
 
-需要稀疏输出时传 `"return_sparse": true`，每项会多一个以十进制 token id 字符串为键、正权重为值的对象：
+需要稀疏输出时传 `"return_sparse": true`，每项会多一个 `[token_id, weight]` 二元数组列表：
 
 ```json
 {
   "object": "embedding",
   "index": 0,
   "embedding": [0.0123, -0.0456, 0.0789],
-  "sparse": {"81492": 0.3436, "24471": 0.24}
+  "sparse": [[81492, 0.3436], [24471, 0.24]]
 }
 ```
 
-同一 token 多次出现取最大权重，特殊 token 不出现；不做额外的归一化或截断。sparse 的键是 **token id**，不是词面：调用方需自行用 BGE-M3 的 tokenizer（XLM-RoBERTa 词表）映射回文本，例如：
+同一 token 多次出现取最大权重，特殊 token 不出现；不做额外的归一化或截断。索引是 **token id** 整数而不是词面，可直接作为 Milvus `SPARSE_FLOAT_VECTOR` 字段值插入（`client.insert` 无需转换）。调用方需自行用 BGE-M3 的 tokenizer（XLM-RoBERTa 词表）映射回文本，例如：
 
 ```python
 from transformers import AutoTokenizer
 tok = AutoTokenizer.from_pretrained("models/bge-m3-mlx-8bit")  # 或官方 BAAI/bge-m3
-words = {tok.convert_ids_to_tokens(int(k)): v for k, v in sparse.items()}
+words = {tok.convert_ids_to_tokens(token_id): weight for token_id, weight in sparse}
 # {'知识': 0.3436, '库': 0.24, ...}
 ```
 

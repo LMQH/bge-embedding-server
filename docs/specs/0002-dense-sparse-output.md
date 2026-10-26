@@ -4,6 +4,7 @@
 - 关联 PRD 与需求 ID：[PRD-0002](../prd/0002-dense-sparse-embeddings.md)，REQ-013～REQ-019。
 - 关联 ADR：[ADR-0005](../adr/0005-native-sparse-head.md)、[ADR-0002](../adr/0002-bge-m3-mlx.md)；dense 基础契约见 [SPEC-0001](0001-embedding-inference.md)。
 - 确认依据：2026-10-21 用户确认验证深度为 M4 smoke 与 8192 tokens，并要求按推荐方案推进改造。接口字段、token id 键和全部正权重按推荐默认值定案；用户未逐项否决，后续调整按文档变更流程更新。
+- 2026-10-26 变更（用户指令）：sparse 输出由“十进制字符串键对象”改为 `[token_id, weight]` 二元数组列表，以便原样作为 Milvus `SPARSE_FLOAT_VECTOR` 字段值使用。依据 pymilvus `entity_is_sparse_matrix` / `sparse_rows_to_proto` 的入参约束：索引为整数、range `[0, 2^32-2]`、SDK 自动排序；JSON 对象键只能是字符串，无法承载整数索引。聚合（同 token 取最大）、过滤（特殊 token、非正权重）与顺序（首次出现）语义不变。
 
 ## 范围
 
@@ -32,16 +33,18 @@
 - 按 token id 聚合：同一 token 多次出现取最大权重。
 - 排除 tokenizer 的全部特殊 token id；只保留 `weight > 0` 的项。
 - 不做 L2 归一化、长度归一化、IDF、top-k 或阈值截断。
-- key 为十进制 token id 字符串，例如 `"81492"`；与官方 BGE-M3 `lexical_weights` 的 id 形式一致，避免 decode 字符串的同键碰撞。
-- value 为有限正数，使用 JSON 数字；不返回 token 文本。
-- 输出顺序按 token 首次出现；JSON 对象顺序不构成语义。
-- 正常非空文本预期至少有一个正权重项；若稀疏头输出全部非正，返回空对象而不是错误。调用方不得假设一定非空。
+- 每条 sparse 为 `[token_id, weight]` 二元数组的有序列表，例如 `[[81492, 0.3436], [24471, 0.24]]`。
+- `token_id` 为 JSON 整数，范围 `0 ≤ id ≤ 2^32-2`，与 tokenizer 词表一致；同一 token 在一行内只出现一次。使用 id 而非 decode 字符串，避免同键碰撞，并可直接作为 Milvus 稀疏索引。
+- `weight` 为有限正数，JSON 数字，取该 token 权重的 float32 值；不返回 token 文本。
+- 输出顺序按 token 首次出现；该形态即 pymilvus 接受的稀疏行形态（二元组/二元数组列表），写入 `SPARSE_FLOAT_VECTOR` 字段时无需转换键类型，排序由 SDK 完成。
+- 不使用 JSON 对象（`{"81492": 0.3436}`）承载稀疏结果：JSON 对象键只能是字符串，任何消费端都必须再做一次键类型转换，且无法表达语言无关的整数索引。
+- 正常非空文本预期至少有一个正权重项；若稀疏头输出全部非正，返回空数组 `[]` 而不是错误。调用方不得假设一定非空。Milvus 拒绝空稀疏行，空数组成员需由调用方在入库前跳过。
 
 ### 响应
 
 `return_sparse` 为 `false` 或省略时，响应与 SPEC-0001 完全一致，不出现 `sparse` 字段。
 
-`return_sparse` 为 `true` 时，`data` 中每个条目增加 `sparse` 对象：
+`return_sparse` 为 `true` 时，`data` 中每个条目增加 `sparse` 数组（`[token_id, weight]` 二元数组的列表）：
 
 ```json
 {
@@ -52,7 +55,7 @@
       "object": "embedding",
       "index": 0,
       "embedding": [0.0123, -0.0456, "..."],
-      "sparse": {"81492": 0.3436, "24471": 0.2400}
+      "sparse": [[81492, 0.3436], [24471, 0.24]]
     }
   ],
   "usage": {"prompt_tokens": 10, "total_tokens": 10}
@@ -84,13 +87,14 @@ sparse 计算失败时整批返回 500，不返回部分结果。错误 message 
 - 性能：稀疏头是每 token 一次 1024 维投影，不得引入明显延迟或内存回退；以 M4 8192 tokens 实测为准。
 - 隐私：不持久化输入或输出；日志不记录正文、dense/sparse 权重或 Key，只允许条数、耗时、状态等安全元数据。
 - 兼容性：`return_sparse` 与 `sparse` 是扩展，不是 OpenAI 标准字段；高层 SDK 可能需要原始 HTTP 或额外字段透传。默认 dense-only 调用不受影响。
+- Milvus 适配：`sparse` 即 `SPARSE_FLOAT_VECTOR` 字段值形态，调用方可直接 `insert`；服务本身不依赖 pymilvus，不管理集合、索引、写入或嵌入重算。服务端不做 float32 之外的数值转换；Milvus 落库为 float32，检索分数与该字段权重之间存在 float32 舍入差异。
 
 ## 验收场景
 
 | 场景 ID | 需求 ID | 前置条件与输入 | 预期结果 | 验证方式 |
 | --- | --- | --- | --- | --- |
 | AC-201 | REQ-013、REQ-015 | 不传或传 `return_sparse=false` 的中英文单条/批量 | 200；无 `sparse` 字段；dense 1024 有限且 L2 归一化；usage 与顺序不变 | 单元测试与 M4 smoke |
-| AC-202 | REQ-013、REQ-016 | `return_sparse=true`，中文与英文单条 | 200；sparse 非空；key 为数字字符串；value 有限且 >0；特殊 token 不出现；dense 有效 | 真实本地推理与 M4 smoke |
+| AC-202 | REQ-013、REQ-016 | `return_sparse=true`，中文与英文单条 | 200；sparse 为非空二元数组列表；`token_id` 为整数、0 ≤ id ≤ 2^32-2、行内唯一；weight 有限且 >0；特殊 token 不出现；dense 有效 | 单元测试（`_sparse` 直接调用）与真实本地推理、M4 smoke |
 | AC-203 | REQ-013、REQ-016 | `return_sparse=true`，中英混合批量 | 每项都有独立 sparse；顺序与 index 正确；usage 为总 token 数 | 单元测试与 M4 smoke |
 | AC-204 | REQ-015 | `return_sparse` 为字符串、数字、null、数组或对象 | 400 `invalid_request`，`param=return_sparse`，不发生推理 | 单元测试 |
 | AC-205 | REQ-017 | 8192 tokens，`return_sparse=true` | 200；usage 为 8192；dense 与 sparse 有效；无 OOM；记录峰值内存与耗时 | M4 实测 |
@@ -98,6 +102,7 @@ sparse 计算失败时整批返回 500，不返回部分结果。错误 message 
 | AC-207 | REQ-015 | 同一输入在改造前后各取 dense | 余弦 ≥ 0.9999；预期逐位一致 | 本地真实推理 |
 | AC-208 | REQ-018 | 发送含哨兵文本的请求并检查日志 | 日志不含正文、权重、Key 或底层异常 | 现有日志测试 |
 | AC-209 | REQ-019 | 文档与索引 | SPEC、PLAN、连接说明、HANDOFF 与索引一致 | 审阅与链接检查 |
+| AC-210 | REQ-013、REQ-016 | 将真实响应的 `data[i].sparse` 原样作为 pymilvus `SPARSE_FLOAT_VECTOR` 字段值 | `sparse_rows_to_proto` 校验通过并产出非空行字节；无需键类型转换 | 本地 pymilvus 校验（不需要 Milvus 服务端） |
 
 ## 未决事项与关联计划
 

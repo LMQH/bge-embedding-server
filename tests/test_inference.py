@@ -24,10 +24,12 @@ def test_real_embedder_single_batch_and_lengths():
 
     sparse = model.embed(ids, return_sparse=True)
     assert all(item.sparse for item in sparse)
-    assert all(key.isdigit() and value > 0
-               for item in sparse for key, value in item.sparse.items())
-    assert all(int(key) not in model.special_ids
-               for item in sparse for key in item.sparse)
+    assert all(isinstance(token_id, int) and 0 <= token_id < 2**32 - 1 and value > 0
+               for item in sparse for token_id, value in item.sparse)
+    assert all(token_id not in model.special_ids
+               for item in sparse for token_id, _ in item.sparse)
+    assert all(len({token_id for token_id, _ in item.sparse}) == len(item.sparse)
+               for item in sparse)
     assert np.array_equal(np.asarray([item.dense for item in sparse]), batch)
 
     for length in (8192, 8193):
@@ -51,7 +53,8 @@ def test_real_embedder_varied_length_batches_match_single():
     sparse_batch = model.embed(ids, return_sparse=True)
     sparse_single = [model.embed([item], return_sparse=True)[0] for item in ids]
     for batched, alone in zip(sparse_batch, sparse_single):
-        assert set(batched.sparse) == set(alone.sparse)
-        for key in batched.sparse:
-            assert math.isclose(batched.sparse[key], alone.sparse[key],
+        assert dict(batched.sparse).keys() == dict(alone.sparse).keys()
+        alone_weights = dict(alone.sparse)
+        for token_id, value in batched.sparse:
+            assert math.isclose(value, alone_weights[token_id],
                                 rel_tol=2e-3, abs_tol=5e-4)

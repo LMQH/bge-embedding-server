@@ -32,9 +32,9 @@
 
 BGE-M3 的多向量（ColBERT）表示、BM25 / SPLADE、第二模型以及服务端融合排序都不在范围内（[SPEC-0002](../specs/0002-dense-sparse-output.md)）。dense 与 sparse 的融合权重、召回后的重排都由调用方自行实现；服务不提供端到端检索质量保证。
 
-### L-04 sparse 是原始词权重，且以 token id 为键【取舍】
+### L-04 sparse 是原始词权重，且以 token id 为索引【取舍】
 
-sparse 为 `ReLU(W·h + b)` 的逐位置权重，同一 token 取最大权重，排除特殊 token，不做 L2 归一化、长度归一化、IDF 或 top-k 截断（[SPEC-0002](../specs/0002-dense-sparse-output.md)）。键是十进制 token id 字符串而不是词面，调用方需要自己维护词表映射；该表示与 tokenizer 绑定，不能跨模型复用，也不能直接当作 BM25 词频使用。
+sparse 为 `ReLU(W·h + b)` 的逐位置权重，同一 token 取最大权重，排除特殊 token，不做 L2 归一化、长度归一化、IDF 或 top-k 截断（[SPEC-0002](../specs/0002-dense-sparse-output.md)）。索引是 token id 整数而不是词面，调用方需要自己维护词表映射；该表示与 tokenizer 绑定，不能跨模型复用，也不能直接当作 BM25 词频使用。
 
 ### L-05 8bit 模型与官方 fp16 不保证数值一致，且未做效果评测【未验证】
 

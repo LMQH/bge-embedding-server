@@ -10,7 +10,8 @@ import numpy as np
 @dataclass
 class Embedding:
     dense: list[float]
-    sparse: dict[str, float] | None = None
+    # [token_id, weight] pairs, ready for a Milvus SPARSE_FLOAT_VECTOR field.
+    sparse: list[list[int | float]] | None = None
 
 
 # Bound one padded forward: a 16 x 512 group is exactly 8192 padded tokens.
@@ -154,14 +155,16 @@ class Embedder:
                        if return_sparse else [None] * batch)
         return values, sparse_rows
 
-    def _sparse(self, ids: list[int], weights: np.ndarray) -> dict[str, float]:
+    def _sparse(self, ids: list[int], weights: np.ndarray) -> list[list[int | float]]:
         if weights.shape != (len(ids),) or not np.isfinite(weights).all():
             raise RuntimeError("Invalid sparse output.")
-        sparse = {}
+        # Aggregate by token id (max weight) in first-occurrence order. Indices
+        # stay unique; Milvus sorts the pairs itself when packing a row.
+        weights_by_id: dict[int, float] = {}
         for token_id, weight in zip(ids, weights):
             if token_id in self.special_ids or weight <= 0:
                 continue
-            key = str(int(token_id))
-            if float(weight) > sparse.get(key, 0.0):
-                sparse[key] = float(weight)
-        return sparse
+            key = int(token_id)
+            if float(weight) > weights_by_id.get(key, 0.0):
+                weights_by_id[key] = float(weight)
+        return [[key, weight] for key, weight in weights_by_id.items()]

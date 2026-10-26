@@ -18,6 +18,12 @@ TEXT = "user-text-sentinel-781b"
 AUTH = {"Authorization": f"Bearer {KEY}"}
 
 
+def sparse_pairs(ids):
+    """Unique [token_id, weight] pairs, matching the Milvus-ready wire shape."""
+    return [[token_id, weight]
+            for token_id, weight in zip(dict.fromkeys(ids[:2]), (0.5, 0.25))]
+
+
 class FakeEmbedder:
     def __init__(self):
         self.calls = []
@@ -37,7 +43,7 @@ class FakeEmbedder:
             raise RuntimeError(TEXT + KEY)
         result = []
         for ids in tokens:
-            sparse = {str(ids[0]): 0.5, str(ids[1]): 0.25} if return_sparse else None
+            sparse = sparse_pairs(ids) if return_sparse else None
             result.append(Embedding([1.0] + [0.0] * 1023, sparse))
         return result
 
@@ -55,7 +61,7 @@ class GatedTokenEmbedder(TokenEmbedder):
         self.started.set()
         assert self.gate.wait(10), "Test did not release inference"
         return [Embedding([float(ids[0])] + [0.0] * 1023,
-                          {str(ids[0]): 0.5, str(ids[1]): 0.25} if return_sparse else None)
+                          sparse_pairs(ids) if return_sparse else None)
                 for ids in tokens]
 
 
@@ -98,8 +104,10 @@ async def test_sparse_is_opt_in_and_preserves_order(settings):
         data = r.json()["data"]
         assert [item["index"] for item in data] == [0, 1]
         assert all(item["sparse"] for item in data)
-        assert all(key.isdigit() and value > 0
-                   for item in data for key, value in item["sparse"].items())
+        assert all(isinstance(token_id, int) and 0 <= token_id < 2**32 - 1 and value > 0
+                   for item in data for token_id, value in item["sparse"])
+        assert all(len(item["sparse"]) == len({token_id for token_id, _ in item["sparse"]})
+                   for item in data)
         assert data[0]["sparse"] != data[1]["sparse"]
         assert all(len(item["embedding"]) == 1024 for item in data)
 
@@ -551,7 +559,7 @@ async def test_micro_batch_failure_retries_each_request(settings):
                 raise RuntimeError("combined failure")
             result = []
             for ids in tokens:
-                sparse = {str(ids[0]): 0.5, str(ids[1]): 0.25} if return_sparse else None
+                sparse = sparse_pairs(ids) if return_sparse else None
                 result.append(Embedding([float(ids[0])] + [0.0] * 1023, sparse))
             return result
 

@@ -6,7 +6,7 @@ from collections import OrderedDict
 from .inference import Embedding
 
 DENSE_BYTES = 4096  # 1024 float32 values, independent of input length.
-_SPARSE_ENTRY_BYTES = 64
+_SPARSE_PAIR_BYTES = 32  # int, float and their list slot plus bookkeeping.
 
 
 def cache_key(tokens: list[int], return_sparse: bool) -> bytes:
@@ -19,14 +19,14 @@ def cache_key(tokens: list[int], return_sparse: bool) -> bytes:
 class EmbeddingCache:
     """Single-threaded (event loop) LRU bounded by an estimated byte budget.
 
-    Stored sparse maps are handed out by reference and are read-only by
-    contract: mutating a returned mapping would corrupt later cache hits.
+    Stored sparse rows are handed out by reference and are read-only by
+    contract: mutating a returned row would corrupt later cache hits.
     """
 
     def __init__(self, max_bytes: int):
         self.max_bytes = max_bytes
-        self._entries: OrderedDict[bytes, tuple[int, array.array, dict[str, float] | None]] = (
-            OrderedDict())
+        self._entries: OrderedDict[
+            bytes, tuple[int, array.array, list[list[int | float]] | None]] = OrderedDict()
         self.estimated_bytes = 0
 
     def lookup(self, tokens: list[int], return_sparse: bool) -> Embedding | None:
@@ -45,8 +45,7 @@ class EmbeddingCache:
             sparse = embedding.sparse
             estimate = DENSE_BYTES
             if sparse is not None:
-                estimate += sum(len(token.encode("utf-8")) + _SPARSE_ENTRY_BYTES
-                                for token in sparse)
+                estimate += _SPARSE_PAIR_BYTES * len(sparse)
             old = self._entries.pop(key, None)
             if old is not None:
                 self.estimated_bytes -= old[0]

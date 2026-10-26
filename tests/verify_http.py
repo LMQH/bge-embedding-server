@@ -42,8 +42,9 @@ def main():
         assert abs(np.linalg.norm(vector) - 1) <= 1e-5
         if args.sparse:
             assert item["sparse"]
-            assert all(key.isdigit() and np.isfinite(value) and value > 0
-                       for key, value in item["sparse"].items())
+            assert all(isinstance(token_id, int) and 0 <= token_id < 2**32 - 1
+                       and np.isfinite(value) and value > 0
+                       for token_id, value in item["sparse"])
         else:
             assert "sparse" not in item
 
