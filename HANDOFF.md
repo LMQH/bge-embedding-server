@@ -1,10 +1,10 @@
 # 项目进度与交接
 
-更新日期：2026-10-26。当前版本：**v1.0.0（定版）**；两机已部署 v1.0.0 之后的 sparse 形态变更（`2632763`），尚未打新 tag。
+更新日期：2026-10-26。当前版本：**v1.1.0（定版）**。
 
 ## 当前状态
 
-v1.0.0 定版。服务已在两机上线同一版本：本机与 Mac mini M4 16GB 目标机（用户级 launchd 常驻，`http://<TAILSCALE_IP>:8000`）。
+v1.1.0 定版。服务已在两机上线同一版本：本机与 Mac mini M4 16GB 目标机（用户级 launchd 常驻，`http://<TAILSCALE_IP>:8000`）。
 
 核心能力与依据：
 
@@ -14,7 +14,14 @@ v1.0.0 定版。服务已在两机上线同一版本：本机与 Mac mini M4 16G
 - 请求观测：[SPEC-0004](docs/specs/0004-request-observability-and-dedup.md)，请求日志 `wait_ms` / `exec_ms` / `ahead` / `dedup`，请求内去重，429 附 `Retry-After: 1`。
 - 能力边界与局限清单：[REF-0003](docs/references/0003-service-limitations.md)。
 
-开发过程记录已按 v1.0.0 定版整理：纯过程性 Plan（项目初始化、首版搭建、队列扩容、配置迁移、历史清理）已删除；保留承载验证数据的 Plan（见下）。本文即过程结论的简洁汇总。
+开发过程记录已在 v1.0.0 定版时整理：纯过程性 Plan（项目初始化、首版搭建、队列扩容、配置迁移、历史清理）已删除；保留承载验证数据的 Plan（见下）。本文即过程结论的简洁汇总。
+
+## 版本记录
+
+| 版本 | 日期 | 内容 |
+| --- | --- | --- |
+| v1.1.0 | 2026-10-26 | `return_sparse` 输出由字符串键对象改为 `[[token_id, weight], ...]`，可直接作为 Milvus `SPARSE_FLOAT_VECTOR` 字段值；两机同步、部署并复验。破坏性：读取 `sparse` 的旧客户端需按 [SPEC-0002](docs/specs/0002-dense-sparse-output.md) 更新。证据见 [PLAN-0013](docs/plans/0013-milvus-sparse-format.md) |
+| v1.0.0 | 2026-10-23 | 首版定版：dense 契约、双路输出、结果缓存、请求观测与去重、批内与跨请求微合批 |
 
 ## 保留的验证记录
 
@@ -56,9 +63,9 @@ v1.0.0 定版。服务已在两机上线同一版本：本机与 Mac mini M4 16G
 
 先使用现有服务；只有实际问题或用户明确需求才增加实现、优化或测试。对 M4 的部署、配置与运维变更需另行授权。运行调优先观察日志中 `wait_ms` / `exec_ms` / 429 分布与缓存命中率，再决定准入控制或 padding 预算调整。
 
-## 仓库治理（v1.0.0）
+## 仓库治理（v1.1.0）
 
 - 文档遵循 [SDD 流程](docs/README.md)：PRD 定需求、ADR 记决策、Spec 定契约、Plan 留验证证据；行为变更先改 Spec。
 - 定版时已删除纯过程性 Plan（初始化、首版搭建、队列扩容、配置迁移、历史清理），结论已并入本文；`docs/service-connection.md` 只保留当前线上契约，历史部署补记由本文承载。
 - 仓库不含模型权重、缓存、凭据与日志；私有连接信息只存在于被忽略的 `config.toml` 与 `docs/service-connection.local.md`。
-- Git 仓库：`main` 分支，`origin` 关联 GitHub（见 `git remote -v`）；定版以 `v1.0.0` tag 为准。
+- Git 仓库：`main` 分支，`origin` 关联 GitHub（见 `git remote -v`）；定版以 `v1.1.0` tag 为准。

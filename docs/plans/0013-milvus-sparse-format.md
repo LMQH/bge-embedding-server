@@ -1,6 +1,6 @@
 # PLAN-0013：sparse 输出改为 Milvus 可直插形态
 
-- 状态：已完成（本机与目标机，已部署重启并复验）
+- 状态：已完成（本机与目标机，已部署重启并复验，随 v1.1.0 发布）
 - 关联 PRD / ADR / Spec：[PRD-0002](../prd/0002-dense-sparse-embeddings.md) REQ-013、REQ-016；[ADR-0005](../adr/0005-native-sparse-head.md)（决策不变）；[SPEC-0002](../specs/0002-dense-sparse-output.md) AC-202、AC-203、AC-210；[SPEC-0003](../specs/0003-result-cache.md) AC-305
 
 ## 目标与前置条件
@@ -48,6 +48,6 @@
 - 已交付：代码、测试、Spec/文档、本机稀疏头与上述证据。破坏性变更，旧客户端需按 SPEC-0002 更新。
 - 目标机已同步：代码 `79ec36f`，权重同一 SHA-256；用户未跟踪文件未被改动。
 - 目标机已部署重启并复验；旧字符串键客户端需按 SPEC-0002 更新，否则解析失败。
-- 版本口径未决：线上运行的是 `v1.0.0` 之后的主分支提交，尚未打新 tag 或提升 `pyproject.toml` 版本。
+- 版本：`pyproject.toml` 提升为 1.1.0 并打 `v1.1.0` tag；`return_sparse` 客户端按破坏性变更对待。
 - 空 sparse（`[]`）保留返回，但 Milvus 拒绝空稀疏行，调用方入库前需跳过。
 - Milvus 落库为 float32，检索分数与响应权重存在 float32 舍入差异。

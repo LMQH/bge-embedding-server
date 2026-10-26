@@ -1,6 +1,6 @@
 # SPEC-0002：稠密与稀疏双路输出契约
 
-- 状态：已确认，2026-10-21。
+- 状态：已确认，2026-10-21；2026-10-26 修订（sparse 输出形态，随 v1.1.0 发布）。
 - 关联 PRD 与需求 ID：[PRD-0002](../prd/0002-dense-sparse-embeddings.md)，REQ-013～REQ-019。
 - 关联 ADR：[ADR-0005](../adr/0005-native-sparse-head.md)、[ADR-0002](../adr/0002-bge-m3-mlx.md)；dense 基础契约见 [SPEC-0001](0001-embedding-inference.md)。
 - 确认依据：2026-10-21 用户确认验证深度为 M4 smoke 与 8192 tokens，并要求按推荐方案推进改造。接口字段、token id 键和全部正权重按推荐默认值定案；用户未逐项否决，后续调整按文档变更流程更新。
