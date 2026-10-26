@@ -27,7 +27,7 @@ v1.0.0 定版。服务已在两机上线同一版本：本机与 Mac mini M4 16G
 | [PLAN-0010](docs/plans/0010-request-optimizations.md) | 请求优化验证：去重、日志字段、Retry-After 实测 |
 | [PLAN-0011](docs/plans/0011-batch-inference.md) | 批内合批：16×25 约 3.3x、16×256 约 1.18x，1k 以上约 1.0x；600 秒连续入库 3537.7 tok/s |
 | [PLAN-0012](docs/plans/0012-inference-optimizations.md)（含 [0012-evidence](docs/plans/0012-evidence/README.md)） | FP16 采纳（快 18–21%，峰值 977→784 MiB）、P2/P3 否决证据、跨请求微合批（20 并发单条 P95 380→146ms） |
-| [PLAN-0013](docs/plans/0013-milvus-sparse-format.md) | sparse 改为 `[token_id, weight]` 二元数组：本机真实推理、HTTP smoke、pymilvus 校验证据；M4 同步待办 |
+| [PLAN-0013](docs/plans/0013-milvus-sparse-format.md) | sparse 改为 `[token_id, weight]` 二元数组：两机同步、真实推理、HTTP smoke 与 pymilvus 校验证据；重启待授权 |
 
 ## 环境与运行位置
 
@@ -50,7 +50,7 @@ v1.0.0 定版。服务已在两机上线同一版本：本机与 Mac mini M4 16G
 - 测试分 `smoke`（默认，4 项起）与 `real`（需本机模型权重与 Metal）两组；定版时两机相关检查通过，详见各保留 Plan。
 - 未做：故障注入、30 秒排队超时实测、soak、整机重启 / 重新登录演练；M4 线上最新版本的冒烟记录未单独归档（部署事实经用户确认）。不承诺容量、吞吐或 SLA。
 - 所有性能数字为同机观测值，不是承诺；原始证据在对应 Plan 与 [0012-evidence](docs/plans/0012-evidence/README.md)。
-- 2026-10-26 sparse 形态变更：本机已补官方稀疏头（`deploy/fetch_sparse_head.py`，4251 字节），非 real 测试 109 项、真实推理测试、本地 HTTP smoke（含 8192 tokens）与 pymilvus 形状校验均通过；M4 代码与权重尚未同步，待补验后升级。
+- 2026-10-26 sparse 形态变更：两机已同步同一提交与同一稀疏头（SHA-256 一致），均通过非 real 测试与真实推理测试；本机另有 HTTP smoke（含 8192 tokens）与 pymilvus 形状校验证据。线上进程未重启，响应契约仍为旧形态，部署与重启待单独授权。
 
 ## 后续工作原则
 
