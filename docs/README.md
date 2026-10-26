@@ -23,7 +23,7 @@
 | PRD | 为什么做、为谁做、范围与成功标准是什么 | [PRD-0001：嵌入推理服务](prd/0001-embedding-service.md)、[PRD-0002：稠密与稀疏双路嵌入输出](prd/0002-dense-sparse-embeddings.md)、[PRD-0003：嵌入结果缓存](prd/0003-result-cache.md)、[PRD-0004：请求观测、请求内去重与过载提示](prd/0004-request-optimizations.md) | [PRD 模板](prd/_template.md) |
 | ADR | 为什么选择某种方案，考虑过哪些替代方案 | [ADR-0001：SDD 开发理念](adr/0001-specification-driven-development.md)、[ADR-0002：BGE-M3 与 MLX](adr/0002-bge-m3-mlx.md)、[ADR-0003：原生 Python 与 conda](adr/0003-native-python-runtime.md)、[ADR-0004：首版基本冒烟](adr/0004-minimal-verification.md)、[ADR-0005：稀疏输出采用 BGE-M3 原生稀疏头](adr/0005-native-sparse-head.md)、[ADR-0006：进程内结果缓存](adr/0006-in-memory-result-cache.md)、[ADR-0007：单 worker 批内合批](adr/0007-batch-inference.md)、[ADR-0008：跨请求微合批](adr/0008-cross-request-micro-batching.md) | [ADR 模板](adr/_template.md) |
 | Spec | 系统必须表现出什么可验证行为 | [SPEC-0001：嵌入推理契约](specs/0001-embedding-inference.md)、[SPEC-0002：稠密与稀疏双路输出契约](specs/0002-dense-sparse-output.md)、[SPEC-0003：嵌入结果缓存契约](specs/0003-result-cache.md)、[SPEC-0004：请求观测、请求内去重与过载提示契约](specs/0004-request-observability-and-dedup.md) | [Spec 模板](specs/_template.md) |
-| Plan | 按什么顺序实施，如何验证与交付 | [PLAN-0003：长输入注意力修复](plans/0003-fused-attention.md)、[PLAN-0006：接口性能测试](plans/0006-performance-test.md)、[PLAN-0007：稠密与稀疏双路输出实施](plans/0007-dense-sparse-output.md)、[PLAN-0009：嵌入结果缓存实施](plans/0009-result-cache.md)、[PLAN-0010：请求观测与去重实施](plans/0010-request-optimizations.md)、[PLAN-0011：单 worker 批内真合批](plans/0011-batch-inference.md)、[PLAN-0012：推理优化](plans/0012-inference-optimizations.md)（含 [0012-evidence](plans/0012-evidence/README.md)）、[PLAN-0013：sparse 改为 Milvus 可直插形态](plans/0013-milvus-sparse-format.md) | [Plan 模板](plans/_template.md) |
+| Plan | AI 按什么依据与步骤执行，如何验收，实际结果是什么 | [完整 Plan 索引（PLAN-0001～PLAN-0014）](plans/README.md) | [Plan 模板](plans/_template.md) |
 | Handoff | 当前进展、待定事项、阻塞与下一步是什么 | [项目进度与交接](../HANDOFF.md) | — |
 | 使用说明 | 如何连接和调用服务 | [推理服务连接与使用说明](service-connection.md) | — |
 | 参考资料 | 外部资料、技术事实与待验证事项是什么 | [MLX 框架、模型格式与官方资料](references/0001-mlx-framework-and-model-formats.md)、[源码接入与代码结构](references/0002-source-layout.md)、[当前服务的局限性](references/0003-service-limitations.md)、[术语表](references/0004-glossary.md) | — |
@@ -41,12 +41,14 @@
 
 ## 命名、状态与维护
 
-- 各类文档分别从 `0001` 连续编号，文件名采用 `NNNN-short-title.md`，文档 ID 分别使用 `PRD-`、`ADR-`、`SPEC-`、`PLAN-` 前缀；不同类型不要求编号一一对应。
+- 各类文档分别从 `0001` 按创建顺序递增编号，文件名采用 `NNNN-short-title.md`，文档 ID 分别使用 `PRD-`、`ADR-`、`SPEC-`、`PLAN-` 前缀；不同类型不要求编号一一对应。已有编号永久保留，不重新编号或复用。
 - `_template.md` 仅作复制起点，不属于正式编号文档。新增文档时补充本页索引，用相对链接关联上下游。
 - PRD 与 Spec 使用“草案 / 已确认 / 已废弃”；Plan 使用“草案 / 进行中 / 已完成 / 已取消”；ADR 使用“提议 / 已接受 / 已废弃 / 已替代”。
 - “已确认”与“已接受”必须有明确依据，记录确认来源；不能因为文件已创建就自动确认。待确定项不得作为实现承诺。
 - PRD 中使用稳定的需求 ID（例如 `REQ-001`），Spec 中的验收场景引用需求 ID，Plan 的工作项引用 Spec 场景或章节。
 - 已接受 ADR 保留原始决策内容。决策改变时新增 ADR，并在旧记录中标注替代状态与链接，不覆写历史理由。
-- PRD 维护需求事实，ADR 维护决策理由，Spec 维护行为契约，Plan 维护执行状态；通过引用关联，避免重复维护同一事实。
+- PRD 维护需求事实，ADR 维护决策理由，Spec 维护行为契约，Plan 保留 AI 执行的依据、任务步骤、验收标准、执行记录与验证结论；通过引用关联，避免重复维护同一事实。
+- Plan 是执行留档，不因已完成、已取消、属于过程性工作或没有测试数据而删除。状态变更补记时间与依据，保留原有执行记录；历史命令与旧契约不作为当前操作指令。
+- `docs/plans/` 仅存计划文档与模板。测试脚本与需入库的原始测试数据归 `tests/`，例如基准工具在 `tests/benchmarks/`、PLAN-0012 历史结果在 `tests/benchmarks/evidence/0012/`；Plan 保留验证摘要并链接原始证据。模型权重、缓存、凭据和私有运行文件仍不入库。
 - 文档变更时检查本文档内相对链接全部可解析（含新增与删除文件后的引用清理）；定版或批量删改后应全库复查一遍。
 - 根目录 [README](../README.md) 仅保留简洁总览与导航，[AGENTS.md](../AGENTS.md) 是协作约定，[HANDOFF.md](../HANDOFF.md) 维护项目级进度与交接摘要，并链接 Plan 中的详细任务与验证证据；交接时覆盖过时摘要，历史记录留在 Plan。本目录不记录虚构的测试、部署或运行结果。

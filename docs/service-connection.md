@@ -1,6 +1,6 @@
 # 推理服务连接与使用说明
 
-本文描述 **v1.1.0 线上契约**（本机与 M4 同版本）。历史部署记录见 [HANDOFF](../HANDOFF.md)。本文中的 `<TAILSCALE_IP>`、`${REMOTE_PROJECT_DIR}` 均为脱敏占位符，不代表可直接使用的地址或路径。实际连接信息由部署方私下提供；如需本地记录，使用已被 Git 忽略的 `docs/service-connection.local.md`，不提交到仓库。API Key 保留在私有 `config.toml` 中。配置和启动方式见 [部署说明](../deploy/README.md)。
+本文描述 **v1.1.0 线上契约**（Mac mini M4 16GB 常驻服务）。历史部署记录见 [HANDOFF](../HANDOFF.md)。本文中的 `<TAILSCALE_IP>`、`${REMOTE_PROJECT_DIR}` 均为脱敏占位符，不代表可直接使用的地址或路径。实际连接信息由部署方私下提供；如需本地记录，使用已被 Git 忽略的 `docs/service-connection.local.md`，不提交到仓库。API Key 保留在私有 `config.toml` 中。配置和启动方式见 [部署说明](../deploy/README.md)。
 
 | 项目 | 配置 |
 |---|---|

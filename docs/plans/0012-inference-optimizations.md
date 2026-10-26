@@ -2,7 +2,9 @@
 
 - 状态：已完成（2026-10-23；P1 采纳，P2/P3 否决，P4 完成；本机 launchd 已重启加载）
 - 关联：[SPEC-0001](../specs/0001-embedding-inference.md)、[ADR-0007](../adr/0007-batch-inference.md)、[PLAN-0011](0011-batch-inference.md)
-- 后续关联：跨请求微合批需新增 ADR 与 SPEC-0001 增补后才能编码。
+- 实施依据：跨请求微合批已由 [ADR-0008](../adr/0008-cross-request-micro-batching.md) 与 SPEC-0001 增补确认，执行结果见下文 P4。
+
+设备说明（2026-10-26 用户澄清）：本文“本机 Mac mini M4”与“M4 目标机”是同一台 M4 16GB。模型级、进程内 ASGI 和回环 HTTP 数据须按各自口径引用，不存在两台 M4 的性能对比。
 
 ## 目标与前置条件
 
@@ -42,9 +44,11 @@
 
 ## 验证记录
 
-P0 基线在 `8cdaf66`（FP16 attention 之前）生成；原始数据保存在本机 `.cache/opt/`，汇总和可审查原始 JSON 已归档到 [`0012-evidence/`](0012-evidence/README.md)。
+2026-10-26 目录整理：5 个基准采集与分析脚本已移至 [tests/benchmarks](../../tests/benchmarks/README.md)，原始结果与测量说明已统一移至 [tests/benchmarks/evidence/0012](../../tests/benchmarks/evidence/0012/README.md)。检查：脚本语法、相对链接、迁移内容及数据完整性；未重跑模型或 HTTP 基准。
 
-待逐项回填：
+P0 基线在 `8cdaf66`（FP16 attention 之前）生成；原始数据保存在本机 `.cache/opt/`，汇总和可审查原始 JSON 已归档到 [测试证据](../../tests/benchmarks/evidence/0012/README.md)。
+
+各项执行结果：
 
 - P0：已完成。基线为 FP32 attention；原始向量/耗时/峰值保存在本机 `.cache/opt/baseline_*`。
 - P1：已完成。FP16 attention 的对照如下（同进程、同输入、先 warmup，再取中位数；dense）：
@@ -86,14 +90,14 @@ P0 基线在 `8cdaf66`（FP16 attention 之前）生成；原始数据保存在�
 
   - 20 并发单条：P95 约降 61%，墙钟约降 62%；16 并发 4 条：P95 约降 4%，墙钟约降 9%。
   - 最终 P95 最大观测 235.2 / 415.6 ms，均低于“基线中位 P95 + 20ms”（400.0 / 437.4 ms）；全部 200，无 5xx。
-  - 105 项非 real、3 项 real 测试通过。进程内数据的证据与原始样本见 [`0012-evidence/`](0012-evidence/README.md)；进程内与 HTTP 数据都不是 SLA。
-  - 重启后真实回环 HTTP 3 次：20 并发单条 P95 中位 174ms、墙钟 0.182 s；16 并发 4 条 P95 中位 329ms、墙钟 0.335 s；全部 200。`verify_http.py --sparse --long --warm` 通过，8192 tokens 约 3.74 s。原始样本见 `0012-evidence/p4_live_http.json`。
+  - 105 项非 real、3 项 real 测试通过。进程内数据的证据与原始样本见 [测试证据](../../tests/benchmarks/evidence/0012/README.md)；进程内与 HTTP 数据都不是 SLA。
+  - 重启后真实回环 HTTP 3 次：20 并发单条 P95 中位 174ms、墙钟 0.182 s；16 并发 4 条 P95 中位 329ms、墙钟 0.335 s；全部 200。`verify_http.py --sparse --long --warm` 通过，8192 tokens 约 3.74 s。原始样本见 [原始 HTTP 样本](../../tests/benchmarks/evidence/0012/p4_live_http.json)。
 
 ## 交付与遗留事项
 
 - 每项单独评估；未达门槛的改动回退，不保留“看起来可能有用”的死代码。
-- 2026-10-23 经用户授权，本机 launchd 已重启加载 FP16 + 跨请求微合批版本；M4 目标机未部署。
-- 2026-10-23（补记）：经用户确认，M4 已于同日完成实际部署，线上为包含本计划全部采纳项（FP16、跨请求微合批）及 O1/O2/O4、批内合批、sparse 双路的最新版本。部署冒烟记录尚未单独归档；本计划的基准与质量数据（[0012-evidence](0012-evidence/README.md)）为对应行为的实测证据。
+- 2026-10-23 经用户授权，同一台 M4 的 launchd 已重启加载 FP16 + 跨请求微合批版本；重启后真实回环 HTTP 结果见上文。
+- 2026-10-23（补记）：经用户确认，M4 已于同日完成实际部署，线上为包含本计划全部采纳项（FP16、跨请求微合批）及 O1/O2/O4、批内合批、sparse 双路的最新版本。设备身份按上述用户澄清统一，真实回环 HTTP 冒烟已归档到 [原始 HTTP 样本](../../tests/benchmarks/evidence/0012/p4_live_http.json)；本计划的基准与质量数据（[PLAN-0012 测试证据](../../tests/benchmarks/evidence/0012/README.md)）为对应行为的实测证据。
 - 跨请求微合批涉及调度语义，未完成 ADR/Spec 前不写实现。
 
 ## P4 实施约束（已确认）

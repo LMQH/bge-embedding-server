@@ -1,6 +1,8 @@
 # PLAN-0012 测试数据
 
-本目录保存 [PLAN-0012](../0012-inference-optimizations.md) 各项优化的可审查证据。数据在本机 Mac mini M4 16GB、项目 conda 环境 `bge-embedding` 中生成；不包含模型权重、请求文本、Key 或本机绝对路径。
+设备口径（2026-10-26 用户澄清）：本机 Mac mini M4 与文档中的 M4 目标机是同一台设备；下列数据按版本和测量方式区分。
+
+本目录保存 [PLAN-0012](../../../../docs/plans/0012-inference-optimizations.md) 各项优化的可审查证据。数据在本机 Mac mini M4 16GB、项目 conda 环境 `bge-embedding` 中生成；不包含模型权重、请求文本、Key 或本机绝对路径。
 
 ## 文件
 
@@ -16,11 +18,8 @@
 | `p4_baseline.json` | P4：跨请求微合批前的并发基线，3 次运行 |
 | `p4_final.json` | P4：实现后的进程内并发结果，10 次运行；记录提交 `2cfc94f` |
 | `p4_live_http.json` | P4：重启后的真实 HTTP 并发冒烟，3 次运行；服务监听本机回环 |
-| `p4_live_http.py` | P4：真实 HTTP 并发采集脚本（从私有 TOML 取 Key，不打印） |
-| `harness.py` | P0–P3 的基准/质量采集脚本（需本地模型与 `config.toml`） |
-| `compare_quality.py` | dense/sparse 误差比较 |
-| `p4_bench.py` | 通过 ASGI 传输、真实模型加载的并发基准；不使用外部 HTTP 服务 |
-| `summarize_p4.py` | 汇总 P4 的中位数与范围 |
+
+采集、比较与汇总脚本统一放在 [tests/benchmarks](../../README.md)，本目录仅保存结果数据与说明。
 
 ## 方法与限制
 

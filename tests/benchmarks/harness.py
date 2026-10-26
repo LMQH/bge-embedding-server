@@ -1,4 +1,4 @@
-"""Baseline/A-B harness for attention optimizations (scratch, not committed)."""
+"""Baseline/A-B harness for PLAN-0012 attention optimizations."""
 import argparse
 import json
 import statistics
