@@ -20,6 +20,7 @@ Plan 记录 AI 执行的依据、任务步骤、验收标准、执行记录与�
 | PLAN-0012 | [推理服务算法与 Infra 优化](0012-inference-optimizations.md) | 已完成；[测试证据](../../tests/benchmarks/evidence/0012/README.md) |
 | PLAN-0013 | [sparse 输出改为 Milvus 可直插形态](0013-milvus-sparse-format.md) | 已完成 |
 | PLAN-0014 | [恢复执行留档与统一 Plan 归档规则](0014-plan-archive-governance.md) | 已完成 |
+| PLAN-0015 | [M4 服务生产补测](0015-production-service-validation.md) | 已完成 |
 
 PLAN-0001 / 0002 / 0004 / 0005 / 0008 曾在 `e1ab99c` 中被删除，2026-10-26 从删除前版本恢复，保留历史内容与来源说明。各计划中的旧契约、环境和命令仅代表当时的执行上下文。
 

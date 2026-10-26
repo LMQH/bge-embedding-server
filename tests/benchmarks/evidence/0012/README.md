@@ -1,6 +1,6 @@
 # PLAN-0012 测试数据
 
-设备口径（2026-10-26 用户澄清）：本机 Mac mini M4 与文档中的 M4 目标机是同一台设备；下列数据按版本和测量方式区分。
+设备口径：文中 M4 目标机与本机 Mac mini M4 为同一台设备；下列数据按版本和测量方式区分。
 
 本目录保存 [PLAN-0012](../../../../docs/plans/0012-inference-optimizations.md) 各项优化的可审查证据。数据在本机 Mac mini M4 16GB、项目 conda 环境 `bge-embedding` 中生成；不包含模型权重、请求文本、Key 或本机绝对路径。
 

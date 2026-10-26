@@ -1,0 +1,3062 @@
+{
+  "baseline": {
+    "summary": {
+      "dense-1x32": {
+        "requests": 100,
+        "success": 100,
+        "statuses": {
+          "200": 100
+        },
+        "codes": {},
+        "invalid": 0,
+        "wall_s": 3.459656707942486,
+        "tokens": 3200,
+        "tokens_s": 924.9472621528082,
+        "texts_s": 28.904601942275256,
+        "p50_ms": 33.59241597354412,
+        "p95_ms": 43.64574979990721,
+        "scheduled_p95_ms": 43.646124890074134,
+        "dispatch_p95_ms": 0.0013748649507761002
+      },
+      "dense-1x512": {
+        "requests": 100,
+        "success": 100,
+        "statuses": {
+          "200": 100
+        },
+        "codes": {},
+        "invalid": 0,
+        "wall_s": 12.414448166964576,
+        "tokens": 51200,
+        "tokens_s": 4124.226813097144,
+        "texts_s": 8.05513049433036,
+        "p50_ms": 123.0212920345366,
+        "p95_ms": 126.28954206593335,
+        "scheduled_p95_ms": 126.29020912572742,
+        "dispatch_p95_ms": 0.001500127837061882
+      },
+      "dense-1x2048": {
+        "requests": 100,
+        "success": 100,
+        "statuses": {
+          "200": 100
+        },
+        "codes": {},
+        "invalid": 0,
+        "wall_s": 54.11197133292444,
+        "tokens": 204800,
+        "tokens_s": 3784.7447608213342,
+        "texts_s": 1.848019902744792,
+        "p50_ms": 540.1471669320017,
+        "p95_ms": 542.1942078974098,
+        "scheduled_p95_ms": 542.1947920694947,
+        "dispatch_p95_ms": 0.001375097781419754
+      },
+      "dense-16x512": {
+        "requests": 20,
+        "success": 20,
+        "statuses": {
+          "200": 20
+        },
+        "codes": {},
+        "invalid": 0,
+        "wall_s": 36.67734174989164,
+        "tokens": 163840,
+        "tokens_s": 4467.063101716853,
+        "texts_s": 8.72473262054073,
+        "p50_ms": 1835.8684168197215,
+        "p95_ms": 1859.0431248303503,
+        "scheduled_p95_ms": 1859.0441248379648,
+        "dispatch_p95_ms": 0.0014998950064182281
+      },
+      "dense-1x8192": {
+        "requests": 3,
+        "success": 3,
+        "statuses": {
+          "200": 3
+        },
+        "codes": {},
+        "invalid": 0,
+        "wall_s": 11.65086575015448,
+        "tokens": 24576,
+        "tokens_s": 2109.3711426272457,
+        "texts_s": 0.25749159455898996,
+        "p50_ms": 3881.0997079126537,
+        "p95_ms": 3888.830792158842,
+        "scheduled_p95_ms": 3888.8310841284692,
+        "dispatch_p95_ms": 0.001125037670135498
+      },
+      "cache-False": {
+        "requests": 100,
+        "success": 100,
+        "statuses": {
+          "200": 100
+        },
+        "codes": {},
+        "invalid": 0,
+        "wall_s": 0.8027840000577271,
+        "tokens": 51200,
+        "tokens_s": 63778.052373139326,
+        "texts_s": 124.56650854128775,
+        "p50_ms": 8.248416939750314,
+        "p95_ms": 9.841541992500424,
+        "scheduled_p95_ms": 9.842166909947991,
+        "dispatch_p95_ms": 0.0007920898497104645
+      },
+      "dual-1x32": {
+        "requests": 100,
+        "success": 100,
+        "statuses": {
+          "200": 100
+        },
+        "codes": {},
+        "invalid": 0,
+        "wall_s": 3.8482239169534296,
+        "tokens": 3200,
+        "tokens_s": 831.5524431679597,
+        "texts_s": 25.98601384899874,
+        "p50_ms": 38.11404085718095,
+        "p95_ms": 48.05104108527303,
+        "scheduled_p95_ms": 48.052291152998805,
+        "dispatch_p95_ms": 0.001375097781419754
+      },
+      "dual-1x512": {
+        "requests": 100,
+        "success": 100,
+        "statuses": {
+          "200": 100
+        },
+        "codes": {},
+        "invalid": 0,
+        "wall_s": 12.489997166907415,
+        "tokens": 51200,
+        "tokens_s": 4099.280353373961,
+        "texts_s": 8.006406940183517,
+        "p50_ms": 123.798584099859,
+        "p95_ms": 127.34591704793274,
+        "scheduled_p95_ms": 127.34699994325638,
+        "dispatch_p95_ms": 0.0014170072972774506
+      },
+      "dual-1x2048": {
+        "requests": 100,
+        "success": 100,
+        "statuses": {
+          "200": 100
+        },
+        "codes": {},
+        "invalid": 0,
+        "wall_s": 57.62250104197301,
+        "tokens": 204800,
+        "tokens_s": 3554.1671447204435,
+        "texts_s": 1.735433176133029,
+        "p50_ms": 576.2413339689374,
+        "p95_ms": 578.7929170764983,
+        "scheduled_p95_ms": 578.7933750543743,
+        "dispatch_p95_ms": 0.0015420373529195786
+      },
+      "dual-16x512": {
+        "requests": 20,
+        "success": 20,
+        "statuses": {
+          "200": 20
+        },
+        "codes": {},
+        "invalid": 0,
+        "wall_s": 37.52975841588341,
+        "tokens": 163840,
+        "tokens_s": 4365.6023090907875,
+        "texts_s": 8.526567009942944,
+        "p50_ms": 1877.4704588577151,
+        "p95_ms": 1879.6888750512153,
+        "scheduled_p95_ms": 1879.6910000965,
+        "dispatch_p95_ms": 0.0018749851733446121
+      },
+      "dual-1x8192": {
+        "requests": 3,
+        "success": 3,
+        "statuses": {
+          "200": 3
+        },
+        "codes": {},
+        "invalid": 0,
+        "wall_s": 11.751410000026226,
+        "tokens": 24576,
+        "tokens_s": 2091.3235092593272,
+        "texts_s": 0.2552885143138827,
+        "p50_ms": 3905.0195410382003,
+        "p95_ms": 3942.7463749889284,
+        "scheduled_p95_ms": 3942.747625056654,
+        "dispatch_p95_ms": 0.001250067725777626
+      },
+      "cache-True": {
+        "requests": 100,
+        "success": 100,
+        "statuses": {
+          "200": 100
+        },
+        "codes": {},
+        "invalid": 0,
+        "wall_s": 0.6868251250125468,
+        "tokens": 51200,
+        "tokens_s": 74545.90424173066,
+        "texts_s": 145.5974692221302,
+        "p50_ms": 5.3446670062839985,
+        "p95_ms": 9.64025012217462,
+        "scheduled_p95_ms": 9.64083313010633,
+        "dispatch_p95_ms": 0.0006670597940683365
+      }
+    },
+    "server_logs": {
+      "requests": 878,
+      "hits": 200,
+      "dedup": 0,
+      "status": {
+        "200": 878
+      },
+      "max_wait_ms": 0
+    },
+    "resources": {
+      "samples": 138,
+      "peak_rss_mib": 331.9375,
+      "first_rss_mib": 309.921875,
+      "last_rss_mib": 331.9375,
+      "first_swap": "total = 1024.00M  used = 33.50M  free = 990.50M  (encrypted)",
+      "last_swap": "total = 1024.00M  used = 33.50M  free = 990.50M  (encrypted)",
+      "first_vm": {
+        "Mach Virtual Memory Statistics": "(page size of 16384 bytes)",
+        "Pages free": "20508",
+        "Pages active": "352771",
+        "Pages inactive": "349052",
+        "Pages speculative": "3184",
+        "Pages throttled": "0",
+        "Pages wired down": "116515",
+        "Pages purgeable": "2943",
+        "\"Translation faults\"": "1780433494",
+        "Pages copy-on-write": "147036830",
+        "Pages zero filled": "1140817537",
+        "Pages reactivated": "31124315",
+        "Pages purged": "5234329",
+        "File-backed pages": "211066",
+        "Anonymous pages": "493941",
+        "Pages stored in compressor": "402981",
+        "Pages occupied by compressor": "171997",
+        "Decompressions": "19429771",
+        "Compressions": "25695259",
+        "Pageins": "35489938",
+        "Pageouts": "626019",
+        "Swapins": "2056165",
+        "Swapouts": "2379636"
+      },
+      "last_vm": {
+        "Mach Virtual Memory Statistics": "(page size of 16384 bytes)",
+        "Pages free": "15767",
+        "Pages active": "328523",
+        "Pages inactive": "329103",
+        "Pages speculative": "3764",
+        "Pages throttled": "0",
+        "Pages wired down": "164942",
+        "Pages purgeable": "4572",
+        "\"Translation faults\"": "1781114900",
+        "Pages copy-on-write": "147155725",
+        "Pages zero filled": "1141080005",
+        "Pages reactivated": "31124660",
+        "Pages purged": "5238967",
+        "File-backed pages": "211718",
+        "Anonymous pages": "449672",
+        "Pages stored in compressor": "402023",
+        "Pages occupied by compressor": "171768",
+        "Decompressions": "19430728",
+        "Compressions": "25695259",
+        "Pageins": "35490811",
+        "Pageouts": "626019",
+        "Swapins": "2056165",
+        "Swapouts": "2379636"
+      }
+    }
+  },
+  "mixed-1": {
+    "summary": {
+      "mixed": {
+        "requests": 300,
+        "success": 300,
+        "statuses": {
+          "200": 300
+        },
+        "codes": {},
+        "invalid": 0,
+        "wall_s": 300.0012043330353,
+        "tokens": 407040,
+        "tokens_s": 1356.7945532249917,
+        "texts_s": 3.2499869531111605,
+        "p50_ms": 56.79479194805026,
+        "p95_ms": 1802.1231670863926,
+        "scheduled_p95_ms": 1803.8231660611928,
+        "dispatch_p95_ms": 2.4900410789996386,
+        "scheduled": 300,
+        "dropped": 0,
+        "arrival_window_s": 300.0,
+        "drain_s": 0.00120433303527534,
+        "offered_rps": 1.0,
+        "False-32": {
+          "requests": 128,
+          "success": 128,
+          "statuses": {
+            "200": 128
+          },
+          "codes": {},
+          "invalid": 0,
+          "wall_s": 300.0012043330353,
+          "tokens": 4096,
+          "tokens_s": 13.653278523018782,
+          "texts_s": 0.42666495384433695,
+          "p50_ms": 56.15283316001296,
+          "p95_ms": 806.2781249172986,
+          "scheduled_p95_ms": 807.8808749560267,
+          "dispatch_p95_ms": 2.514041028916836
+        },
+        "False-512": {
+          "requests": 24,
+          "success": 24,
+          "statuses": {
+            "200": 24
+          },
+          "codes": {},
+          "invalid": 0,
+          "wall_s": 300.0012043330353,
+          "tokens": 196608,
+          "tokens_s": 655.3573691049016,
+          "texts_s": 1.279994861533011,
+          "p50_ms": 1798.8727078773081,
+          "p95_ms": 1824.3222502060235,
+          "scheduled_p95_ms": 1825.4351250361651,
+          "dispatch_p95_ms": 2.4327081628143787
+        },
+        "False-2048": {
+          "requests": 8,
+          "success": 8,
+          "statuses": {
+            "200": 8
+          },
+          "codes": {},
+          "invalid": 0,
+          "wall_s": 300.0012043330353,
+          "tokens": 16384,
+          "tokens_s": 54.61311409207513,
+          "texts_s": 0.02666655961527106,
+          "p50_ms": 595.8707500249147,
+          "p95_ms": 650.9893340989947,
+          "scheduled_p95_ms": 652.4481251835823,
+          "dispatch_p95_ms": 2.356083132326603
+        },
+        "True-32": {
+          "requests": 112,
+          "success": 112,
+          "statuses": {
+            "200": 112
+          },
+          "codes": {},
+          "invalid": 0,
+          "wall_s": 300.0012043330353,
+          "tokens": 3584,
+          "tokens_s": 11.946618707641434,
+          "texts_s": 0.3733318346137948,
+          "p50_ms": 55.95012498088181,
+          "p95_ms": 814.4232081249356,
+          "scheduled_p95_ms": 815.6355831306428,
+          "dispatch_p95_ms": 2.4755410850048065
+        },
+        "True-512": {
+          "requests": 21,
+          "success": 21,
+          "statuses": {
+            "200": 21
+          },
+          "codes": {},
+          "invalid": 0,
+          "wall_s": 300.0012043330353,
+          "tokens": 172032,
+          "tokens_s": 573.4376979667888,
+          "texts_s": 1.1199955038413845,
+          "p50_ms": 1801.7103329766542,
+          "p95_ms": 1823.381874943152,
+          "scheduled_p95_ms": 1827.1278331521899,
+          "dispatch_p95_ms": 2.4507080670446157
+        },
+        "True-2048": {
+          "requests": 7,
+          "success": 7,
+          "statuses": {
+            "200": 7
+          },
+          "codes": {},
+          "invalid": 0,
+          "wall_s": 300.0012043330353,
+          "tokens": 14336,
+          "tokens_s": 47.78647483056574,
+          "texts_s": 0.023333239663362176,
+          "p50_ms": 632.9911658540368,
+          "p95_ms": 668.8290829770267,
+          "scheduled_p95_ms": 671.2938330601901,
+          "dispatch_p95_ms": 29.48612510226667
+        }
+      }
+    },
+    "server_logs": {
+      "requests": 300,
+      "hits": 0,
+      "dedup": 0,
+      "status": {
+        "200": 300
+      },
+      "max_wait_ms": 804
+    },
+    "resources": {
+      "samples": 145,
+      "peak_rss_mib": 463.171875,
+      "first_rss_mib": 454.625,
+      "last_rss_mib": 463.171875,
+      "first_swap": "total = 1024.00M  used = 33.50M  free = 990.50M  (encrypted)",
+      "last_swap": "total = 1024.00M  used = 33.50M  free = 990.50M  (encrypted)",
+      "first_vm": {
+        "Mach Virtual Memory Statistics": "(page size of 16384 bytes)",
+        "Pages free": "15953",
+        "Pages active": "347740",
+        "Pages inactive": "345732",
+        "Pages speculative": "1443",
+        "Pages throttled": "0",
+        "Pages wired down": "114152",
+        "Pages purgeable": "9951",
+        "\"Translation faults\"": "1785821205",
+        "Pages copy-on-write": "147695992",
+        "Pages zero filled": "1143352175",
+        "Pages reactivated": "31233165",
+        "Pages purged": "5262767",
+        "File-backed pages": "214730",
+        "Anonymous pages": "480185",
+        "Pages stored in compressor": "439930",
+        "Pages occupied by compressor": "189204",
+        "Decompressions": "19531609",
+        "Compressions": "25867883",
+        "Pageins": "35515030",
+        "Pageouts": "626490",
+        "Swapins": "2056165",
+        "Swapouts": "2379636"
+      },
+      "last_vm": {
+        "Mach Virtual Memory Statistics": "(page size of 16384 bytes)",
+        "Pages free": "24519",
+        "Pages active": "322189",
+        "Pages inactive": "328706",
+        "Pages speculative": "696",
+        "Pages throttled": "0",
+        "Pages wired down": "149451",
+        "Pages purgeable": "5449",
+        "\"Translation faults\"": "1786545023",
+        "Pages copy-on-write": "147819163",
+        "Pages zero filled": "1143921353",
+        "Pages reactivated": "31233576",
+        "Pages purged": "5272880",
+        "File-backed pages": "209253",
+        "Anonymous pages": "442338",
+        "Pages stored in compressor": "437573",
+        "Pages occupied by compressor": "188190",
+        "Decompressions": "19532701",
+        "Compressions": "25867883",
+        "Pageins": "35516152",
+        "Pageouts": "626506",
+        "Swapins": "2056165",
+        "Swapouts": "2379636"
+      }
+    },
+    "minute_windows": {
+      "0": {
+        "requests": 60,
+        "success": 60,
+        "statuses": {
+          "200": 60
+        },
+        "codes": {},
+        "invalid": 0,
+        "wall_s": 60,
+        "tokens": 81408,
+        "tokens_s": 1356.8,
+        "texts_s": 3.25,
+        "p50_ms": 57.0208749268204,
+        "p95_ms": 1821.18595787324,
+        "scheduled_p95_ms": 1823.6186660360545,
+        "dispatch_p95_ms": 2.4923330638557673
+      },
+      "1": {
+        "requests": 60,
+        "success": 60,
+        "statuses": {
+          "200": 60
+        },
+        "codes": {},
+        "invalid": 0,
+        "wall_s": 60,
+        "tokens": 81408,
+        "tokens_s": 1356.8,
+        "texts_s": 3.25,
+        "p50_ms": 56.592707987874746,
+        "p95_ms": 1801.058790879324,
+        "scheduled_p95_ms": 1805.6355000007898,
+        "dispatch_p95_ms": 2.5179581716656685
+      },
+      "2": {
+        "requests": 60,
+        "success": 60,
+        "statuses": {
+          "200": 60
+        },
+        "codes": {},
+        "invalid": 0,
+        "wall_s": 60,
+        "tokens": 81408,
+        "tokens_s": 1356.8,
+        "texts_s": 3.25,
+        "p50_ms": 56.64879106916487,
+        "p95_ms": 1800.932708196342,
+        "scheduled_p95_ms": 1802.3517911788076,
+        "dispatch_p95_ms": 1.5482499729841948
+      },
+      "3": {
+        "requests": 60,
+        "success": 60,
+        "statuses": {
+          "200": 60
+        },
+        "codes": {},
+        "invalid": 0,
+        "wall_s": 60,
+        "tokens": 81408,
+        "tokens_s": 1356.8,
+        "texts_s": 3.25,
+        "p50_ms": 56.942040799185634,
+        "p95_ms": 1801.7103329766542,
+        "scheduled_p95_ms": 1802.7325000148267,
+        "dispatch_p95_ms": 1.5930000226944685
+      },
+      "4": {
+        "requests": 60,
+        "success": 60,
+        "statuses": {
+          "200": 60
+        },
+        "codes": {},
+        "invalid": 0,
+        "wall_s": 60,
+        "tokens": 81408,
+        "tokens_s": 1356.8,
+        "texts_s": 3.25,
+        "p50_ms": 56.75920913927257,
+        "p95_ms": 1797.008833149448,
+        "scheduled_p95_ms": 1798.31508314237,
+        "dispatch_p95_ms": 1.5551249962300062
+      }
+    },
+    "cohort_trends": {}
+  },
+  "mixed-2": {
+    "summary": {
+      "mixed": {
+        "requests": 600,
+        "success": 600,
+        "statuses": {
+          "200": 600
+        },
+        "codes": {},
+        "invalid": 0,
+        "wall_s": 300.09460454108194,
+        "tokens": 814080,
+        "tokens_s": 2712.744540159019,
+        "texts_s": 6.497950881129726,
+        "p50_ms": 429.7152499202639,
+        "p95_ms": 1823.9807079080492,
+        "scheduled_p95_ms": 1826.243958203122,
+        "dispatch_p95_ms": 2.3922082036733627,
+        "scheduled": 600,
+        "dropped": 0,
+        "arrival_window_s": 300.0,
+        "drain_s": 0.09460454108193517,
+        "offered_rps": 2.0,
+        "False-32": {
+          "requests": 240,
+          "success": 240,
+          "statuses": {
+            "200": 240
+          },
+          "codes": {},
+          "invalid": 0,
+          "wall_s": 300.09460454108194,
+          "tokens": 7680,
+          "tokens_s": 25.591929624141688,
+          "texts_s": 0.7997478007544278,
+          "p50_ms": 335.2206249255687,
+          "p95_ms": 1370.4900830052793,
+          "scheduled_p95_ms": 1372.749833157286,
+          "dispatch_p95_ms": 2.446250058710575
+        },
+        "False-512": {
+          "requests": 45,
+          "success": 45,
+          "statuses": {
+            "200": 45
+          },
+          "codes": {},
+          "invalid": 0,
+          "wall_s": 300.09460454108194,
+          "tokens": 368640,
+          "tokens_s": 1228.412621958801,
+          "texts_s": 2.3992434022632834,
+          "p50_ms": 1816.7860840912908,
+          "p95_ms": 1862.0364591479301,
+          "scheduled_p95_ms": 1863.4107501711696,
+          "dispatch_p95_ms": 2.3435410112142563
+        },
+        "False-2048": {
+          "requests": 15,
+          "success": 15,
+          "statuses": {
+            "200": 15
+          },
+          "codes": {},
+          "invalid": 0,
+          "wall_s": 300.09460454108194,
+          "tokens": 30720,
+          "tokens_s": 102.36771849656675,
+          "texts_s": 0.049984237547151734,
+          "p50_ms": 592.505999840796,
+          "p95_ms": 628.812083043158,
+          "scheduled_p95_ms": 631.1209581326693,
+          "dispatch_p95_ms": 2.5322081055492163
+        },
+        "True-32": {
+          "requests": 240,
+          "success": 240,
+          "statuses": {
+            "200": 240
+          },
+          "codes": {},
+          "invalid": 0,
+          "wall_s": 300.09460454108194,
+          "tokens": 7680,
+          "tokens_s": 25.591929624141688,
+          "texts_s": 0.7997478007544278,
+          "p50_ms": 343.76758406870067,
+          "p95_ms": 1369.2894170526415,
+          "scheduled_p95_ms": 1371.9065410550684,
+          "dispatch_p95_ms": 2.354083117097616
+        },
+        "True-512": {
+          "requests": 45,
+          "success": 45,
+          "statuses": {
+            "200": 45
+          },
+          "codes": {},
+          "invalid": 0,
+          "wall_s": 300.09460454108194,
+          "tokens": 368640,
+          "tokens_s": 1228.412621958801,
+          "texts_s": 2.3992434022632834,
+          "p50_ms": 1821.0205000359565,
+          "p95_ms": 1852.4657499510795,
+          "scheduled_p95_ms": 1853.6754581145942,
+          "dispatch_p95_ms": 2.471416024491191
+        },
+        "True-2048": {
+          "requests": 15,
+          "success": 15,
+          "statuses": {
+            "200": 15
+          },
+          "codes": {},
+          "invalid": 0,
+          "wall_s": 300.09460454108194,
+          "tokens": 30720,
+          "tokens_s": 102.36771849656675,
+          "texts_s": 0.049984237547151734,
+          "p50_ms": 593.2476250454783,
+          "p95_ms": 615.107084158808,
+          "scheduled_p95_ms": 647.7784160524607,
+          "dispatch_p95_ms": 59.71862515434623
+        }
+      }
+    },
+    "server_logs": {
+      "requests": 600,
+      "hits": 0,
+      "dedup": 0,
+      "status": {
+        "200": 600
+      },
+      "max_wait_ms": 1385
+    },
+    "resources": {
+      "samples": 145,
+      "peak_rss_mib": 473.046875,
+      "first_rss_mib": 463.171875,
+      "last_rss_mib": 470.859375,
+      "first_swap": "total = 1024.00M  used = 33.50M  free = 990.50M  (encrypted)",
+      "last_swap": "total = 1024.00M  used = 33.50M  free = 990.50M  (encrypted)",
+      "first_vm": {
+        "Mach Virtual Memory Statistics": "(page size of 16384 bytes)",
+        "Pages free": "18686",
+        "Pages active": "346680",
+        "Pages inactive": "343895",
+        "Pages speculative": "2199",
+        "Pages throttled": "0",
+        "Pages wired down": "114050",
+        "Pages purgeable": "5464",
+        "\"Translation faults\"": "1786641865",
+        "Pages copy-on-write": "147821475",
+        "Pages zero filled": "1144001303",
+        "Pages reactivated": "31233576",
+        "Pages purged": "5272880",
+        "File-backed pages": "213882",
+        "Anonymous pages": "478892",
+        "Pages stored in compressor": "437565",
+        "Pages occupied by compressor": "188185",
+        "Decompressions": "19532707",
+        "Compressions": "25867883",
+        "Pageins": "35516318",
+        "Pageouts": "626506",
+        "Swapins": "2056165",
+        "Swapouts": "2379636"
+      },
+      "last_vm": {
+        "Mach Virtual Memory Statistics": "(page size of 16384 bytes)",
+        "Pages free": "22567",
+        "Pages active": "342009",
+        "Pages inactive": "322680",
+        "Pages speculative": "955",
+        "Pages throttled": "0",
+        "Pages wired down": "137231",
+        "Pages purgeable": "5177",
+        "\"Translation faults\"": "1787459526",
+        "Pages copy-on-write": "147954010",
+        "Pages zero filled": "1145650099",
+        "Pages reactivated": "31255696",
+        "Pages purged": "5281067",
+        "File-backed pages": "208478",
+        "Anonymous pages": "457166",
+        "Pages stored in compressor": "439238",
+        "Pages occupied by compressor": "188564",
+        "Decompressions": "19534578",
+        "Compressions": "25871506",
+        "Pageins": "35517594",
+        "Pageouts": "626579",
+        "Swapins": "2056165",
+        "Swapouts": "2379636"
+      }
+    },
+    "minute_windows": {
+      "0": {
+        "requests": 119,
+        "success": 119,
+        "statuses": {
+          "200": 119
+        },
+        "codes": {},
+        "invalid": 0,
+        "wall_s": 60,
+        "tokens": 160768,
+        "tokens_s": 2679.4666666666667,
+        "texts_s": 6.483333333333333,
+        "p50_ms": 389.3137911800295,
+        "p95_ms": 1816.7860840912908,
+        "scheduled_p95_ms": 1818.0770000908524,
+        "dispatch_p95_ms": 1.5247080009430647
+      },
+      "1": {
+        "requests": 120,
+        "success": 120,
+        "statuses": {
+          "200": 120
+        },
+        "codes": {},
+        "invalid": 0,
+        "wall_s": 60,
+        "tokens": 162816,
+        "tokens_s": 2713.6,
+        "texts_s": 6.5,
+        "p50_ms": 407.8931249678135,
+        "p95_ms": 1826.910541858524,
+        "scheduled_p95_ms": 1837.3721251264215,
+        "dispatch_p95_ms": 2.344166161492467
+      },
+      "2": {
+        "requests": 120,
+        "success": 120,
+        "statuses": {
+          "200": 120
+        },
+        "codes": {},
+        "invalid": 0,
+        "wall_s": 60,
+        "tokens": 162816,
+        "tokens_s": 2713.6,
+        "texts_s": 6.5,
+        "p50_ms": 429.7152499202639,
+        "p95_ms": 1823.8877500407398,
+        "scheduled_p95_ms": 1826.243958203122,
+        "dispatch_p95_ms": 2.505333162844181
+      },
+      "3": {
+        "requests": 120,
+        "success": 120,
+        "statuses": {
+          "200": 120
+        },
+        "codes": {},
+        "invalid": 0,
+        "wall_s": 60,
+        "tokens": 162816,
+        "tokens_s": 2713.6,
+        "texts_s": 6.5,
+        "p50_ms": 428.0733331106603,
+        "p95_ms": 1823.6687921453267,
+        "scheduled_p95_ms": 1825.0152082182467,
+        "dispatch_p95_ms": 2.278375206515193
+      },
+      "4": {
+        "requests": 120,
+        "success": 120,
+        "statuses": {
+          "200": 120
+        },
+        "codes": {},
+        "invalid": 0,
+        "wall_s": 60,
+        "tokens": 162816,
+        "tokens_s": 2713.6,
+        "texts_s": 6.5,
+        "p50_ms": 409.41724996082485,
+        "p95_ms": 1821.0205000359565,
+        "scheduled_p95_ms": 1822.3419580608606,
+        "dispatch_p95_ms": 1.5612081624567509
+      },
+      "5": {
+        "requests": 1,
+        "success": 1,
+        "statuses": {
+          "200": 1
+        },
+        "codes": {},
+        "invalid": 0,
+        "wall_s": 60,
+        "tokens": 2048,
+        "tokens_s": 34.13333333333333,
+        "texts_s": 0.016666666666666666,
+        "p50_ms": 592.7595000248402,
+        "p95_ms": 592.7595000248402,
+        "scheduled_p95_ms": 594.1054581198841,
+        "dispatch_p95_ms": 1.3459580950438976
+      }
+    },
+    "cohort_trends": {}
+  },
+  "mixed-3": {
+    "summary": {
+      "mixed": {
+        "requests": 900,
+        "success": 900,
+        "statuses": {
+          "200": 900
+        },
+        "codes": {},
+        "invalid": 0,
+        "wall_s": 300.5060552919749,
+        "tokens": 1221120,
+        "tokens_s": 4063.5454044796093,
+        "texts_s": 9.733580899586327,
+        "p50_ms": 1343.7178330495954,
+        "p95_ms": 2179.6924169175327,
+        "scheduled_p95_ms": 2180.9061670210212,
+        "dispatch_p95_ms": 2.385583007708192,
+        "scheduled": 900,
+        "dropped": 0,
+        "arrival_window_s": 300.0,
+        "drain_s": 0.506055291974917,
+        "offered_rps": 3.0,
+        "False-32": {
+          "requests": 368,
+          "success": 368,
+          "statuses": {
+            "200": 368
+          },
+          "codes": {},
+          "invalid": 0,
+          "wall_s": 300.5060552919749,
+          "tokens": 11776,
+          "tokens_s": 39.18723031573627,
+          "texts_s": 1.2246009473667585,
+          "p50_ms": 1186.6287500597537,
+          "p95_ms": 2126.590291969478,
+          "scheduled_p95_ms": 2128.8188751786947,
+          "dispatch_p95_ms": 2.418000251054764
+        },
+        "False-512": {
+          "requests": 69,
+          "success": 69,
+          "statuses": {
+            "200": 69
+          },
+          "codes": {},
+          "invalid": 0,
+          "wall_s": 300.5060552919749,
+          "tokens": 565248,
+          "tokens_s": 1880.987055155341,
+          "texts_s": 3.6738028421002755,
+          "p50_ms": 1945.072375005111,
+          "p95_ms": 2370.788791915402,
+          "scheduled_p95_ms": 2372.0426252111793,
+          "dispatch_p95_ms": 2.3180420976132154
+        },
+        "False-2048": {
+          "requests": 23,
+          "success": 23,
+          "statuses": {
+            "200": 23
+          },
+          "codes": {},
+          "invalid": 0,
+          "wall_s": 300.5060552919749,
+          "tokens": 47104,
+          "tokens_s": 156.7489212629451,
+          "texts_s": 0.0765375592104224,
+          "p50_ms": 840.790499933064,
+          "p95_ms": 859.5245000906289,
+          "scheduled_p95_ms": 859.7557502798736,
+          "dispatch_p95_ms": 18.26637494377792
+        },
+        "True-32": {
+          "requests": 352,
+          "success": 352,
+          "statuses": {
+            "200": 352
+          },
+          "codes": {},
+          "invalid": 0,
+          "wall_s": 300.5060552919749,
+          "tokens": 11264,
+          "tokens_s": 37.48343769331296,
+          "texts_s": 1.17135742791603,
+          "p50_ms": 1185.307583073154,
+          "p95_ms": 2132.272374816239,
+          "scheduled_p95_ms": 2133.4949999582022,
+          "dispatch_p95_ms": 2.4082916788756847
+        },
+        "True-512": {
+          "requests": 66,
+          "success": 66,
+          "statuses": {
+            "200": 66
+          },
+          "codes": {},
+          "invalid": 0,
+          "wall_s": 300.5060552919749,
+          "tokens": 540672,
+          "tokens_s": 1799.2050092790219,
+          "texts_s": 3.5140722837480896,
+          "p50_ms": 1946.636375039816,
+          "p95_ms": 2373.62916697748,
+          "scheduled_p95_ms": 2374.833500245586,
+          "dispatch_p95_ms": 2.3001248482614756
+        },
+        "True-2048": {
+          "requests": 22,
+          "success": 22,
+          "statuses": {
+            "200": 22
+          },
+          "codes": {},
+          "invalid": 0,
+          "wall_s": 300.5060552919749,
+          "tokens": 45056,
+          "tokens_s": 149.93375077325183,
+          "texts_s": 0.07320983924475187,
+          "p50_ms": 843.0347910616547,
+          "p95_ms": 854.2410829104483,
+          "scheduled_p95_ms": 855.4598747286946,
+          "dispatch_p95_ms": 14.729292131960392
+        }
+      }
+    },
+    "server_logs": {
+      "requests": 900,
+      "hits": 0,
+      "dedup": 0,
+      "status": {
+        "200": 900
+      },
+      "max_wait_ms": 2067
+    },
+    "resources": {
+      "samples": 146,
+      "peak_rss_mib": 488.703125,
+      "first_rss_mib": 470.78125,
+      "last_rss_mib": 488.6875,
+      "first_swap": "total = 1024.00M  used = 33.50M  free = 990.50M  (encrypted)",
+      "last_swap": "total = 1024.00M  used = 33.50M  free = 990.50M  (encrypted)",
+      "first_vm": {
+        "Mach Virtual Memory Statistics": "(page size of 16384 bytes)",
+        "Pages free": "15750",
+        "Pages active": "342700",
+        "Pages inactive": "340231",
+        "Pages speculative": "2607",
+        "Pages throttled": "0",
+        "Pages wired down": "123932",
+        "Pages purgeable": "3833",
+        "\"Translation faults\"": "1787553049",
+        "Pages copy-on-write": "147956198",
+        "Pages zero filled": "1145754307",
+        "Pages reactivated": "31255738",
+        "Pages purged": "5281067",
+        "File-backed pages": "214224",
+        "Anonymous pages": "471314",
+        "Pages stored in compressor": "439236",
+        "Pages occupied by compressor": "188564",
+        "Decompressions": "19534580",
+        "Compressions": "25871506",
+        "Pageins": "35518732",
+        "Pageouts": "626579",
+        "Swapins": "2056165",
+        "Swapouts": "2379636"
+      },
+      "last_vm": {
+        "Mach Virtual Memory Statistics": "(page size of 16384 bytes)",
+        "Pages free": "10693",
+        "Pages active": "319223",
+        "Pages inactive": "319613",
+        "Pages speculative": "3198",
+        "Pages throttled": "0",
+        "Pages wired down": "173303",
+        "Pages purgeable": "3998",
+        "\"Translation faults\"": "1788360634",
+        "Pages copy-on-write": "148100867",
+        "Pages zero filled": "1148087694",
+        "Pages reactivated": "31256407",
+        "Pages purged": "5286409",
+        "File-backed pages": "215347",
+        "Anonymous pages": "426687",
+        "Pages stored in compressor": "436782",
+        "Pages occupied by compressor": "187564",
+        "Decompressions": "19537071",
+        "Compressions": "25871506",
+        "Pageins": "35519876",
+        "Pageouts": "626579",
+        "Swapins": "2056165",
+        "Swapouts": "2379636"
+      }
+    },
+    "minute_windows": {
+      "0": {
+        "requests": 175,
+        "success": 175,
+        "statuses": {
+          "200": 175
+        },
+        "codes": {},
+        "invalid": 0,
+        "wall_s": 60,
+        "tokens": 242048,
+        "tokens_s": 4034.133333333333,
+        "texts_s": 9.666666666666666,
+        "p50_ms": 1213.67233293131,
+        "p95_ms": 2104.1797921061516,
+        "scheduled_p95_ms": 2112.455750349909,
+        "dispatch_p95_ms": 1.435666810721159
+      },
+      "1": {
+        "requests": 180,
+        "success": 180,
+        "statuses": {
+          "200": 180
+        },
+        "codes": {},
+        "invalid": 0,
+        "wall_s": 60,
+        "tokens": 244224,
+        "tokens_s": 4070.4,
+        "texts_s": 9.75,
+        "p50_ms": 1341.7021671775728,
+        "p95_ms": 2170.0511248782277,
+        "scheduled_p95_ms": 2171.450166264549,
+        "dispatch_p95_ms": 1.4249170199036598
+      },
+      "2": {
+        "requests": 180,
+        "success": 180,
+        "statuses": {
+          "200": 180
+        },
+        "codes": {},
+        "invalid": 0,
+        "wall_s": 60,
+        "tokens": 244224,
+        "tokens_s": 4070.4,
+        "texts_s": 9.75,
+        "p50_ms": 1386.187250027433,
+        "p95_ms": 2211.192792048678,
+        "scheduled_p95_ms": 2212.4025421217084,
+        "dispatch_p95_ms": 1.3802088797092438
+      },
+      "3": {
+        "requests": 180,
+        "success": 180,
+        "statuses": {
+          "200": 180
+        },
+        "codes": {},
+        "invalid": 0,
+        "wall_s": 60,
+        "tokens": 244224,
+        "tokens_s": 4070.4,
+        "texts_s": 9.75,
+        "p50_ms": 1347.1073750406504,
+        "p95_ms": 2179.710708092898,
+        "scheduled_p95_ms": 2181.085125077516,
+        "dispatch_p95_ms": 1.5300421509891748
+      },
+      "4": {
+        "requests": 180,
+        "success": 180,
+        "statuses": {
+          "200": 180
+        },
+        "codes": {},
+        "invalid": 0,
+        "wall_s": 60,
+        "tokens": 244224,
+        "tokens_s": 4070.4,
+        "texts_s": 9.75,
+        "p50_ms": 1339.9319590535015,
+        "p95_ms": 2170.260666171089,
+        "scheduled_p95_ms": 2172.47329140082,
+        "dispatch_p95_ms": 7.097708759829402
+      },
+      "5": {
+        "requests": 5,
+        "success": 5,
+        "statuses": {
+          "200": 5
+        },
+        "codes": {},
+        "invalid": 0,
+        "wall_s": 60,
+        "tokens": 2176,
+        "tokens_s": 36.266666666666666,
+        "texts_s": 0.08333333333333333,
+        "p50_ms": 1501.6113340388983,
+        "p95_ms": 2161.403917009011,
+        "scheduled_p95_ms": 2163.628166774288,
+        "dispatch_p95_ms": 2.241624752059579
+      }
+    },
+    "cohort_trends": {}
+  },
+  "overload": {
+    "summary": {
+      "long-burst": {
+        "requests": 24,
+        "success": 2,
+        "statuses": {
+          "200": 2,
+          "429": 22
+        },
+        "codes": {
+          "queue_timeout": 18,
+          "queue_full": 4
+        },
+        "invalid": 0,
+        "wall_s": 30.966267416952178,
+        "tokens": 65536,
+        "tokens_s": 2116.3674367845497,
+        "texts_s": 0.258345634373114,
+        "p50_ms": 15410.477832891047,
+        "p95_ms": 30959.444832988083,
+        "scheduled_p95_ms": 30965.983083005995,
+        "dispatch_p95_ms": 13.664833037182689
+      },
+      "post-overload": {
+        "requests": 20,
+        "success": 20,
+        "statuses": {
+          "200": 20
+        },
+        "codes": {},
+        "invalid": 0,
+        "wall_s": 0.9903426251839846,
+        "tokens": 640,
+        "tokens_s": 646.2409914761587,
+        "texts_s": 20.19503098362996,
+        "p50_ms": 44.8507908731699,
+        "p95_ms": 75.38100006058812,
+        "scheduled_p95_ms": 75.38183405995369,
+        "dispatch_p95_ms": 0.0012498348951339722
+      }
+    },
+    "server_logs": {
+      "requests": 47,
+      "hits": 0,
+      "dedup": 0,
+      "status": {
+        "429": 22,
+        "200": 23,
+        "499": 2
+      },
+      "max_wait_ms": 30001
+    },
+    "resources": {
+      "samples": 36,
+      "peak_rss_mib": 560.375,
+      "first_rss_mib": 367.078125,
+      "last_rss_mib": 560.375,
+      "first_swap": "total = 1024.00M  used = 33.50M  free = 990.50M  (encrypted)",
+      "last_swap": "total = 1024.00M  used = 33.50M  free = 990.50M  (encrypted)",
+      "first_vm": {
+        "Mach Virtual Memory Statistics": "(page size of 16384 bytes)",
+        "Pages free": "6427",
+        "Pages active": "330470",
+        "Pages inactive": "317426",
+        "Pages speculative": "14931",
+        "Pages throttled": "0",
+        "Pages wired down": "118688",
+        "Pages purgeable": "1936",
+        "\"Translation faults\"": "1795375576",
+        "Pages copy-on-write": "148970954",
+        "Pages zero filled": "1156990058",
+        "Pages reactivated": "31440344",
+        "Pages purged": "5361721",
+        "File-backed pages": "244162",
+        "Anonymous pages": "418665",
+        "Pages stored in compressor": "521336",
+        "Pages occupied by compressor": "226101",
+        "Decompressions": "19631908",
+        "Compressions": "26062192",
+        "Pageins": "35610336",
+        "Pageouts": "627310",
+        "Swapins": "2056165",
+        "Swapouts": "2379636"
+      },
+      "last_vm": {
+        "Mach Virtual Memory Statistics": "(page size of 16384 bytes)",
+        "Pages free": "5556",
+        "Pages active": "324796",
+        "Pages inactive": "327292",
+        "Pages speculative": "930",
+        "Pages throttled": "0",
+        "Pages wired down": "154338",
+        "Pages purgeable": "344",
+        "\"Translation faults\"": "1796265187",
+        "Pages copy-on-write": "149056147",
+        "Pages zero filled": "1157269266",
+        "Pages reactivated": "31447022",
+        "Pages purged": "5364780",
+        "File-backed pages": "210605",
+        "Anonymous pages": "442413",
+        "Pages stored in compressor": "466744",
+        "Pages occupied by compressor": "201010",
+        "Decompressions": "19642793",
+        "Compressions": "26064318",
+        "Pageins": "35615011",
+        "Pageouts": "627414",
+        "Swapins": "2056165",
+        "Swapouts": "2379636"
+      }
+    }
+  },
+  "recovery": {
+    "recovery": {
+      "waiting_cancel": {
+        "active": {
+          "status": 200,
+          "code": "",
+          "valid": true,
+          "tokens": 32768,
+          "texts": 4,
+          "sparse": false,
+          "length": 8192,
+          "start_s": 0.026425333926454186,
+          "dispatch_ms": 26.425333926454186,
+          "retry_after": null,
+          "end_s": 15.350436375010759,
+          "latency_ms": 15324.011041084304,
+          "scheduled_ms": 15350.436375010759
+        },
+        "probe": {
+          "status": 200,
+          "code": "",
+          "valid": true,
+          "tokens": 32,
+          "texts": 1,
+          "sparse": false,
+          "length": 32,
+          "start_s": 1.9168946892023087e-06,
+          "dispatch_ms": 0.0021669548004865646,
+          "retry_after": null,
+          "end_s": 0.03115654201246798,
+          "latency_ms": 31.154625117778778,
+          "scheduled_ms": 31.156792072579265
+        }
+      },
+      "sigterm": {
+        "requests": [
+          {
+            "status": 200,
+            "code": "",
+            "valid": true,
+            "tokens": 32768,
+            "texts": 4,
+            "sparse": false,
+            "length": 8192,
+            "start_s": 0.10098683321848512,
+            "dispatch_ms": 100.98683321848512,
+            "retry_after": null,
+            "end_s": 15.702759125037119,
+            "latency_ms": 15601.772291818634,
+            "scheduled_ms": 15702.759125037119
+          },
+          {
+            "status": 503,
+            "code": "model_unavailable",
+            "valid": false,
+            "tokens": 0,
+            "texts": 4,
+            "sparse": false,
+            "length": 8192,
+            "start_s": 0.40316725010052323,
+            "dispatch_ms": 0.08833291940391064,
+            "retry_after": null,
+            "end_s": 0.7821225421503186,
+            "latency_ms": 378.9552920497954,
+            "scheduled_ms": 379.0436249691993
+          },
+          {
+            "status": 503,
+            "code": "model_unavailable",
+            "valid": false,
+            "tokens": 0,
+            "texts": 4,
+            "sparse": false,
+            "length": 8192,
+            "start_s": 0.40641562500968575,
+            "dispatch_ms": 3.3062498550862074,
+            "retry_after": null,
+            "end_s": 0.7825938330497593,
+            "latency_ms": 376.1782080400735,
+            "scheduled_ms": 379.4844578951597
+          }
+        ],
+        "recovery": {
+          "ready_seconds": 2.5919735829811543,
+          "pid_changed": true,
+          "signal_to_ready_seconds": 17.590146166970953
+        },
+        "waiting_503_observed": true,
+        "probe": {
+          "status": 200,
+          "code": "",
+          "valid": true,
+          "tokens": 32,
+          "texts": 1,
+          "sparse": false,
+          "length": 32,
+          "start_s": 2.919696271419525e-07,
+          "dispatch_ms": 0.00037509016692638397,
+          "retry_after": null,
+          "end_s": 0.04460495803505182,
+          "latency_ms": 44.60466606542468,
+          "scheduled_ms": 44.60504115559161
+        }
+      },
+      "sigkill": {
+        "recovery": {
+          "ready_seconds": 9.993255292065442,
+          "pid_changed": true,
+          "signal_to_ready_seconds": 9.993350374978036
+        },
+        "probe": {
+          "status": 200,
+          "code": "",
+          "valid": true,
+          "tokens": 32,
+          "texts": 1,
+          "sparse": false,
+          "length": 32,
+          "start_s": 4.169996827840805e-07,
+          "dispatch_ms": 0.000500120222568512,
+          "retry_after": null,
+          "end_s": 0.0646614998113364,
+          "latency_ms": 64.66108281165361,
+          "scheduled_ms": 64.66158293187618
+        }
+      }
+    }
+  },
+  "short-20": {
+    "summary": {
+      "short": {
+        "requests": 6000,
+        "success": 6000,
+        "statuses": {
+          "200": 6000
+        },
+        "codes": {},
+        "invalid": 0,
+        "wall_s": 300.0064908750355,
+        "tokens": 192000,
+        "tokens_s": 639.9861530995192,
+        "texts_s": 19.999567284359976,
+        "p50_ms": 48.6366250552237,
+        "p95_ms": 71.25512510538101,
+        "scheduled_p95_ms": 77.7051670011133,
+        "dispatch_p95_ms": 3.385207848623395,
+        "scheduled": 6000,
+        "dropped": 0,
+        "arrival_window_s": 300.0,
+        "drain_s": 0.006490875035524368,
+        "offered_rps": 20.0,
+        "False-32": {
+          "requests": 3000,
+          "success": 3000,
+          "statuses": {
+            "200": 3000
+          },
+          "codes": {},
+          "invalid": 0,
+          "wall_s": 300.0064908750355,
+          "tokens": 96000,
+          "tokens_s": 319.9930765497596,
+          "texts_s": 9.999783642179988,
+          "p50_ms": 48.64354198798537,
+          "p95_ms": 71.73987501300871,
+          "scheduled_p95_ms": 77.73812511004508,
+          "dispatch_p95_ms": 3.4062080085277557
+        },
+        "True-32": {
+          "requests": 3000,
+          "success": 3000,
+          "statuses": {
+            "200": 3000
+          },
+          "codes": {},
+          "invalid": 0,
+          "wall_s": 300.0064908750355,
+          "tokens": 96000,
+          "tokens_s": 319.9930765497596,
+          "texts_s": 9.999783642179988,
+          "p50_ms": 48.62029105424881,
+          "p95_ms": 70.83675009198487,
+          "scheduled_p95_ms": 77.57600001059473,
+          "dispatch_p95_ms": 3.3365420531481504
+        }
+      }
+    },
+    "server_logs": {
+      "requests": 6000,
+      "hits": 0,
+      "dedup": 0,
+      "status": {
+        "200": 6000
+      },
+      "max_wait_ms": 158
+    },
+    "resources": {
+      "samples": 145,
+      "peak_rss_mib": 355.828125,
+      "first_rss_mib": 331.953125,
+      "last_rss_mib": 355.828125,
+      "first_swap": "total = 1024.00M  used = 33.50M  free = 990.50M  (encrypted)",
+      "last_swap": "total = 1024.00M  used = 33.50M  free = 990.50M  (encrypted)",
+      "first_vm": {
+        "Mach Virtual Memory Statistics": "(page size of 16384 bytes)",
+        "Pages free": "18673",
+        "Pages active": "353879",
+        "Pages inactive": "351020",
+        "Pages speculative": "2356",
+        "Pages throttled": "0",
+        "Pages wired down": "115892",
+        "Pages purgeable": "4602",
+        "\"Translation faults\"": "1781203090",
+        "Pages copy-on-write": "147157389",
+        "Pages zero filled": "1141137462",
+        "Pages reactivated": "31124660",
+        "Pages purged": "5238967",
+        "File-backed pages": "211723",
+        "Anonymous pages": "495532",
+        "Pages stored in compressor": "402023",
+        "Pages occupied by compressor": "171768",
+        "Decompressions": "19430728",
+        "Compressions": "25695259",
+        "Pageins": "35490825",
+        "Pageouts": "626019",
+        "Swapins": "2056165",
+        "Swapouts": "2379636"
+      },
+      "last_vm": {
+        "Mach Virtual Memory Statistics": "(page size of 16384 bytes)",
+        "Pages free": "17033",
+        "Pages active": "334066",
+        "Pages inactive": "335716",
+        "Pages speculative": "1455",
+        "Pages throttled": "0",
+        "Pages wired down": "151896",
+        "Pages purgeable": "6478",
+        "\"Translation faults\"": "1782092732",
+        "Pages copy-on-write": "147290136",
+        "Pages zero filled": "1141324408",
+        "Pages reactivated": "31127804",
+        "Pages purged": "5244780",
+        "File-backed pages": "205601",
+        "Anonymous pages": "465636",
+        "Pages stored in compressor": "404902",
+        "Pages occupied by compressor": "173451",
+        "Decompressions": "19433279",
+        "Compressions": "25700939",
+        "Pageins": "35492446",
+        "Pageouts": "626063",
+        "Swapins": "2056165",
+        "Swapouts": "2379636"
+      }
+    },
+    "minute_windows": {
+      "0": {
+        "requests": 1199,
+        "success": 1199,
+        "statuses": {
+          "200": 1199
+        },
+        "codes": {},
+        "invalid": 0,
+        "wall_s": 60,
+        "tokens": 38368,
+        "tokens_s": 639.4666666666667,
+        "texts_s": 19.983333333333334,
+        "p50_ms": 48.38016699068248,
+        "p95_ms": 63.95587488077581,
+        "scheduled_p95_ms": 71.83274999260902,
+        "dispatch_p95_ms": 3.288458101451397
+      },
+      "1": {
+        "requests": 1201,
+        "success": 1201,
+        "statuses": {
+          "200": 1201
+        },
+        "codes": {},
+        "invalid": 0,
+        "wall_s": 60,
+        "tokens": 38432,
+        "tokens_s": 640.5333333333333,
+        "texts_s": 20.016666666666666,
+        "p50_ms": 48.827792052179575,
+        "p95_ms": 73.55833286419511,
+        "scheduled_p95_ms": 78.94254196435213,
+        "dispatch_p95_ms": 3.294750116765499
+      },
+      "2": {
+        "requests": 1200,
+        "success": 1200,
+        "statuses": {
+          "200": 1200
+        },
+        "codes": {},
+        "invalid": 0,
+        "wall_s": 60,
+        "tokens": 38400,
+        "tokens_s": 640.0,
+        "texts_s": 20.0,
+        "p50_ms": 48.3238329179585,
+        "p95_ms": 64.13904088549316,
+        "scheduled_p95_ms": 73.04024999029934,
+        "dispatch_p95_ms": 3.3914169762283564
+      },
+      "3": {
+        "requests": 1200,
+        "success": 1200,
+        "statuses": {
+          "200": 1200
+        },
+        "codes": {},
+        "invalid": 0,
+        "wall_s": 60,
+        "tokens": 38400,
+        "tokens_s": 640.0,
+        "texts_s": 20.0,
+        "p50_ms": 48.80762496031821,
+        "p95_ms": 70.95145806670189,
+        "scheduled_p95_ms": 77.23462488502264,
+        "dispatch_p95_ms": 3.3119579311460257
+      },
+      "4": {
+        "requests": 1199,
+        "success": 1199,
+        "statuses": {
+          "200": 1199
+        },
+        "codes": {},
+        "invalid": 0,
+        "wall_s": 60,
+        "tokens": 38368,
+        "tokens_s": 639.4666666666667,
+        "texts_s": 19.983333333333334,
+        "p50_ms": 48.84970816783607,
+        "p95_ms": 81.38499991036952,
+        "scheduled_p95_ms": 87.40575006231666,
+        "dispatch_p95_ms": 3.663124982267618
+      },
+      "5": {
+        "requests": 1,
+        "success": 1,
+        "statuses": {
+          "200": 1
+        },
+        "codes": {},
+        "invalid": 0,
+        "wall_s": 60,
+        "tokens": 32,
+        "tokens_s": 0.5333333333333333,
+        "texts_s": 0.016666666666666666,
+        "p50_ms": 54.17812499217689,
+        "p95_ms": 54.17812499217689,
+        "scheduled_p95_ms": 56.27712490968406,
+        "dispatch_p95_ms": 2.0989999175071716
+      }
+    },
+    "cohort_trends": {}
+  },
+  "short-40": {
+    "summary": {
+      "short": {
+        "requests": 12000,
+        "success": 12000,
+        "statuses": {
+          "200": 12000
+        },
+        "codes": {},
+        "invalid": 0,
+        "wall_s": 300.0785422499757,
+        "tokens": 384000,
+        "tokens_s": 1279.6649741123936,
+        "texts_s": 39.9895304410123,
+        "p50_ms": 134.86004201695323,
+        "p95_ms": 199.73320793360472,
+        "scheduled_p95_ms": 202.85066682845354,
+        "dispatch_p95_ms": 5.6422080378979445,
+        "scheduled": 12000,
+        "dropped": 0,
+        "arrival_window_s": 300.0,
+        "drain_s": 0.07854224997572601,
+        "offered_rps": 40.0,
+        "False-32": {
+          "requests": 6000,
+          "success": 6000,
+          "statuses": {
+            "200": 6000
+          },
+          "codes": {},
+          "invalid": 0,
+          "wall_s": 300.0785422499757,
+          "tokens": 192000,
+          "tokens_s": 639.8324870561968,
+          "texts_s": 19.99476522050615,
+          "p50_ms": 134.6980829257518,
+          "p95_ms": 200.54154191166162,
+          "scheduled_p95_ms": 204.03370796702802,
+          "dispatch_p95_ms": 5.811916897073388
+        },
+        "True-32": {
+          "requests": 6000,
+          "success": 6000,
+          "statuses": {
+            "200": 6000
+          },
+          "codes": {},
+          "invalid": 0,
+          "wall_s": 300.0785422499757,
+          "tokens": 192000,
+          "tokens_s": 639.8324870561968,
+          "texts_s": 19.99476522050615,
+          "p50_ms": 135.03995910286903,
+          "p95_ms": 198.63941706717014,
+          "scheduled_p95_ms": 201.66816702112556,
+          "dispatch_p95_ms": 5.429042037576437
+        }
+      }
+    },
+    "server_logs": {
+      "requests": 12000,
+      "hits": 0,
+      "dedup": 0,
+      "status": {
+        "200": 12000
+      },
+      "max_wait_ms": 212
+    },
+    "resources": {
+      "samples": 145,
+      "peak_rss_mib": 377.359375,
+      "first_rss_mib": 296.75,
+      "last_rss_mib": 377.359375,
+      "first_swap": "total = 1024.00M  used = 33.50M  free = 990.50M  (encrypted)",
+      "last_swap": "total = 1024.00M  used = 33.50M  free = 990.50M  (encrypted)",
+      "first_vm": {
+        "Mach Virtual Memory Statistics": "(page size of 16384 bytes)",
+        "Pages free": "6305",
+        "Pages active": "333138",
+        "Pages inactive": "330307",
+        "Pages speculative": "2067",
+        "Pages throttled": "0",
+        "Pages wired down": "110670",
+        "Pages purgeable": "11238",
+        "\"Translation faults\"": "1783089915",
+        "Pages copy-on-write": "147343750",
+        "Pages zero filled": "1141928065",
+        "Pages reactivated": "31191172",
+        "Pages purged": "5248515",
+        "File-backed pages": "217435",
+        "Anonymous pages": "448077",
+        "Pages stored in compressor": "476946",
+        "Pages occupied by compressor": "230886",
+        "Decompressions": "19442511",
+        "Compressions": "25784720",
+        "Pageins": "35506669",
+        "Pageouts": "626123",
+        "Swapins": "2056165",
+        "Swapouts": "2379636"
+      },
+      "last_vm": {
+        "Mach Virtual Memory Statistics": "(page size of 16384 bytes)",
+        "Pages free": "18127",
+        "Pages active": "321766",
+        "Pages inactive": "321057",
+        "Pages speculative": "239",
+        "Pages throttled": "0",
+        "Pages wired down": "152195",
+        "Pages purgeable": "7593",
+        "\"Translation faults\"": "1783998043",
+        "Pages copy-on-write": "147476056",
+        "Pages zero filled": "1142072898",
+        "Pages reactivated": "31191983",
+        "Pages purged": "5249063",
+        "File-backed pages": "215326",
+        "Anonymous pages": "427736",
+        "Pages stored in compressor": "462020",
+        "Pages occupied by compressor": "200717",
+        "Decompressions": "19479721",
+        "Compressions": "25809063",
+        "Pageins": "35509708",
+        "Pageouts": "626290",
+        "Swapins": "2056165",
+        "Swapouts": "2379636"
+      }
+    },
+    "minute_windows": {
+      "0": {
+        "requests": 2396,
+        "success": 2396,
+        "statuses": {
+          "200": 2396
+        },
+        "codes": {},
+        "invalid": 0,
+        "wall_s": 60,
+        "tokens": 76672,
+        "tokens_s": 1277.8666666666666,
+        "texts_s": 39.93333333333333,
+        "p50_ms": 131.75395806320012,
+        "p95_ms": 196.58512505702674,
+        "scheduled_p95_ms": 200.49533294513822,
+        "dispatch_p95_ms": 5.60516701079905
+      },
+      "1": {
+        "requests": 2400,
+        "success": 2400,
+        "statuses": {
+          "200": 2400
+        },
+        "codes": {},
+        "invalid": 0,
+        "wall_s": 60,
+        "tokens": 76800,
+        "tokens_s": 1280.0,
+        "texts_s": 40.0,
+        "p50_ms": 137.4725829809904,
+        "p95_ms": 197.06233404576778,
+        "scheduled_p95_ms": 200.89983311481774,
+        "dispatch_p95_ms": 5.26833301410079
+      },
+      "2": {
+        "requests": 2399,
+        "success": 2399,
+        "statuses": {
+          "200": 2399
+        },
+        "codes": {},
+        "invalid": 0,
+        "wall_s": 60,
+        "tokens": 76768,
+        "tokens_s": 1279.4666666666667,
+        "texts_s": 39.983333333333334,
+        "p50_ms": 133.56075016781688,
+        "p95_ms": 196.46483310498297,
+        "scheduled_p95_ms": 199.21304215677083,
+        "dispatch_p95_ms": 5.737875122576952
+      },
+      "3": {
+        "requests": 2400,
+        "success": 2400,
+        "statuses": {
+          "200": 2400
+        },
+        "codes": {},
+        "invalid": 0,
+        "wall_s": 60,
+        "tokens": 76800,
+        "tokens_s": 1280.0,
+        "texts_s": 40.0,
+        "p50_ms": 136.71837490983307,
+        "p95_ms": 205.03291697241366,
+        "scheduled_p95_ms": 207.96929183416069,
+        "dispatch_p95_ms": 5.7197080459445715
+      },
+      "4": {
+        "requests": 2401,
+        "success": 2401,
+        "statuses": {
+          "200": 2401
+        },
+        "codes": {},
+        "invalid": 0,
+        "wall_s": 60,
+        "tokens": 76832,
+        "tokens_s": 1280.5333333333333,
+        "texts_s": 40.016666666666666,
+        "p50_ms": 134.7602081950754,
+        "p95_ms": 200.47320798039436,
+        "scheduled_p95_ms": 203.5957919433713,
+        "dispatch_p95_ms": 5.887666950002313
+      },
+      "5": {
+        "requests": 4,
+        "success": 4,
+        "statuses": {
+          "200": 4
+        },
+        "codes": {},
+        "invalid": 0,
+        "wall_s": 60,
+        "tokens": 128,
+        "tokens_s": 2.1333333333333333,
+        "texts_s": 0.06666666666666667,
+        "p50_ms": 123.2578328344971,
+        "p95_ms": 167.21991705708206,
+        "scheduled_p95_ms": 169.44279219023883,
+        "dispatch_p95_ms": 5.429042037576437
+      }
+    },
+    "cohort_trends": {}
+  },
+  "short-80": {
+    "summary": {
+      "short": {
+        "requests": 24000,
+        "success": 19121,
+        "statuses": {
+          "200": 19121,
+          "429": 4879
+        },
+        "codes": {
+          "queue_full": 4879
+        },
+        "invalid": 0,
+        "wall_s": 300.1252191250678,
+        "tokens": 611872,
+        "tokens_s": 2038.7223765591702,
+        "texts_s": 63.71007426747407,
+        "p50_ms": 245.6349169369787,
+        "p95_ms": 387.4740831088275,
+        "scheduled_p95_ms": 389.2313751857728,
+        "dispatch_p95_ms": 6.816500099375844,
+        "scheduled": 24000,
+        "dropped": 0,
+        "arrival_window_s": 300.0,
+        "drain_s": 0.12521912506781518,
+        "offered_rps": 80.0,
+        "False-32": {
+          "requests": 12000,
+          "success": 9642,
+          "statuses": {
+            "200": 9642,
+            "429": 2358
+          },
+          "codes": {
+            "queue_full": 2358
+          },
+          "invalid": 0,
+          "wall_s": 300.1252191250678,
+          "tokens": 308544,
+          "tokens_s": 1028.0508945548622,
+          "texts_s": 32.126590454839445,
+          "p50_ms": 245.9327089600265,
+          "p95_ms": 391.88283402472734,
+          "scheduled_p95_ms": 393.31579208374023,
+          "dispatch_p95_ms": 6.9504170678555965
+        },
+        "True-32": {
+          "requests": 12000,
+          "success": 9479,
+          "statuses": {
+            "429": 2521,
+            "200": 9479
+          },
+          "codes": {
+            "queue_full": 2521
+          },
+          "invalid": 0,
+          "wall_s": 300.1252191250678,
+          "tokens": 303328,
+          "tokens_s": 1010.6714820043081,
+          "texts_s": 31.58348381263463,
+          "p50_ms": 245.41129195131361,
+          "p95_ms": 383.8245419319719,
+          "scheduled_p95_ms": 385.7852921355516,
+          "dispatch_p95_ms": 6.703958148136735
+        }
+      }
+    },
+    "server_logs": {
+      "requests": 24000,
+      "hits": 0,
+      "dedup": 0,
+      "status": {
+        "200": 19121,
+        "429": 4879
+      },
+      "max_wait_ms": 347
+    },
+    "resources": {
+      "samples": 147,
+      "peak_rss_mib": 440.734375,
+      "first_rss_mib": 377.4375,
+      "last_rss_mib": 440.734375,
+      "first_swap": "total = 1024.00M  used = 33.50M  free = 990.50M  (encrypted)",
+      "last_swap": "total = 1024.00M  used = 33.50M  free = 990.50M  (encrypted)",
+      "first_vm": {
+        "Mach Virtual Memory Statistics": "(page size of 16384 bytes)",
+        "Pages free": "14224",
+        "Pages active": "345106",
+        "Pages inactive": "342480",
+        "Pages speculative": "2024",
+        "Pages throttled": "0",
+        "Pages wired down": "109607",
+        "Pages purgeable": "8527",
+        "\"Translation faults\"": "1784090081",
+        "Pages copy-on-write": "147477829",
+        "Pages zero filled": "1142132445",
+        "Pages reactivated": "31191983",
+        "Pages purged": "5249063",
+        "File-backed pages": "221197",
+        "Anonymous pages": "468413",
+        "Pages stored in compressor": "462020",
+        "Pages occupied by compressor": "200717",
+        "Decompressions": "19479721",
+        "Compressions": "25809063",
+        "Pageins": "35510834",
+        "Pageouts": "626290",
+        "Swapins": "2056165",
+        "Swapouts": "2379636"
+      },
+      "last_vm": {
+        "Mach Virtual Memory Statistics": "(page size of 16384 bytes)",
+        "Pages free": "45863",
+        "Pages active": "303210",
+        "Pages inactive": "301004",
+        "Pages speculative": "3309",
+        "Pages throttled": "0",
+        "Pages wired down": "157350",
+        "Pages purgeable": "9761",
+        "\"Translation faults\"": "1785198099",
+        "Pages copy-on-write": "147614356",
+        "Pages zero filled": "1142579106",
+        "Pages reactivated": "31232899",
+        "Pages purged": "5259665",
+        "File-backed pages": "210799",
+        "Anonymous pages": "396724",
+        "Pages stored in compressor": "471380",
+        "Pages occupied by compressor": "202975",
+        "Decompressions": "19512350",
+        "Compressions": "25867883",
+        "Pageins": "35513041",
+        "Pageouts": "626465",
+        "Swapins": "2056165",
+        "Swapouts": "2379636"
+      }
+    },
+    "minute_windows": {
+      "0": {
+        "requests": 4788,
+        "success": 3668,
+        "statuses": {
+          "200": 3668,
+          "429": 1120
+        },
+        "codes": {
+          "queue_full": 1120
+        },
+        "invalid": 0,
+        "wall_s": 60,
+        "tokens": 117376,
+        "tokens_s": 1956.2666666666667,
+        "texts_s": 61.13333333333333,
+        "p50_ms": 263.4028340689838,
+        "p95_ms": 395.3588749282062,
+        "scheduled_p95_ms": 398.94525008276105,
+        "dispatch_p95_ms": 7.564000319689512
+      },
+      "1": {
+        "requests": 4797,
+        "success": 3960,
+        "statuses": {
+          "200": 3960,
+          "429": 837
+        },
+        "codes": {
+          "queue_full": 837
+        },
+        "invalid": 0,
+        "wall_s": 60,
+        "tokens": 126720,
+        "tokens_s": 2112.0,
+        "texts_s": 66.0,
+        "p50_ms": 224.15424999780953,
+        "p95_ms": 370.3554170206189,
+        "scheduled_p95_ms": 372.1134171355516,
+        "dispatch_p95_ms": 6.872792262583971
+      },
+      "2": {
+        "requests": 4803,
+        "success": 3856,
+        "statuses": {
+          "429": 947,
+          "200": 3856
+        },
+        "codes": {
+          "queue_full": 947
+        },
+        "invalid": 0,
+        "wall_s": 60,
+        "tokens": 123392,
+        "tokens_s": 2056.5333333333333,
+        "texts_s": 64.26666666666667,
+        "p50_ms": 240.81704206764698,
+        "p95_ms": 388.92649998888373,
+        "scheduled_p95_ms": 390.0658751372248,
+        "dispatch_p95_ms": 6.8086672108620405
+      },
+      "3": {
+        "requests": 4803,
+        "success": 3723,
+        "statuses": {
+          "200": 3723,
+          "429": 1080
+        },
+        "codes": {
+          "queue_full": 1080
+        },
+        "invalid": 0,
+        "wall_s": 60,
+        "tokens": 119136,
+        "tokens_s": 1985.6,
+        "texts_s": 62.05,
+        "p50_ms": 260.46358281746507,
+        "p95_ms": 399.4450829923153,
+        "scheduled_p95_ms": 400.7087501231581,
+        "dispatch_p95_ms": 6.193833192810416
+      },
+      "4": {
+        "requests": 4796,
+        "success": 3901,
+        "statuses": {
+          "200": 3901,
+          "429": 895
+        },
+        "codes": {
+          "queue_full": 895
+        },
+        "invalid": 0,
+        "wall_s": 60,
+        "tokens": 124832,
+        "tokens_s": 2080.5333333333333,
+        "texts_s": 65.01666666666667,
+        "p50_ms": 230.84025015123188,
+        "p95_ms": 382.5529171153903,
+        "scheduled_p95_ms": 383.78812512382865,
+        "dispatch_p95_ms": 6.737500196322799
+      },
+      "5": {
+        "requests": 13,
+        "success": 13,
+        "statuses": {
+          "200": 13
+        },
+        "codes": {},
+        "invalid": 0,
+        "wall_s": 60,
+        "tokens": 416,
+        "tokens_s": 6.933333333333334,
+        "texts_s": 0.21666666666666667,
+        "p50_ms": 157.8539169859141,
+        "p95_ms": 182.43641615845263,
+        "scheduled_p95_ms": 186.19770812802017,
+        "dispatch_p95_ms": 3.7612919695675373
+      }
+    },
+    "cohort_trends": {}
+  },
+  "soak": {
+    "summary": {
+      "mixed": {
+        "requests": 4050,
+        "success": 4050,
+        "statuses": {
+          "200": 4050
+        },
+        "codes": {},
+        "invalid": 0,
+        "wall_s": 1800.5271544998977,
+        "tokens": 5498112,
+        "tokens_s": 3053.6123747198462,
+        "texts_s": 7.314524508605931,
+        "p50_ms": 654.7955831047148,
+        "p95_ms": 1937.173708807677,
+        "scheduled_p95_ms": 1939.3834171351045,
+        "dispatch_p95_ms": 2.5021671317517757,
+        "scheduled": 4050,
+        "dropped": 0,
+        "arrival_window_s": 1800.0,
+        "drain_s": 0.5271544998977333,
+        "offered_rps": 2.25,
+        "False-32": {
+          "requests": 1624,
+          "success": 1624,
+          "statuses": {
+            "200": 1624
+          },
+          "codes": {},
+          "invalid": 0,
+          "wall_s": 1800.5271544998977,
+          "tokens": 51968,
+          "tokens_s": 28.862658288780032,
+          "texts_s": 0.901958071524376,
+          "p50_ms": 560.3774590417743,
+          "p95_ms": 1571.5336250141263,
+          "scheduled_p95_ms": 1575.2588750328869,
+          "dispatch_p95_ms": 2.426236402243376
+        },
+        "False-512": {
+          "requests": 305,
+          "success": 305,
+          "statuses": {
+            "200": 305
+          },
+          "codes": {},
+          "invalid": 0,
+          "wall_s": 1800.5271544998977,
+          "tokens": 2498560,
+          "tokens_s": 1387.6824871846952,
+          "texts_s": 2.710317357782608,
+          "p50_ms": 1857.785833068192,
+          "p95_ms": 2016.7130830232054,
+          "scheduled_p95_ms": 2018.3643756899983,
+          "dispatch_p95_ms": 2.496708184480667
+        },
+        "False-2048": {
+          "requests": 101,
+          "success": 101,
+          "statuses": {
+            "200": 101
+          },
+          "codes": {},
+          "invalid": 0,
+          "wall_s": 1800.5271544998977,
+          "tokens": 206848,
+          "tokens_s": 114.88191082430673,
+          "texts_s": 0.05609468301968102,
+          "p50_ms": 600.2303331624717,
+          "p95_ms": 627.204375108704,
+          "scheduled_p95_ms": 639.1282777767628,
+          "dispatch_p95_ms": 6.333708995953202
+        },
+        "True-32": {
+          "requests": 1616,
+          "success": 1616,
+          "statuses": {
+            "200": 1616
+          },
+          "codes": {},
+          "invalid": 0,
+          "wall_s": 1800.5271544998977,
+          "tokens": 51712,
+          "tokens_s": 28.720477706076682,
+          "texts_s": 0.8975149283148963,
+          "p50_ms": 559.0867500286549,
+          "p95_ms": 1574.7002500575036,
+          "scheduled_p95_ms": 1575.5612363573164,
+          "dispatch_p95_ms": 2.5039303582161665
+        },
+        "True-512": {
+          "requests": 303,
+          "success": 303,
+          "statuses": {
+            "200": 303
+          },
+          "codes": {},
+          "invalid": 0,
+          "wall_s": 1800.5271544998977,
+          "tokens": 2482176,
+          "tokens_s": 1378.5829298916808,
+          "texts_s": 2.692544784944689,
+          "p50_ms": 1857.1915000211447,
+          "p95_ms": 2018.6948329210281,
+          "scheduled_p95_ms": 2020.8733894396573,
+          "dispatch_p95_ms": 2.4907500483095646
+        },
+        "True-2048": {
+          "requests": 101,
+          "success": 101,
+          "statuses": {
+            "200": 101
+          },
+          "codes": {},
+          "invalid": 0,
+          "wall_s": 1800.5271544998977,
+          "tokens": 206848,
+          "tokens_s": 114.88191082430673,
+          "texts_s": 0.05609468301968102,
+          "p50_ms": 600.7408748846501,
+          "p95_ms": 629.8735421150923,
+          "scheduled_p95_ms": 632.2069447487593,
+          "dispatch_p95_ms": 2.458041999489069
+        }
+      }
+    },
+    "server_logs": {
+      "requests": 4050,
+      "hits": 0,
+      "dedup": 0,
+      "status": {
+        "200": 4050
+      },
+      "max_wait_ms": 1671
+    },
+    "resources": {
+      "samples": 871,
+      "peak_rss_mib": 521.96875,
+      "first_rss_mib": 488.671875,
+      "last_rss_mib": 366.796875,
+      "first_swap": "total = 1024.00M  used = 33.50M  free = 990.50M  (encrypted)",
+      "last_swap": "total = 1024.00M  used = 33.50M  free = 990.50M  (encrypted)",
+      "first_vm": {
+        "Mach Virtual Memory Statistics": "(page size of 16384 bytes)",
+        "Pages free": "16160",
+        "Pages active": "348121",
+        "Pages inactive": "345506",
+        "Pages speculative": "1699",
+        "Pages throttled": "0",
+        "Pages wired down": "114859",
+        "Pages purgeable": "7449",
+        "\"Translation faults\"": "1788454409",
+        "Pages copy-on-write": "148102925",
+        "Pages zero filled": "1148168506",
+        "Pages reactivated": "31256407",
+        "Pages purged": "5286409",
+        "File-backed pages": "215371",
+        "Anonymous pages": "479955",
+        "Pages stored in compressor": "436780",
+        "Pages occupied by compressor": "187564",
+        "Decompressions": "19537073",
+        "Compressions": "25871506",
+        "Pageins": "35519890",
+        "Pageouts": "626579",
+        "Swapins": "2056165",
+        "Swapouts": "2379636"
+      },
+      "last_vm": {
+        "Mach Virtual Memory Statistics": "(page size of 16384 bytes)",
+        "Pages free": "9419",
+        "Pages active": "300512",
+        "Pages inactive": "268800",
+        "Pages speculative": "31921",
+        "Pages throttled": "0",
+        "Pages wired down": "168764",
+        "Pages purgeable": "2717",
+        "\"Translation faults\"": "1795266595",
+        "Pages copy-on-write": "148969139",
+        "Pages zero filled": "1156930046",
+        "Pages reactivated": "31440344",
+        "Pages purged": "5361691",
+        "File-backed pages": "257066",
+        "Anonymous pages": "344167",
+        "Pages stored in compressor": "545258",
+        "Pages occupied by compressor": "234533",
+        "Decompressions": "19617645",
+        "Compressions": "26062192",
+        "Pageins": "35609228",
+        "Pageouts": "627310",
+        "Swapins": "2056165",
+        "Swapouts": "2379636"
+      }
+    },
+    "minute_windows": {
+      "0": {
+        "requests": 134,
+        "success": 134,
+        "statuses": {
+          "200": 134
+        },
+        "codes": {},
+        "invalid": 0,
+        "wall_s": 60,
+        "tokens": 179584,
+        "tokens_s": 2993.0666666666666,
+        "texts_s": 7.233333333333333,
+        "p50_ms": 606.4262080471963,
+        "p95_ms": 1832.4434999376535,
+        "scheduled_p95_ms": 1834.7817081958055,
+        "dispatch_p95_ms": 4.705972271040082
+      },
+      "1": {
+        "requests": 133,
+        "success": 133,
+        "statuses": {
+          "200": 133
+        },
+        "codes": {},
+        "invalid": 0,
+        "wall_s": 60,
+        "tokens": 181568,
+        "tokens_s": 3026.133333333333,
+        "texts_s": 7.216666666666667,
+        "p50_ms": 659.7963329404593,
+        "p95_ms": 1945.8005419000983,
+        "scheduled_p95_ms": 1948.0222228448838,
+        "dispatch_p95_ms": 3.1251946929842234
+      },
+      "2": {
+        "requests": 138,
+        "success": 138,
+        "statuses": {
+          "200": 138
+        },
+        "codes": {},
+        "invalid": 0,
+        "wall_s": 60,
+        "tokens": 189888,
+        "tokens_s": 3164.8,
+        "texts_s": 7.55,
+        "p50_ms": 667.7643328439444,
+        "p95_ms": 1954.184167087078,
+        "scheduled_p95_ms": 1955.9333475772291,
+        "dispatch_p95_ms": 12.6985979732126
+      },
+      "3": {
+        "requests": 134,
+        "success": 134,
+        "statuses": {
+          "200": 134
+        },
+        "codes": {},
+        "invalid": 0,
+        "wall_s": 60,
+        "tokens": 179584,
+        "tokens_s": 2993.0666666666666,
+        "texts_s": 7.233333333333333,
+        "p50_ms": 608.7866250891238,
+        "p95_ms": 1851.844625081867,
+        "scheduled_p95_ms": 1854.8750700429082,
+        "dispatch_p95_ms": 27.008208679035306
+      },
+      "4": {
+        "requests": 135,
+        "success": 135,
+        "statuses": {
+          "200": 135
+        },
+        "codes": {},
+        "invalid": 0,
+        "wall_s": 60,
+        "tokens": 181632,
+        "tokens_s": 3027.2,
+        "texts_s": 7.25,
+        "p50_ms": 626.9957500044256,
+        "p95_ms": 1952.7990829665214,
+        "scheduled_p95_ms": 1971.751417266205,
+        "dispatch_p95_ms": 34.63518084026873
+      },
+      "5": {
+        "requests": 133,
+        "success": 133,
+        "statuses": {
+          "200": 133
+        },
+        "codes": {},
+        "invalid": 0,
+        "wall_s": 60,
+        "tokens": 181568,
+        "tokens_s": 3026.133333333333,
+        "texts_s": 7.216666666666667,
+        "p50_ms": 685.723542002961,
+        "p95_ms": 1972.4313328042626,
+        "scheduled_p95_ms": 1974.6616808697581,
+        "dispatch_p95_ms": 2.4108891375362873
+      },
+      "6": {
+        "requests": 138,
+        "success": 138,
+        "statuses": {
+          "200": 138
+        },
+        "codes": {},
+        "invalid": 0,
+        "wall_s": 60,
+        "tokens": 189888,
+        "tokens_s": 3164.8,
+        "texts_s": 7.55,
+        "p50_ms": 697.2062499262393,
+        "p95_ms": 1981.6734578926116,
+        "scheduled_p95_ms": 1984.0169588569552,
+        "dispatch_p95_ms": 2.4147366639226675
+      },
+      "7": {
+        "requests": 134,
+        "success": 134,
+        "statuses": {
+          "200": 134
+        },
+        "codes": {},
+        "invalid": 0,
+        "wall_s": 60,
+        "tokens": 179584,
+        "tokens_s": 2993.0666666666666,
+        "texts_s": 7.233333333333333,
+        "p50_ms": 598.2881670352072,
+        "p95_ms": 1862.6454160548747,
+        "scheduled_p95_ms": 1864.9829167407006,
+        "dispatch_p95_ms": 2.4132507387548685
+      },
+      "8": {
+        "requests": 135,
+        "success": 135,
+        "statuses": {
+          "200": 135
+        },
+        "codes": {},
+        "invalid": 0,
+        "wall_s": 60,
+        "tokens": 181632,
+        "tokens_s": 3027.2,
+        "texts_s": 7.25,
+        "p50_ms": 618.4349581599236,
+        "p95_ms": 1968.1375829968601,
+        "scheduled_p95_ms": 1970.4905417747796,
+        "dispatch_p95_ms": 6.351708900183439
+      },
+      "9": {
+        "requests": 133,
+        "success": 133,
+        "statuses": {
+          "200": 133
+        },
+        "codes": {},
+        "invalid": 0,
+        "wall_s": 60,
+        "tokens": 181568,
+        "tokens_s": 3026.133333333333,
+        "texts_s": 7.216666666666667,
+        "p50_ms": 700.2463331446052,
+        "p95_ms": 1982.9112079460174,
+        "scheduled_p95_ms": 1985.1419443730265,
+        "dispatch_p95_ms": 19.372374983504415
+      },
+      "10": {
+        "requests": 138,
+        "success": 138,
+        "statuses": {
+          "200": 138
+        },
+        "codes": {},
+        "invalid": 0,
+        "wall_s": 60,
+        "tokens": 189888,
+        "tokens_s": 3164.8,
+        "texts_s": 7.55,
+        "p50_ms": 692.0124581083655,
+        "p95_ms": 1983.9975000359118,
+        "scheduled_p95_ms": 1986.2903472967446,
+        "dispatch_p95_ms": 36.88370902091265
+      },
+      "11": {
+        "requests": 134,
+        "success": 134,
+        "statuses": {
+          "200": 134
+        },
+        "codes": {},
+        "invalid": 0,
+        "wall_s": 60,
+        "tokens": 179584,
+        "tokens_s": 2993.0666666666666,
+        "texts_s": 7.233333333333333,
+        "p50_ms": 628.0854160431772,
+        "p95_ms": 1870.4091249965131,
+        "scheduled_p95_ms": 1918.6144166160375,
+        "dispatch_p95_ms": 2.627847483381629
+      },
+      "12": {
+        "requests": 135,
+        "success": 135,
+        "statuses": {
+          "200": 135
+        },
+        "codes": {},
+        "invalid": 0,
+        "wall_s": 60,
+        "tokens": 181632,
+        "tokens_s": 3027.2,
+        "texts_s": 7.25,
+        "p50_ms": 668.7157501000911,
+        "p95_ms": 1992.2404170501977,
+        "scheduled_p95_ms": 1994.5099169854075,
+        "dispatch_p95_ms": 2.5809723883867264
+      },
+      "13": {
+        "requests": 133,
+        "success": 133,
+        "statuses": {
+          "200": 133
+        },
+        "codes": {},
+        "invalid": 0,
+        "wall_s": 60,
+        "tokens": 181568,
+        "tokens_s": 3026.133333333333,
+        "texts_s": 7.216666666666667,
+        "p50_ms": 686.6515839938074,
+        "p95_ms": 1987.8915001172572,
+        "scheduled_p95_ms": 1989.1505697742105,
+        "dispatch_p95_ms": 24.662138894200325
+      },
+      "14": {
+        "requests": 138,
+        "success": 138,
+        "statuses": {
+          "200": 138
+        },
+        "codes": {},
+        "invalid": 0,
+        "wall_s": 60,
+        "tokens": 189888,
+        "tokens_s": 3164.8,
+        "texts_s": 7.55,
+        "p50_ms": 704.5100419782102,
+        "p95_ms": 1990.0353339035064,
+        "scheduled_p95_ms": 1991.350639378652,
+        "dispatch_p95_ms": 15.223652822896838
+      },
+      "15": {
+        "requests": 134,
+        "success": 134,
+        "statuses": {
+          "200": 134
+        },
+        "codes": {},
+        "invalid": 0,
+        "wall_s": 60,
+        "tokens": 179584,
+        "tokens_s": 2993.0666666666666,
+        "texts_s": 7.233333333333333,
+        "p50_ms": 621.3419171981514,
+        "p95_ms": 1875.4710420034826,
+        "scheduled_p95_ms": 1876.785597531125,
+        "dispatch_p95_ms": 1.5952917747199535
+      },
+      "16": {
+        "requests": 135,
+        "success": 135,
+        "statuses": {
+          "200": 135
+        },
+        "codes": {},
+        "invalid": 0,
+        "wall_s": 60,
+        "tokens": 181632,
+        "tokens_s": 3027.2,
+        "texts_s": 7.25,
+        "p50_ms": 624.0878750104457,
+        "p95_ms": 1988.1960831116885,
+        "scheduled_p95_ms": 1989.6059860475361,
+        "dispatch_p95_ms": 3.812625305727124
+      },
+      "17": {
+        "requests": 133,
+        "success": 133,
+        "statuses": {
+          "200": 133
+        },
+        "codes": {},
+        "invalid": 0,
+        "wall_s": 60,
+        "tokens": 181568,
+        "tokens_s": 3026.133333333333,
+        "texts_s": 7.216666666666667,
+        "p50_ms": 711.1527498345822,
+        "p95_ms": 1996.6804161667824,
+        "scheduled_p95_ms": 1998.0636390391737,
+        "dispatch_p95_ms": 3.407500684261322
+      },
+      "18": {
+        "requests": 138,
+        "success": 138,
+        "statuses": {
+          "200": 138
+        },
+        "codes": {},
+        "invalid": 0,
+        "wall_s": 60,
+        "tokens": 189888,
+        "tokens_s": 3164.8,
+        "texts_s": 7.55,
+        "p50_ms": 712.7334999386221,
+        "p95_ms": 1987.471125088632,
+        "scheduled_p95_ms": 1988.8425837270916,
+        "dispatch_p95_ms": 3.6822364199906588
+      },
+      "19": {
+        "requests": 134,
+        "success": 134,
+        "statuses": {
+          "200": 134
+        },
+        "codes": {},
+        "invalid": 0,
+        "wall_s": 60,
+        "tokens": 179584,
+        "tokens_s": 2993.0666666666666,
+        "texts_s": 7.233333333333333,
+        "p50_ms": 601.9067498855293,
+        "p95_ms": 1881.809666985646,
+        "scheduled_p95_ms": 1883.1547920126468,
+        "dispatch_p95_ms": 1.5810143668204546
+      },
+      "20": {
+        "requests": 135,
+        "success": 135,
+        "statuses": {
+          "200": 135
+        },
+        "codes": {},
+        "invalid": 0,
+        "wall_s": 60,
+        "tokens": 181632,
+        "tokens_s": 3027.2,
+        "texts_s": 7.25,
+        "p50_ms": 617.763957940042,
+        "p95_ms": 1999.309916049242,
+        "scheduled_p95_ms": 2000.5332499276847,
+        "dispatch_p95_ms": 1.5328333247452974
+      },
+      "21": {
+        "requests": 133,
+        "success": 133,
+        "statuses": {
+          "200": 133
+        },
+        "codes": {},
+        "invalid": 0,
+        "wall_s": 60,
+        "tokens": 181568,
+        "tokens_s": 3026.133333333333,
+        "texts_s": 7.216666666666667,
+        "p50_ms": 718.2330000214279,
+        "p95_ms": 2002.2995001636446,
+        "scheduled_p95_ms": 2003.5095000639558,
+        "dispatch_p95_ms": 1.6158749349415302
+      },
+      "22": {
+        "requests": 138,
+        "success": 138,
+        "statuses": {
+          "200": 138
+        },
+        "codes": {},
+        "invalid": 0,
+        "wall_s": 60,
+        "tokens": 189888,
+        "tokens_s": 3164.8,
+        "texts_s": 7.55,
+        "p50_ms": 717.1833750326186,
+        "p95_ms": 1994.9165000580251,
+        "scheduled_p95_ms": 1997.5024310406297,
+        "dispatch_p95_ms": 1.52675062417984
+      },
+      "23": {
+        "requests": 134,
+        "success": 134,
+        "statuses": {
+          "200": 134
+        },
+        "codes": {},
+        "invalid": 0,
+        "wall_s": 60,
+        "tokens": 179584,
+        "tokens_s": 2993.0666666666666,
+        "texts_s": 7.233333333333333,
+        "p50_ms": 617.4947498366237,
+        "p95_ms": 1900.9904169943184,
+        "scheduled_p95_ms": 1902.2750006988645,
+        "dispatch_p95_ms": 1.5826534945517778
+      },
+      "24": {
+        "requests": 135,
+        "success": 135,
+        "statuses": {
+          "200": 135
+        },
+        "codes": {},
+        "invalid": 0,
+        "wall_s": 60,
+        "tokens": 181632,
+        "tokens_s": 3027.2,
+        "texts_s": 7.25,
+        "p50_ms": 730.5417919997126,
+        "p95_ms": 2050.887041958049,
+        "scheduled_p95_ms": 2052.0679864566773,
+        "dispatch_p95_ms": 1.6062776558101177
+      },
+      "25": {
+        "requests": 133,
+        "success": 133,
+        "statuses": {
+          "200": 133
+        },
+        "codes": {},
+        "invalid": 0,
+        "wall_s": 60,
+        "tokens": 181568,
+        "tokens_s": 3026.133333333333,
+        "texts_s": 7.216666666666667,
+        "p50_ms": 682.0517498999834,
+        "p95_ms": 1969.437874853611,
+        "scheduled_p95_ms": 1970.649653347209,
+        "dispatch_p95_ms": 1.5234311576932669
+      },
+      "26": {
+        "requests": 138,
+        "success": 138,
+        "statuses": {
+          "200": 138
+        },
+        "codes": {},
+        "invalid": 0,
+        "wall_s": 60,
+        "tokens": 189888,
+        "tokens_s": 3164.8,
+        "texts_s": 7.55,
+        "p50_ms": 683.12954204157,
+        "p95_ms": 1969.0497079864144,
+        "scheduled_p95_ms": 1970.2731946017593,
+        "dispatch_p95_ms": 1.524027669802308
+      },
+      "27": {
+        "requests": 134,
+        "success": 134,
+        "statuses": {
+          "200": 134
+        },
+        "codes": {},
+        "invalid": 0,
+        "wall_s": 60,
+        "tokens": 179584,
+        "tokens_s": 2993.0666666666666,
+        "texts_s": 7.233333333333333,
+        "p50_ms": 604.8800840508193,
+        "p95_ms": 1902.3678749799728,
+        "scheduled_p95_ms": 1903.7507364992052,
+        "dispatch_p95_ms": 1.5264030080288649
+      },
+      "28": {
+        "requests": 135,
+        "success": 135,
+        "statuses": {
+          "200": 135
+        },
+        "codes": {},
+        "invalid": 0,
+        "wall_s": 60,
+        "tokens": 181632,
+        "tokens_s": 3027.2,
+        "texts_s": 7.25,
+        "p50_ms": 629.1742089670151,
+        "p95_ms": 1956.9012499414384,
+        "scheduled_p95_ms": 1968.2228474412113,
+        "dispatch_p95_ms": 1.5151251573115587
+      },
+      "29": {
+        "requests": 133,
+        "success": 133,
+        "statuses": {
+          "200": 133
+        },
+        "codes": {},
+        "invalid": 0,
+        "wall_s": 60,
+        "tokens": 181568,
+        "tokens_s": 3026.133333333333,
+        "texts_s": 7.216666666666667,
+        "p50_ms": 676.5429999213666,
+        "p95_ms": 1961.1019999720156,
+        "scheduled_p95_ms": 1962.3308891896158,
+        "dispatch_p95_ms": 1.5653751324862242
+      },
+      "30": {
+        "requests": 3,
+        "success": 3,
+        "statuses": {
+          "200": 3
+        },
+        "codes": {},
+        "invalid": 0,
+        "wall_s": 60,
+        "tokens": 8256,
+        "tokens_s": 137.6,
+        "texts_s": 0.3,
+        "p50_ms": 1411.516334163025,
+        "p95_ms": 1826.6863329336047,
+        "scheduled_p95_ms": 1828.051958233118,
+        "dispatch_p95_ms": 1.3659445103257895
+      }
+    },
+    "cohort_trends": {
+      "False-32": {
+        "stable_10_20_min": {
+          "requests": 544,
+          "success": 544,
+          "statuses": {
+            "200": 544
+          },
+          "codes": {},
+          "invalid": 0,
+          "wall_s": 600,
+          "tokens": 17408,
+          "tokens_s": 29.013333333333332,
+          "texts_s": 0.9066666666666666,
+          "p50_ms": 564.0984999481589,
+          "p95_ms": 1593.771249987185,
+          "scheduled_p95_ms": 1597.5123753305525,
+          "dispatch_p95_ms": 3.6822364199906588
+        },
+        "last_10_min": {
+          "requests": 535,
+          "success": 535,
+          "statuses": {
+            "200": 535
+          },
+          "codes": {},
+          "invalid": 0,
+          "wall_s": 600,
+          "tokens": 17120,
+          "tokens_s": 28.533333333333335,
+          "texts_s": 0.8916666666666667,
+          "p50_ms": 563.6589170899242,
+          "p95_ms": 1579.9709998536855,
+          "scheduled_p95_ms": 1581.2604443635792,
+          "dispatch_p95_ms": 1.4821114018559456
+        }
+      },
+      "False-512": {
+        "stable_10_20_min": {
+          "requests": 102,
+          "success": 102,
+          "statuses": {
+            "200": 102
+          },
+          "codes": {},
+          "invalid": 0,
+          "wall_s": 600,
+          "tokens": 835584,
+          "tokens_s": 1392.64,
+          "texts_s": 2.72,
+          "p50_ms": 1861.842333106324,
+          "p95_ms": 2016.7130830232054,
+          "scheduled_p95_ms": 2017.9348473902792,
+          "dispatch_p95_ms": 2.378306118771434
+        },
+        "last_10_min": {
+          "requests": 101,
+          "success": 101,
+          "statuses": {
+            "200": 101
+          },
+          "codes": {},
+          "invalid": 0,
+          "wall_s": 600,
+          "tokens": 827392,
+          "tokens_s": 1378.9866666666667,
+          "texts_s": 2.6933333333333334,
+          "p50_ms": 1865.7072498463094,
+          "p95_ms": 2050.887041958049,
+          "scheduled_p95_ms": 2052.0679864566773,
+          "dispatch_p95_ms": 1.5997507143765688
+        }
+      },
+      "False-2048": {
+        "stable_10_20_min": {
+          "requests": 33,
+          "success": 33,
+          "statuses": {
+            "200": 33
+          },
+          "codes": {},
+          "invalid": 0,
+          "wall_s": 600,
+          "tokens": 67584,
+          "tokens_s": 112.64,
+          "texts_s": 0.055,
+          "p50_ms": 600.2303331624717,
+          "p95_ms": 635.1485410705209,
+          "scheduled_p95_ms": 642.518250271678,
+          "dispatch_p95_ms": 51.19345826096833
+        },
+        "last_10_min": {
+          "requests": 33,
+          "success": 33,
+          "statuses": {
+            "200": 33
+          },
+          "codes": {},
+          "invalid": 0,
+          "wall_s": 600,
+          "tokens": 67584,
+          "tokens_s": 112.64,
+          "texts_s": 0.055,
+          "p50_ms": 601.755749899894,
+          "p95_ms": 646.0375830065459,
+          "scheduled_p95_ms": 647.3320554941893,
+          "dispatch_p95_ms": 1.699305372312665
+        }
+      },
+      "True-32": {
+        "stable_10_20_min": {
+          "requests": 538,
+          "success": 538,
+          "statuses": {
+            "200": 538
+          },
+          "codes": {},
+          "invalid": 0,
+          "wall_s": 600,
+          "tokens": 17216,
+          "tokens_s": 28.69333333333333,
+          "texts_s": 0.8966666666666666,
+          "p50_ms": 565.4427919071168,
+          "p95_ms": 1594.1300000995398,
+          "scheduled_p95_ms": 1597.2819167654961,
+          "dispatch_p95_ms": 6.53140340000391
+        },
+        "last_10_min": {
+          "requests": 544,
+          "success": 544,
+          "statuses": {
+            "200": 544
+          },
+          "codes": {},
+          "invalid": 0,
+          "wall_s": 600,
+          "tokens": 17408,
+          "tokens_s": 29.013333333333332,
+          "texts_s": 0.9066666666666666,
+          "p50_ms": 562.1135418768972,
+          "p95_ms": 1572.7231251075864,
+          "scheduled_p95_ms": 1573.9860562607646,
+          "dispatch_p95_ms": 1.5440694987773895
+        }
+      },
+      "True-512": {
+        "stable_10_20_min": {
+          "requests": 101,
+          "success": 101,
+          "statuses": {
+            "200": 101
+          },
+          "codes": {},
+          "invalid": 0,
+          "wall_s": 600,
+          "tokens": 827392,
+          "tokens_s": 1378.9866666666667,
+          "texts_s": 2.6933333333333334,
+          "p50_ms": 1861.285749822855,
+          "p95_ms": 2027.9161669313908,
+          "scheduled_p95_ms": 2029.1339587420225,
+          "dispatch_p95_ms": 2.502389485016465
+        },
+        "last_10_min": {
+          "requests": 102,
+          "success": 102,
+          "statuses": {
+            "200": 102
+          },
+          "codes": {},
+          "invalid": 0,
+          "wall_s": 600,
+          "tokens": 835584,
+          "tokens_s": 1392.64,
+          "texts_s": 2.72,
+          "p50_ms": 1860.9617920592427,
+          "p95_ms": 2019.7238340042531,
+          "scheduled_p95_ms": 2020.8733894396573,
+          "dispatch_p95_ms": 1.5205696690827608
+        }
+      },
+      "True-2048": {
+        "stable_10_20_min": {
+          "requests": 34,
+          "success": 34,
+          "statuses": {
+            "200": 34
+          },
+          "codes": {},
+          "invalid": 0,
+          "wall_s": 600,
+          "tokens": 69632,
+          "tokens_s": 116.05333333333333,
+          "texts_s": 0.056666666666666664,
+          "p50_ms": 599.9853748362511,
+          "p95_ms": 629.8735421150923,
+          "scheduled_p95_ms": 632.2069447487593,
+          "dispatch_p95_ms": 13.669527601450682
+        },
+        "last_10_min": {
+          "requests": 34,
+          "success": 34,
+          "statuses": {
+            "200": 34
+          },
+          "codes": {},
+          "invalid": 0,
+          "wall_s": 600,
+          "tokens": 69632,
+          "tokens_s": 116.05333333333333,
+          "texts_s": 0.056666666666666664,
+          "p50_ms": 601.2285421602428,
+          "p95_ms": 647.5355420261621,
+          "scheduled_p95_ms": 648.7348615191877,
+          "dispatch_p95_ms": 1.6428062226623297
+        }
+      }
+    }
+  }
+}

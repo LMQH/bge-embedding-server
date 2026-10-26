@@ -33,22 +33,4 @@ git -C src/vendor/mlx fetch --depth 1 origin 36969c094354086e15d2a327a9c50feb20b
 git -C src/vendor/mlx checkout --detach 36969c094354086e15d2a327a9c50feb20b9cf11
 ```
 
-此流程按提交号恢复内容，检出后为 detached HEAD。不要用未经核对的 `git pull` 替代版本记录；有意更新上游后应同步此记录，并重新验证实际使用的运行时。
-
-根 `.gitignore` 忽略该本地克隆。当前不是 submodule；在新机器上仅获取父项目文件不会自动带下 MLX 源码，需要执行上述获取步骤。
-
-## 阅读上游源码的入口
-
-以下路径均相对于 `src/vendor/mlx/`：
-
-| 路径 | 内容 |
-| --- | --- |
-| `README.md` | 框架介绍、安装及文档入口 |
-| `mlx/` | C++ 核心实现 |
-| `mlx/backend/metal/` | Apple GPU 的 Metal 后端 |
-| `python/src/` | Python 绑定 |
-| `python/mlx/` | Python 层，包括神经网络与优化器等 |
-| `docs/src/install.rst` | 与此提交配套的安装及构建说明 |
-| `CMakeLists.txt`、`setup.py`、`pyproject.toml` | C++ 与 Python 构建入口 |
-
-构建或安装前，先确定项目 conda 环境与运行依赖方式，再按对应版本的说明执行。上游测试与本项目的 BGE-M3、API 验收测试分开维护。
+检出后为 detached HEAD；更新上游须同步本记录并重新验证运行时。根 `.gitignore` 忽略该克隆，也不是 submodule，新机器需单独获取。

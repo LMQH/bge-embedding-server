@@ -2,21 +2,15 @@
 
 更新日期：2026-10-26。本文记录当前版本（同一台 Mac mini M4 16GB，dense + sparse 双路输出、FP16 + 批内合批 + 跨请求微合批）的能力边界，用于技术评估、接入决策与容量规划。
 
-2026-10-23 已实施并部署 O1（请求日志观测）、O2（请求内去重）、O4（429 `Retry-After`），见 [SPEC-0004](../specs/0004-request-observability-and-dedup.md) / [PLAN-0010](../plans/0010-request-optimizations.md)；同一日实现单 worker 批内真合批，见 [SPEC-0001](../specs/0001-embedding-inference.md) / [PLAN-0011](../plans/0011-batch-inference.md)；FP16 attention 与跨请求微合批见 [PLAN-0012](../plans/0012-inference-optimizations.md) / [ADR-0008](../adr/0008-cross-request-micro-batching.md)。经用户确认，上述能力均已随 2026-10-23 的部署上线 M4 线上。下列条目已按当前版本更新。
+当前实现含请求日志、请求内去重、429 `Retry-After`（[SPEC-0004](../specs/0004-request-observability-and-dedup.md)）、批内合批（[PLAN-0011](../plans/0011-batch-inference.md)）、FP16 与跨请求微合批（[PLAN-0012](../plans/0012-inference-optimizations.md)、[ADR-0008](../adr/0008-cross-request-micro-batching.md)）。下列条目按当前版本描述。
 
-本文是**快照与分析**，不是服务承诺，也不替代行为契约；与 [SPEC-0001](../specs/0001-embedding-inference.md)、[SPEC-0002](../specs/0002-dense-sparse-output.md)、[SPEC-0003](../specs/0003-result-cache.md) 冲突时以 Spec 为准。面向使用者的“适合 / 不负责”概览见 [README](../../README.md) 的适用场景与边界。
-
-## 阅读方式
-
-每条局限标注一种类型：
+本文是快照与分析，不是承诺；与 Spec 冲突时以 Spec 为准。每条标注类型：
 
 | 类型 | 含义 |
 | --- | --- |
 | **取舍** | 为换取单机可预测性、隐私边界或实现简单而有意放弃的能力；短期不计划改变 |
 | **缺口** | 当前实现没有、接入后大概率会遇到的能力或防护 |
 | **未验证** | 没有测试或观测证据，不能对外承诺；获得证据后应更新本文 |
-
-事实依据为 Spec、代码与 Plan；推算值单独标注。本文不重复 PRD 的需求背景，也不把“未验证”写成“已失败”。
 
 ## 一、模型能力层
 
@@ -117,7 +111,7 @@ sparse 为 `ReLU(W·h + b)` 的逐位置权重，同一 token 取最大权重，
 
 ### L-22 验证范围未覆盖故障、长稳与部分部署路径【未验证】
 
-已完成的验证以基本冒烟、定向回归与性能观测为主；未做故障注入、30 秒排队超时实测、soak、整机重启或重新登录；同一台 M4 已完成部署与真实 HTTP 冒烟，当前版本证据见 [PLAN-0013](../plans/0013-milvus-sparse-format.md)。性能证据包括旧版同机 HTTP 单请求 / 并发、模型级批量与 10 分钟连续推理，以及优化后的进程内 ASGI / 回环 HTTP 测量；不能将不同版本与口径拼成当前版本统一基线，也不能外推到真实业务负载。因此当前不承诺容量、吞吐、可用性或恢复时间。详见 [HANDOFF](../../HANDOFF.md) 的当前验证范围与各 Plan。
+v1.1.0 已在 M4 完成真实 HTTP 补测：基线、阶梯、30 分钟持续、过载与 30 秒排队超时、取消、SIGTERM / SIGKILL 恢复，见 [PLAN-0015](../plans/0015-production-service-validation.md)。未覆盖能耗、Metal 峰值、整机重启 / 登录、跨主机客户端；P95 目标与 RTO 未定义，因此不承诺容量、吞吐、可用性或恢复时间。
 
 ## 影响排序与候选方向
 
@@ -133,7 +127,7 @@ sparse 为 `ReLU(W·h + b)` 的逐位置权重，同一 token 取最大权重，
 
 ## 维护方式
 
-- 本文是 2026-10-22 的快照。Spec、实现或部署变化后同步更新对应条目，并在 [HANDOFF](../../HANDOFF.md) 记一行摘要。
+- 本文是 2026-10-26 的快照。Spec、实现或部署变化后同步更新对应条目，并在 [HANDOFF](../../HANDOFF.md) 记一行摘要。
 - 新增条目先判定类型：有意设计的写“取舍”，实现缺失写“缺口”，没有证据的写“未验证”。获得证据后改写事实或删除，不把未验证项长期混在结论里。
 - 本文不用于对外承诺 SLA、容量或检索效果；面向使用者的承诺口径以 Spec 与 README 为准。
 
